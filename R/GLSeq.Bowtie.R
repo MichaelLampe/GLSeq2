@@ -2,26 +2,27 @@ source("GLSeq.Util.R")
 setwd(dest.dir)
 # copy genome indices to the destimation dir: 
 ref.dir <- paste(base.dir, rGenome, sep="")
-indCopy <- paste("cd ", ref.dir, " && cp * ", dest.dir, sep="")
+indCopy <- paste("cd ", ref.dir, " && cp ",refFASTAname," ",dest.dir, sep="")
 system(indCopy)
 #
 comm.stack.pool <- NULL # 
+####################
+# Index the Bowtie or Bowtie2 Aligner
 #
-# Argument the form:
+#Argument the form:
 # Prepare reference, what aligner to use, what reference to use, file name
 #
-#-f means FASTA input, --seed indicates random number generator seed will stay constant.
-IndexOptions <- paste("-f","--seed 0")
-# --sam gives a sam file output, -t gives time information for the process.
-BowtieOptions <- paste("-S","-t","-q")
-Bowtie2Options <- paste ("-t")
+#-f means FASTA input
+####################
+IndexOptions <- paste("-f")
 if (qAlgor == "Bowtie"){
   index <- paste("bowtie-build",IndexOptions,refFASTAname,rGenome)
 }
 if (qAlgor == "Bowtie2"){
   index <- paste("bowtie2-build",IndexOptions,refFASTAname,rGenome)
 }
-comm.stack.pool <- paste(index)
+system(index)
+#
 for (zz in 1:nStreams) {
   # assembly and runing the system command, one library at a time:
   for (i in rangelist[[zz]]) {
@@ -33,50 +34,56 @@ for (zz in 1:nStreams) {
     if (paired.end) fq.right <- fqfiles.table[i,2]
     this.library <- substr(fqfiles.table[i,1], 1,libNchar)
     this.resName <- paste(this.library, text.add, sep=".")
-    unsorted.sam <- paste(this.resName, "unsorted.sam", sep=".")
+    countable.sam <- paste(this.resName, "countable.sam", sep=".")
     ###################
     # Alignment
     ###################
+    # --sam gives a sam file output, -t gives time information for the process.
+    # --chunkmbs may fix paired end read problems skipping reads due to memory exhaustion
+    # Default for chunkmbs = 64, 512 is 8x larger.  No known problems created by this option.
+    ###################
     if (qAlgor == "Bowtie"){
+      BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
       if (paired.end){
-        align <- paste("bowtie",BowtieOptions,rGenome,"-1",fq.left,"-2",fq.right,unsorted.sam)
+        align <- paste("bowtie",BowtieOptions,rGenome,"-1",fq.left,"-2",fq.right,countable.sam)
       }else{
-        align <- paste("bowtie",BowtieOptions,rGenome,fq.left,unsorted.sam)
+        align <- paste("bowtie",BowtieOptions,rGenome,fq.left,countable.sam)
       }
     }
+    ###################
+    # Might need to change a few things in Bowtie2
+    # It gets hung soemtimes, though I'm not sure 
+    # if it is the same issue as in the Bowtie algo
+    ###################
     if (qAlgor == "Bowtie2"){
+      Bowtie2Options <- paste ("-t","-q")
       if (paired.end){
-        align <- paste("bowtie2","-fr",Bowtie2Options,rGenome,"-U","-1",fq.left,"-2",fq.right,"-S",unsorted.sam)
+        align <- paste("bowtie2","-fr",Bowtie2Options,rGenome,"-1",fq.left,"-2",fq.right,"-S",countable.sam)
       }else{
-        align <- paste("bowtie2",Bowtie2Options,rGenome,"-U",fq.left,"-S",unsorted.sam)
+        align <- paste("bowtie2",Bowtie2Options,rGenome,"-U",fq.left,"-S",countable.sam)
       }
     }
     ###################
     # Counting Step
     ###################
     #
-    # TODO: Need to add cleanup steps related to counting
-    #
-    if (!is.null(cAlgor)){
+    count <- FALSE
+    if (counting == "counting"){
+      setwd(base.dir)
+      count <- TRUE
       source("GLSeq.Counting.R")
     }
-    if (!is.null(count.comm)){
-      comm.stack.pool <- paste(comm.stack.pool " && ",align," && ", count.comm,sep="")
-    } else{
-    comm.stack.pool <- paste(comm.stack.pool " && ",align,sep="")
-    }
+    ###################
+    # Command Construction
+    ###################
+    comm.i <- paste(align)
+    if (count) comm.i <- paste(comm.i, "&&", count.comm)
+    # for the very first assembly in the stack: 
+    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " date && ", comm.i)
+    # for subsequent assemblies of every stack: 
+    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
+    
   }
   if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")
-  comm.stack.pool <- paste(comm.stack.pool,  " && echo  >  ", fileCompletenessID, ".", zz, " & ", sep="")
-}
-# collection of the results: 
-collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
-collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
-collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 1>> ", collLog, " 2>> ", collerr, " &", sep="") 
-if (resCollect == "nocollect") collResults <- "\n"
-# 
-# pool of all the system commands (versions for +/- compute expression and +/- collect results): 
-#
-comm.stack.pool <- paste(comm.stack.pool, collResults, "\n", sep=" ") 
-if (exprRun == "noexprcalc") comm.stack.pool <- paste(collResults, "\n", sep=" ") 
-  
+  comm.stack.pool <- paste(comm.stack.pool,  " && echo  >  ", fileCompletenessID, ".", zz, " & ",sep="")
+} 
