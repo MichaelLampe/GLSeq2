@@ -1,9 +1,9 @@
 source("GLSeq.Util.R")
-
+setwd(dest.dir)
 # if (!(paired.end)) stop('BWA pipeline is currently supported for paired-end libraries only \n')
 # copy genome indices to the destimation dir: 
 ref.dir <- paste(base.dir, rGenome, sep="")
-indCopy <- paste("cd ", ref.dir, " && cp * ", dest.dir, sep="")
+indCopy <- paste("cd ", ref.dir, " && cp ",refFASTAname," ",dest.dir, sep="")
 system(indCopy)
 #
 comm.stack.pool <- NULL # 
@@ -13,6 +13,7 @@ comm.stack.pool <- NULL #
 # Might be able to do this with rsem too in some cases (Create index file)
 ###################################################################################
 index <- paste(bwaPath, "index", refFASTAname) # System command #0
+system(index)
 #
 for (zz in 1:nStreams) {
   # assembly and runing the system command, one library at a time:
@@ -30,15 +31,15 @@ for (zz in 1:nStreams) {
     # names of the expected sai files:
     sainame.left <- paste(fq.left,"sai",sep=".")
     if (paired.end) sainame.right <- paste(fq.right,"sai",sep=".")
-    # alignment commands:
+    # Alignment Commands:
     aln.left <- paste(bwaPath, "aln", refFASTAname, fq.left, ">", sainame.left) # System command #1
     if (paired.end) aln.right <- paste(bwaPath, "aln", refFASTAname, fq.right, ">", sainame.right) # System command #2
-    # creating SAM file: 
+    # Sam File Creation:
     if (paired.end) sam.create <- paste(bwaPath, "sampe", refFASTAname, sainame.left, sainame.right, fq.left, fq.right, ">>", unsorted.sam) # System command #3
     if (!(paired.end)) sam.create <- paste(bwaPath, "samse", refFASTAname, sainame.left, fq.left, ">>", unsorted.sam)
     #
     ###################
-    # SAM file cleanup
+    # SAM file Cleanup
     ###################
     # the executable:
     cleanSAM <- paste("java -Xmx2g -jar ",picardToolsPath, "CleanSam.jar", sep="")
@@ -46,6 +47,7 @@ for (zz in 1:nStreams) {
     cleaned.sam <- paste(this.resName, "cleaned.sam", sep=".")
     # 
     # SAM cleanup system command:
+    # I = Input file; O= Output file
     cleansam.comm <- paste(cleanSAM, " I=", unsorted.sam, " O=", cleaned.sam, sep="") # System command #4
     #
     ###################
@@ -63,6 +65,9 @@ for (zz in 1:nStreams) {
     sorted.arg <- paste(this.resName, "sorted", sep=".")
     ref.index <- paste(refFASTAname, "fai", sep=".") 
     sorted.bam <- paste(this.resName, "sorted.bam", sep=".") 
+    # -u = Uncompressed BAM file output, better for the pipe
+    # -S = Input is a SAM File
+    # -t = TAB-delimited file
     bam.create <- paste("samtools view -uS -t ", ref.index, final.sam, " | samtools sort - ", sorted.arg) # System command #6
     bam.index <- paste("samtools index", sorted.bam) # System command #7
     #
@@ -83,9 +88,9 @@ for (zz in 1:nStreams) {
     # Counting Step
     ###################
     #
-    # TODO: Need to add cleanup steps related to counting
-    #
-    if (!is.null(cAlgor)){
+    count.comm <- paste ("")
+    if (counting == "counting"){
+      setwd(base.dir)
       source("GLSeq.Counting.R")
     }
     ###################
@@ -96,8 +101,8 @@ for (zz in 1:nStreams) {
     #
     # current command:
     # Removes all files added except for the final countable file.  
-    if (paired.end) comm.i <- paste(index, "&&", aln.left, "&&", aln.right, "&&", sam.create, "&&", cleansam.comm, "&&", finalsam.comm, "&&", bam.create, "&&", bam.index, "&&", countable.comm, "&&", spaceCleanup)
-    if (!(paired.end)) comm.i <- paste(index, "&&",aln.left, "&&", sam.create, "&&", cleansam.comm, "&&", finalsam.comm, "&&", bam.create, "&&", bam.index, "&&", countable.comm, "&&", "&&", spaceCleanup)
+    if (paired.end) comm.i <- paste(aln.left, "&&", aln.right, "&&", sam.create, "&&", cleansam.comm, "&&", finalsam.comm, "&&", bam.create, "&&", bam.index, "&&", countable.comm, "&&", count.comm,"&&", spaceCleanup)
+    if (!(paired.end)) comm.i <- paste(aln.left, "&&", sam.create, "&&", cleansam.comm, "&&", finalsam.comm, "&&", bam.create, "&&", bam.index, "&&", countable.comm, "&&", count.comm, "&&", spaceCleanup)
     # for the very first assembly in the stack: 
     if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " date && ", comm.i)
     # for subsequent assemblies of every stack: 
@@ -107,14 +112,3 @@ for (zz in 1:nStreams) {
   if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")
   comm.stack.pool <- paste(comm.stack.pool,  " && echo  >  ", fileCompletenessID, ".", zz, " & ", sep="")
 } # for zz
-#
-# collection of the results: 
-collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
-collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
-collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 1>> ", collLog, " 2>> ", collerr, " &", sep="") 
-if (resCollect == "nocollect") collResults <- "\n"
-# 
-# pool of all the system commands (versions for +/- compute expression and +/- collect results): 
-#
-comm.stack.pool <- paste(comm.stack.pool, collResults, "\n", sep=" ") 
-if (exprRun == "noexprcalc") comm.stack.pool <- paste(collResults, "\n", sep=" ") 
