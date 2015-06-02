@@ -150,10 +150,10 @@ values: _dataprep_, _nodataprep_
 In the case of _nodataprep_, the ready-to-go FASTQ files (with .fq extensions for single-end libraries and .1.fq / .2.fq extensions for the paired-end libraries) are expected to be located in the _readyData.dir_ folder (as indicated in the _GLSeq2.attr.R_ file).   
 With _dataprep_, the particular behaviour will depend on parameter setting under "PRE-PROCESSING OPTIONS" in the attribute file.   
 
-3. Align data? 
+3. Align data?	
 values: _alignment_ (normal), _noalignment_ (the case of using the pipeline to run either data pre-processing only or results collection only - see "Separate run of the pipeline modules" below). 
 
-4. Count data?
+4. Count data?	
 values: _counting_,_nocounting_ (To use one or a combination of the counting programs available either after alignment or on separate prepared SAM files)
 
 5. Collect the results?   
