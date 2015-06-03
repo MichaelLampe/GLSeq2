@@ -25,6 +25,11 @@ import javax.swing.SpinnerNumberModel;
 public class Reference extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
+	private final JTextArea referenceGenome = new JTextArea();
+	private final JTextArea refFastaFile = new JTextArea();
+	private final JTextArea refGFF = new JTextArea();
+	private final JTextArea refFeatureID = new JTextArea();
+	private final JSpinner gtfFileColumns = new JSpinner();
 
 	/**
 	 * Launch the application.
@@ -44,6 +49,12 @@ public class Reference extends JDialog {
 	 */
 	public Reference() {
 		initGUI();
+		//
+		referenceGenome.setText(GLSeq2_Main_Application.att.getRGenome());
+		refFastaFile.setText(GLSeq2_Main_Application.att.getFASTAname());
+		refGFF.setText(GLSeq2_Main_Application.att.getGFFname());
+		refFeatureID.setText(GLSeq2_Main_Application.att.getIdAttr());
+		gtfFileColumns.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getFeatureColumn()));
 	}
 	private void initGUI() {
 		setResizable(false);
@@ -54,16 +65,15 @@ public class Reference extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 55, 496, 59);
-			contentPanel.add(panel);
+			JPanel refGenome = new JPanel();
+			refGenome.setForeground(Color.DARK_GRAY);
+			refGenome.setBackground(Color.LIGHT_GRAY);
+			refGenome.setLayout(null);
+			refGenome.setBounds(10, 55, 496, 59);
+			contentPanel.add(refGenome);
 			{
-				JTextArea textArea = new JTextArea();
-				textArea.setBounds(135, 11, 355, 37);
-				panel.add(textArea);
+				referenceGenome.setBounds(135, 11, 355, 37);
+				refGenome.add(referenceGenome);
 			}
 			{
 				JTextPane txtpnReferenceGenome = new JTextPane();
@@ -73,7 +83,7 @@ public class Reference extends JDialog {
 				txtpnReferenceGenome.setFont(new Font("Arial", Font.PLAIN, 11));
 				txtpnReferenceGenome.setEditable(false);
 				txtpnReferenceGenome.setBounds(10, 11, 122, 37);
-				panel.add(txtpnReferenceGenome);
+				refGenome.add(txtpnReferenceGenome);
 			}
 		}
 		{
@@ -83,9 +93,8 @@ public class Reference extends JDialog {
 			panel.setBounds(10, 125, 496, 59);
 			contentPanel.add(panel);
 			{
-				JTextArea textArea = new JTextArea();
-				textArea.setBounds(135, 11, 355, 37);
-				panel.add(textArea);
+				refFastaFile.setBounds(135, 11, 355, 37);
+				panel.add(refFastaFile);
 			}
 			{
 				JTextPane txtpnNameOfReference = new JTextPane();
@@ -106,9 +115,8 @@ public class Reference extends JDialog {
 			panel.setBounds(10, 195, 496, 59);
 			contentPanel.add(panel);
 			{
-				JTextArea textArea = new JTextArea();
-				textArea.setBounds(135, 11, 355, 37);
-				panel.add(textArea);
+				refGFF.setBounds(135, 11, 355, 37);
+				panel.add(refGFF);
 			}
 			{
 				JTextPane txtpnNameOfReference_1 = new JTextPane();
@@ -129,15 +137,14 @@ public class Reference extends JDialog {
 			panel.setBounds(10, 265, 496, 59);
 			contentPanel.add(panel);
 			{
-				JTextArea textArea = new JTextArea();
-				textArea.setBounds(135, 11, 355, 37);
-				panel.add(textArea);
+				refFeatureID.setBounds(135, 11, 355, 37);
+				panel.add(refFeatureID);
 			}
 			{
 				JTextPane txtpnNameOfGff = new JTextPane();
 				txtpnNameOfGff.setForeground(Color.DARK_GRAY);
 				nimbusFix(Color.LIGHT_GRAY,txtpnNameOfGff);
-				txtpnNameOfGff.setText("Name of GFF Feature ID File");
+				txtpnNameOfGff.setText("Reference Feature ID");
 				txtpnNameOfGff.setFont(new Font("Arial", Font.PLAIN, 11));
 				txtpnNameOfGff.setEditable(false);
 				txtpnNameOfGff.setBounds(10, 11, 121, 37);
@@ -164,10 +171,9 @@ public class Reference extends JDialog {
 			txtpnNumberOfColumns.setEditable(false);
 		}
 		{
-			JSpinner spinner = new JSpinner();
-			spinner.setModel(new SpinnerNumberModel(new Integer(9), new Integer(0), null, new Integer(1)));
-			spinner.setBounds(192, 336, 59, 40);
-			contentPanel.add(spinner);
+			gtfFileColumns.setModel(new SpinnerNumberModel(new Integer(9), new Integer(0), null, new Integer(1)));
+			gtfFileColumns.setBounds(192, 336, 59, 40);
+			contentPanel.add(gtfFileColumns);
 		}
 		{
 			JTextArea txtrOk = new JTextArea();
@@ -184,6 +190,16 @@ public class Reference extends JDialog {
 				JButton okButton = new JButton("Apply and Close");
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
+				okButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e) {
+						GLSeq2_Main_Application.att.setRGenome(referenceGenome.getText());
+						GLSeq2_Main_Application.att.setFASTAname(refFastaFile.getText());
+						GLSeq2_Main_Application.att.setGFFname(refGFF.getText());
+						GLSeq2_Main_Application.att.setIdAttr(refFeatureID.getText());
+						GLSeq2_Main_Application.att.setFeatureColumn(String.valueOf(gtfFileColumns.getValue()));
+						dispose();
+					}
+				});
 				getRootPane().setDefaultButton(okButton);
 			}
 			{

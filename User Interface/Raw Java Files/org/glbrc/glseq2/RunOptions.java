@@ -18,20 +18,26 @@ import java.util.List;
 import java.util.Scanner;
 
 public class RunOptions {
-	private String updateFromDatabase = "";
-	private String processedData = "";
-	private String alignment = "";
-	private String counting = "";
-	private String collectResults = "";
-	private String runId = "";
-	private String protocolId = "";
-	private String attributeFilePath = "";
-	private String ampersand = "";
+	private String updateFromDatabase;
+	private String processedData;
+	private String alignment;
+	private String counting;
+	private String collectResults;
+	private String runId;
+	private String protocolId;
+	private String attributeFilePath;
+	private String ampersand;
 
-	// #######################################################
-	// ################# Constructor ##########################
-	// #######################################################
 	public RunOptions() {
+		updateFromDatabase = "noupdate";
+		processedData = "nodataprep";
+		alignment = "noalignment";
+		counting = "nocounting";
+		collectResults = "nocollect";
+		runId = "";
+		protocolId = "0";
+		attributeFilePath = "";
+		ampersand = "&";
 	}
 
 	public String getScriptDirectory(String scriptDirectory) {
