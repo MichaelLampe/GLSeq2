@@ -14,7 +14,7 @@ prepareReference <- paste("rsem-prepare-reference",refFASTAname,refName)
 
 countfile <- paste(this.resName,"RSEM","counts", sep=".") 
 rsemOptions <- paste("--sam","--paired-end")
-calculateExpression <- paste("rsem-calculate-expression",rsemOptions,countable.sam,refName,countFile,"&&","cp",countFile,destDirRSEMCount)
+calculateExpression <- paste("rsem-calculate-expression",rsemOptions,countable.sam,refName,countFile,"&&","mv",countFile,destDirRSEMCount)
 if (count.comm != "") count.comm <- paste(count.comm, "&&", prepareReference, "&&",calculateExpression)
 if (count.comm == "") count.comm <- paste(prepareReference, "&&", calculateExpression)
 
