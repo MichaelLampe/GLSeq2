@@ -32,15 +32,15 @@ public class Data_And_Library extends JDialog {
 	private final JTextArea rawDirectory = new JTextArea(GLSeq2_Main_Application.att.getDirectory());
 	private final JTextPane txtpnDirectoryContainingRaw = new JTextPane();
 	private final JPanel panel_1 = new JPanel();
-	private final JButton button = new JButton("");
+	private final JButton preprocFilesButton = new JButton("");
 	private final JTextArea preprocessedFiles = new JTextArea(GLSeq2_Main_Application.att.getDirectoryFq());
 	private final JTextPane txtpnDirectoryContainingPreprocessed = new JTextPane();
 	private final JPanel panel_2 = new JPanel();
-	private final JButton button_1 = new JButton("");
+	private final JButton baseDirButton = new JButton("");
 	private final JTextArea destinationDirectory = new JTextArea(GLSeq2_Main_Application.att.getDestinationDirectory());
 	private final JTextPane txtpnBaseOfDestination = new JTextPane();
 	private final JPanel panel_3 = new JPanel();
-	private final JButton button_2 = new JButton("");
+	private final JButton rawFilesButton = new JButton("");
 	private final JTextArea rawFileNames = new JTextArea(GLSeq2_Main_Application.att.getRawFileNames());
 	private final JTextPane txtpnRawFileNames = new JTextPane();
 	private final JButton zippedButton = new JButton();
@@ -63,6 +63,10 @@ public class Data_And_Library extends JDialog {
 	private final JComboBox<String> sequencingPlatforms = new JComboBox<String>();
 	private final JComboBox<String> strandedness = new JComboBox<String>();
 	private final JSpinner libraryIdLength = new JSpinner();
+	private final JPanel panel_10 = new JPanel();
+	private final JButton countableSamDirButton = new JButton("");
+	private final JTextArea countableSamDir = new JTextArea(GLSeq2_Main_Application.att.getCountableSamDir());
+	private final JTextPane txtpnCountableSamFile = new JTextPane();
 
 	/**
 	 * Launch the application.
@@ -94,7 +98,6 @@ public class Data_And_Library extends JDialog {
 		}
 		//
 		//
-		System.out.println(GLSeq2_Main_Application.att.getLibNchar() + "Spinner");
 		if (GLSeq2_Main_Application.att.getLibNchar().equals("0")){
 			libraryIdLength.setValue(4);
 		} else{
@@ -134,6 +137,7 @@ public class Data_And_Library extends JDialog {
 						GLSeq2_Main_Application.att.setDirectoryFq(preprocessedFiles.getText());
 						GLSeq2_Main_Application.att.setDestinationDirectory(destinationDirectory.getText());
 						GLSeq2_Main_Application.att.setRawFileNames(rawFileNames.getText());	
+						GLSeq2_Main_Application.att.setCountableSamDir(countableSamDir.getText());
 						//
 						//private final JButton zippedButton = new JButton("Using Zipped Files (.gz)");
 						//private final JButton endButton = new JButton("Using Paired Ended Data");
@@ -156,9 +160,7 @@ public class Data_And_Library extends JDialog {
 						GLSeq2_Main_Application.att.setQScores(String.valueOf(qualityScores.getSelectedItem()));
 						GLSeq2_Main_Application.att.setSeqPlatform(String.valueOf(sequencingPlatforms.getSelectedItem()));
 						GLSeq2_Main_Application.att.setLibstrand(String.valueOf(strandedness.getSelectedItem()));
-						GLSeq2_Main_Application.att.setLibNchar(String.valueOf(libraryIdLength.getValue()));
-						
-						
+						GLSeq2_Main_Application.att.setLibNchar(String.valueOf(libraryIdLength.getValue()));					
 						dispose();
 					}
 					
@@ -203,14 +205,14 @@ public class Data_And_Library extends JDialog {
 				JPanel panel = new JPanel();
 				panel.setForeground(Color.DARK_GRAY);
 				panel.setBackground(Color.LIGHT_GRAY);
-				panel.setBounds(10, 42, 496, 59);
+				panel.setBounds(10, 42, 496, 42);
 				filledLibraryOptions.add(panel);
 				panel.setLayout(null);
 				{
-					JButton btnNewButton = new JButton("");
-					btnNewButton.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-					btnNewButton.setBounds(132, 11, 38, 37);
-					btnNewButton.addActionListener(new ActionListener() {
+					JButton rawDirButton = new JButton("");
+					rawDirButton.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+					rawDirButton.setBounds(132, 0, 38, 37);
+					rawDirButton.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							final JFileChooser chooser = new JFileChooser();
 							chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -222,9 +224,9 @@ public class Data_And_Library extends JDialog {
 							}
 						}
 					});
-					panel.add(btnNewButton);
+					panel.add(rawDirButton);
 				}
-				rawDirectory.setBounds(180, 11, 306, 37);
+				rawDirectory.setBounds(180, 0, 306, 37);
 				
 				panel.add(rawDirectory);
 				txtpnDirectoryContainingRaw.setForeground(Color.DARK_GRAY);
@@ -232,30 +234,30 @@ public class Data_And_Library extends JDialog {
 				txtpnDirectoryContainingRaw.setEditable(false);
 				txtpnDirectoryContainingRaw.setFont(new Font("Arial", Font.PLAIN, 11));
 				txtpnDirectoryContainingRaw.setText("Directory Containing Raw Files");
-				txtpnDirectoryContainingRaw.setBounds(10, 11, 112, 37);
+				txtpnDirectoryContainingRaw.setBounds(0, 0, 112, 37);
 				
 				panel.add(txtpnDirectoryContainingRaw);
 			}
 			panel_1.setForeground(Color.DARK_GRAY);
 			panel_1.setBackground(Color.LIGHT_GRAY);
 			panel_1.setLayout(null);
-			panel_1.setBounds(10, 101, 496, 59);
+			panel_1.setBounds(10, 91, 496, 42);
 			
 			filledLibraryOptions.add(panel_1);
 			panel_2.setForeground(Color.DARK_GRAY);
 			panel_2.setBackground(Color.LIGHT_GRAY);
 			panel_2.setLayout(null);
-			panel_2.setBounds(10, 160, 496, 59);
+			panel_2.setBounds(10, 144, 496, 42);
 			
 			filledLibraryOptions.add(panel_2);
 			panel_3.setForeground(Color.DARK_GRAY);
 			panel_3.setBackground(Color.LIGHT_GRAY);
 			panel_3.setLayout(null);
-			panel_3.setBounds(10, 219, 496, 59);
+			panel_3.setBounds(10, 197, 496, 42);
 			
 			filledLibraryOptions.add(panel_3);
 			zippedButton.setFont(new Font("Arial", Font.PLAIN, 15));
-			zippedButton.setBounds(10, 289, 226, 59);
+			zippedButton.setBounds(10, 295, 226, 59);
 			zippedButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					if (zippedButton.getText().equals("Using Zipped Files (.gz)")){
@@ -269,7 +271,7 @@ public class Data_And_Library extends JDialog {
 			
 			filledLibraryOptions.add(zippedButton);
 			endButton.setFont(new Font("Arial", Font.PLAIN, 15));
-			endButton.setBounds(280, 289, 226, 59);
+			endButton.setBounds(280, 295, 226, 59);
 			endButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					if (endButton.getText().equals("Using Paired Ended Data")){
@@ -353,7 +355,40 @@ public class Data_And_Library extends JDialog {
 			panel_9.setBounds(266, 510, 240, 48);
 			
 			filledLibraryOptions.add(panel_9);
+			panel_10.setLayout(null);
+			panel_10.setForeground(Color.DARK_GRAY);
+			panel_10.setBackground(Color.LIGHT_GRAY);
+			panel_10.setBounds(10, 250, 496, 42);
+			
+			filledLibraryOptions.add(panel_10);
 		}
+		countableSamDirButton.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		countableSamDirButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(countableSamDir);
+				try {
+					File file = chooser.getSelectedFile();
+					countableSamDir.setText(file.getAbsolutePath());
+				} catch (NullPointerException ea) {
+				}
+			}
+		});
+		countableSamDirButton.setBounds(132, 0, 38, 37);
+		
+		panel_10.add(countableSamDirButton);
+		countableSamDir.setBounds(180, 0, 306, 37);
+		
+		panel_10.add(countableSamDir);
+		txtpnCountableSamFile.setText("Countable SAM File Directory");
+		txtpnCountableSamFile.setForeground(Color.DARK_GRAY);
+		nimbusFix(Color.LIGHT_GRAY,txtpnCountableSamFile);
+		txtpnCountableSamFile.setFont(new Font("Arial", Font.PLAIN, 11));
+		txtpnCountableSamFile.setEditable(false);
+		txtpnCountableSamFile.setBounds(0, 0, 112, 37);
+		
+		panel_10.add(txtpnCountableSamFile);
 		panel_9.setLayout(null);
 		txtpnLibraryIdLength.setForeground(Color.DARK_GRAY);
 		nimbusFix(Color.LIGHT_GRAY,txtpnLibraryIdLength);
@@ -389,9 +424,9 @@ public class Data_And_Library extends JDialog {
 		txtpnStrain.setBounds(10, 11, 160, 31);
 		
 		panel_4.add(txtpnStrain);
-		button_2.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-		button_2.setBounds(132, 11, 38, 37);
-		button_2.addActionListener(new ActionListener() {
+		rawFilesButton.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		rawFilesButton.setBounds(132, 0, 38, 37);
+		rawFilesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				final JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -404,20 +439,20 @@ public class Data_And_Library extends JDialog {
 			}
 		});
 		
-		panel_3.add(button_2);
-		rawFileNames.setBounds(180, 11, 306, 37);
+		panel_3.add(rawFilesButton);
+		rawFileNames.setBounds(180, 0, 306, 37);
 		panel_3.add(rawFileNames);
 		txtpnRawFileNames.setForeground(Color.DARK_GRAY);
 		nimbusFix(Color.LIGHT_GRAY,txtpnRawFileNames);
 		txtpnRawFileNames.setEditable(false);
 		txtpnRawFileNames.setText("Raw File Names");
 		txtpnRawFileNames.setFont(new Font("Arial", Font.PLAIN, 11));
-		txtpnRawFileNames.setBounds(10, 11, 112, 37);
+		txtpnRawFileNames.setBounds(0, 0, 112, 37);
 		
 		panel_3.add(txtpnRawFileNames);
-		button_1.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-		button_1.setBounds(132, 11, 38, 37);
-		button_1.addActionListener(new ActionListener() {
+		baseDirButton.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		baseDirButton.setBounds(132, 0, 38, 37);
+		baseDirButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				final JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -430,8 +465,8 @@ public class Data_And_Library extends JDialog {
 			}
 		});
 		
-		panel_2.add(button_1);
-		destinationDirectory.setBounds(180, 11, 306, 37);
+		panel_2.add(baseDirButton);
+		destinationDirectory.setBounds(180, 0, 306, 37);
 		
 		panel_2.add(destinationDirectory);
 		txtpnBaseOfDestination.setForeground(Color.DARK_GRAY);
@@ -439,12 +474,12 @@ public class Data_And_Library extends JDialog {
 		txtpnBaseOfDestination.setEditable(false);
 		txtpnBaseOfDestination.setText("Base of Destination Directory");
 		txtpnBaseOfDestination.setFont(new Font("Arial", Font.PLAIN, 11));
-		txtpnBaseOfDestination.setBounds(10, 11, 112, 37);
+		txtpnBaseOfDestination.setBounds(0, 0, 112, 37);
 		
 		panel_2.add(txtpnBaseOfDestination);
-		button.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-		button.setBounds(132, 11, 38, 37);
-		button.addActionListener(new ActionListener() {
+		preprocFilesButton.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		preprocFilesButton.setBounds(132, 0, 38, 37);
+		preprocFilesButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				final JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -457,8 +492,8 @@ public class Data_And_Library extends JDialog {
 			}
 		});
 		
-		panel_1.add(button);
-		preprocessedFiles.setBounds(180, 11, 306, 37);
+		panel_1.add(preprocFilesButton);
+		preprocessedFiles.setBounds(180, 0, 306, 37);
 		
 		panel_1.add(preprocessedFiles);
 		txtpnDirectoryContainingPreprocessed.setForeground(Color.DARK_GRAY);
@@ -466,7 +501,7 @@ public class Data_And_Library extends JDialog {
 		txtpnDirectoryContainingPreprocessed.setEditable(false);
 		txtpnDirectoryContainingPreprocessed.setText("Directory Containing Pre-Processed Files");
 		txtpnDirectoryContainingPreprocessed.setFont(new Font("Arial", Font.PLAIN, 11));
-		txtpnDirectoryContainingPreprocessed.setBounds(10, 11, 112, 37);
+		txtpnDirectoryContainingPreprocessed.setBounds(0, 0, 112, 37);
 		
 		panel_1.add(txtpnDirectoryContainingPreprocessed);
 	}

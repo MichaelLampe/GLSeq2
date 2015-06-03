@@ -16,16 +16,17 @@ public class Attributes {
 
 	// Data and Library Attributes
 	private String directory = "";
-	private String unzipped = "";
+	private String unzipped = "FALSE";
 	private String directoryFq = "";
 	private String rawFileNames = "";
 	private String strain = "";
-	private String pairedEnd = "";
+	private String pairedEnd = "TRUE";
 	private String seqPlatform = "";
 	private String qScores = "";
 	private String libstrands = "";
 	private String libNchar = "0";
-	private String libList = "";
+	private String libList = "\"NULL\"";
+	private String countableSamDir = "";
 
 	// Reference Attributes
 	private String rGenome = "";
@@ -37,14 +38,15 @@ public class Attributes {
 	// Run Attributes
 	private String scriptDirectory = "";
 	private String destinationDirectory = "";
-	private String cAlgor = "";
+	private String FeatureCounts = "";
+	private String RSEM = "";
+	private String HTSeq = "";
 	private String aAlgor = "";
 	private String nCores = "0";
 	private String nStreams = "0";
 	private String nStreamsDataPrep = "0";
-	private String runAttempt = "";
 	private String qAlgor = "";
-	private String GPUaccel = "";
+	private String GPUaccel = "FALSE";
 
 	// Pre-Processing Attributes
 	private String readTrim = "0";
@@ -53,13 +55,13 @@ public class Attributes {
 	private String artificialFASTA = "";
 
 	// Common Processing Attributes
-	private String strandExtract = "";
+	private String strandExtract = "FALSE";
 
 	// RSEM Attributes
-	private String compConf = "";
+	private String compConf = "FALSE";
 	private String fragMaxLength = "0";
 	private String ciMem = "0";
-	private String genobam = "";
+	private String genobam = "FALSE";
 
 	// Environment Attributes
 	private String trimPath = "";
@@ -200,6 +202,9 @@ public class Attributes {
 	public void setLibList(String libList) {
 		this.libList = libList;
 	}
+	public void setCountableSamDir(String countableSamDir){
+		this.countableSamDir = countableSamDir;
+	}
 
 	// Reference Attribute Setters
 	public void setRGenome(String rGenome) {
@@ -241,10 +246,6 @@ public class Attributes {
 
 	public void setStreamsDataPrep(String nStreamsDataPrep) {
 		this.nStreamsDataPrep = nStreamsDataPrep;
-	}
-
-	public void setRunAttempt(String runAttempt) {
-		this.runAttempt = runAttempt;
 	}
 
 	public void setQuantAlgor(String qAlgor) {
@@ -327,8 +328,14 @@ public class Attributes {
 	public void setCushawIndexPath(String cushawIndexPath){
 		this.cushawIndexPath = cushawIndexPath;
 	}
-	public void setcAlgor(String cAlgor){
-		this.cAlgor = cAlgor;
+	public void setHTSeq(String HTSeq){
+		this.HTSeq= HTSeq;
+	}
+	public void setFeatureCounts(String FeatureCounts){
+		this.FeatureCounts = FeatureCounts;
+	}
+	public void setRSEM(String RSEM){
+		this.RSEM = RSEM;
 	}
 	public void setaAlgor(String aAlgor){
 		this.aAlgor = aAlgor;
@@ -338,8 +345,14 @@ public class Attributes {
 	public String getCushawIndexPath(){
 		return cushawIndexPath;
 	}
-	public String getcAlgor(){
-		return cAlgor;
+	public String getHTSeq(){
+		return HTSeq;
+	}
+	public String getFeatureCounts(){
+		return FeatureCounts;
+	}
+	public String getRSEM(){
+		return RSEM;
 	}
 	public String getaAlgor(){
 		return aAlgor;
@@ -389,6 +402,9 @@ public class Attributes {
 	public String getLibList() {
 		return libList;
 	}
+	public String getCountableSamDir(){
+		return countableSamDir;
+	}
 
 	// Reference Attribute Getters
 	public String getRGenome() {
@@ -430,10 +446,6 @@ public class Attributes {
 
 	public String getStreamsDataPrep() {
 		return nStreamsDataPrep;
-	}
-
-	public String getRunAttempt() {
-		return runAttempt;
 	}
 
 	public String getQuantAlgor() {
@@ -551,7 +563,7 @@ public class Attributes {
 		writer.write("readyData.dir <- \"" + directoryFq + "\"\n");
 		writer.write("#\n");
 		writer.write("# raw file names: \n");
-		writer.write("raw.fNames <- " + rawFileNames + "\n");
+		writer.write("raw.fNames <- \"" + rawFileNames + "\"\n");
 		writer.write("#\n");
 		writer.write("# strain\n");
 		writer.write("strain <- \"" + strain + "\"\n");
@@ -573,6 +585,9 @@ public class Attributes {
 		writer.write("#\n");
 		writer.write("# Subset of the libraries to process (optional; normally the list wil be generated from the actual directory content)\n");
 		writer.write("libList <- " + libList + "\n");
+		writer.write("#\n");
+		writer.write("# Takes a directory of files with the end title \"countable.sam\" and collects them for counting\n");
+		writer.write("countable.sams.dir <- \"" + countableSamDir + "\"\n");
 		writer.write("#\n");
 		writer.write("###############################\n");
 		writer.write("# REFERENCE OPTIONS\n");
@@ -621,18 +636,19 @@ public class Attributes {
 		writer.write("# (may differ from the number of streams for expression computation because of particular software demands) \n");
 		writer.write("nStreamsDataPrep <- " + nStreamsDataPrep + "\n");
 		writer.write("#\n");
-		writer.write("# the default run attempt\n");
-		writer.write("runAttempt <- " + runAttempt + "\n");
-		writer.write("#\n");
 		writer.write("# the actual unique run ID - \n");
 		writer.write("# text.add <- paste(expID, runAttempt, sep=\".\")\n");
 		writer.write("# now is being generated inside GLSeq.top.R\n");
 		writer.write("#\n");
 		writer.write("# *** quantification algorithm ***\n");
 		writer.write("aAlgor <- \"" + aAlgor + "\" \n");
-		writer.write("#");
-		writer.write("#");
-		writer.write("cAlgor <- c(" + cAlgor + ")\n");
+		writer.write("#\n");
+		writer.write("#\n");
+		// This is just assigning them as variables and just making them as a list in the R file
+		writer.write("HTSeq <- \"" +HTSeq + "\"\n");
+		writer.write("FeatureCounts <- \"" + FeatureCounts + "\"\n");
+		writer.write("RSEM <- \"" + RSEM + "\"\n");
+		writer.write("cAlgor <- c(HTSeq,RSEM,FeatureCounts)\n");
 		writer.write("#\n");
 		writer.write("#  GPU acceleration option for CUSHAW\n");
 		writer.write("GPU.accel <- " + GPUaccel.toUpperCase() + "\n");

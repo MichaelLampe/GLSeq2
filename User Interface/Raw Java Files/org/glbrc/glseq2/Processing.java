@@ -23,6 +23,10 @@ import javax.swing.SpinnerNumberModel;
 public class Processing extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
+	private final JSpinner minTrimRead = new JSpinner();
+	private final JTextArea artificialName = new JTextArea();
+	private final JSpinner trimHead = new JSpinner();
+	private final JButton trimReads = new JButton("Trimming Raw Reads");
 
 	/**
 	 * Launch the application.
@@ -42,6 +46,14 @@ public class Processing extends JDialog {
 	 */
 	public Processing() {
 		initGUI();
+		// Assign some variables
+		artificialName.setText(GLSeq2_Main_Application.att.getArtificialFASTA());
+		minTrimRead.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getMinTrim()));
+		trimHead.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getTrimhead()));
+		if (GLSeq2_Main_Application.att.getReadTrim().equals("FALSE")){
+			trimReads.setText("Not Trimming Raw Reads");
+		}
+		
 	}
 	private void initGUI() {
 		setBackground(Color.LIGHT_GRAY);
@@ -60,9 +72,8 @@ public class Processing extends JDialog {
 			panel.setBounds(10, 131, 496, 59);
 			contentPanel.add(panel);
 			{
-				JTextArea textArea = new JTextArea();
-				textArea.setBounds(156, 11, 330, 37);
-				panel.add(textArea);
+				artificialName.setBounds(156, 11, 330, 37);
+				panel.add(artificialName);
 			}
 			{
 				JTextPane txtpnNameOfFasta = new JTextPane();
@@ -83,10 +94,9 @@ public class Processing extends JDialog {
 			panel.setBounds(10, 201, 496, 40);
 			contentPanel.add(panel);
 			{
-				JSpinner spinner = new JSpinner();
-				spinner.setModel(new SpinnerNumberModel(new Integer(12), new Integer(0), null, new Integer(1)));
-				spinner.setBounds(116, 0, 98, 40);
-				panel.add(spinner);
+				trimHead.setModel(new SpinnerNumberModel(new Integer(12), new Integer(0), null, new Integer(1)));
+				trimHead.setBounds(116, 0, 98, 40);
+				panel.add(trimHead);
 			}
 			{
 				JTextPane txtpnTrimHead = new JTextPane();
@@ -106,10 +116,9 @@ public class Processing extends JDialog {
 			panel.setBounds(10, 252, 496, 40);
 			contentPanel.add(panel);
 			{
-				JSpinner spinner = new JSpinner();
-				spinner.setModel(new SpinnerNumberModel(new Integer(36), new Integer(0), null, new Integer(1)));
-				spinner.setBounds(116, 0, 98, 40);
-				panel.add(spinner);
+				minTrimRead.setModel(new SpinnerNumberModel(new Integer(36), new Integer(0), null, new Integer(1)));
+				minTrimRead.setBounds(116, 0, 98, 40);
+				panel.add(minTrimRead);
 			}
 			{
 				JTextPane txtpnMinimumTrimRead = new JTextPane();
@@ -122,21 +131,20 @@ public class Processing extends JDialog {
 			}
 		}
 		{
-			final JButton btnNewButton = new JButton("Trimming Raw Reads");
-			btnNewButton.setForeground(Color.DARK_GRAY);
-			btnNewButton.setFont(new Font("Arial", Font.PLAIN, 20));
-			btnNewButton.setBounds(10, 51, 496, 69);
-			btnNewButton.addActionListener(new ActionListener(){
+			trimReads.setForeground(Color.DARK_GRAY);
+			trimReads.setFont(new Font("Arial", Font.PLAIN, 20));
+			trimReads.setBounds(10, 51, 496, 69);
+			trimReads.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent arg0) {
-					if (btnNewButton.getText().equals("Trimming Raw Reads")){
-						btnNewButton.setText("Not Trimming Raw Reads");
+					if (trimReads.getText().equals("Trimming Raw Reads")){
+						trimReads.setText("Not Trimming Raw Reads");
 					}
 					else{
-						btnNewButton.setText("Trimming Raw Reads");
+						trimReads.setText("Trimming Raw Reads");
 					}
 				}
 			});
-			contentPanel.add(btnNewButton);
+			contentPanel.add(trimReads);
 		}
 		{
 			JTextPane txtpnTrimmingAndProcessing = new JTextPane();
@@ -156,6 +164,19 @@ public class Processing extends JDialog {
 			{
 				JButton okButton = new JButton("Apply and Close");
 				okButton.setActionCommand("OK");
+				okButton.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0){
+						GLSeq2_Main_Application.att.setArtificialFASTA(artificialName.getText());
+						GLSeq2_Main_Application.att.setMinTrim(String.valueOf(minTrimRead.getValue()));
+						GLSeq2_Main_Application.att.setTrimhead(String.valueOf(trimHead.getValue()));
+						if (trimReads.getText().equals("Not Trimming Raw Reads")){
+							GLSeq2_Main_Application.att.setReadTrim("FALSE");
+						} else{
+							GLSeq2_Main_Application.att.setReadTrim("TRUE");
+						}
+						dispose();
+					}
+				});
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
