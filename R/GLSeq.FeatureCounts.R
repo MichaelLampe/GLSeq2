@@ -13,11 +13,6 @@ library(Rsubread)
 #############
 setwd(dest.dir)
 #
-#############
-# Null Fixes
-#############
-#
-if (is.null(this.resName)) this.resName <- text.add
 #
 #
 #############

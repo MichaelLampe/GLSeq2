@@ -234,9 +234,6 @@ if (!is.null(readyData.dir)) readyData.dir <- trailDirCheck(readyData.dir)
 # Destination directory for bam / wig files
 destDirBam <- paste(dest.dir, text.add, ".viz/", sep="")
 #
-# Destination directory for count files + combined matrix
-destDirCount <-  paste(dest.dir, text.add, ".counts/", sep="")
-#
 # Destination directory for log /stat files:
 destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="") 
 #
@@ -246,14 +243,29 @@ destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="")
 #
 destDir.create <- paste("mkdir ", dest.dir, sep="")
 destDirBam.create <- paste("mkdir ", destDirBam, sep="")
-destDirCount.create <- paste("mkdir ", destDirCount, sep="")
 destDirLog.create <- paste("mkdir ", destDirLog, sep="")
-#
-#
 try(system(destDir.create))
 try(system(destDirBam.create))
-try(system(destDirCount.create))
 try(system(destDirLog.create))
+#
+if ("HTSeq" %in% cAlgor){
+  destDirHTSeqCount <-  paste(dest.dir, text.add, ".HTSeq.counting/", sep="")
+  destDirHTSeqCount.create <- paste("mkdir ", destDirHTSeqCount, sep="")
+  try(system(destDirHTSeqCount.create))
+}
+#
+if ("FeatureCounts" %in% cAlgor){
+  destDirFeatureCountsCount <-  paste(dest.dir, text.add, ".FeatureCounts.counting/", sep="")
+  destDirFeatureCountsCount.create <- paste("mkdir ", destDirFeatureCountsCount, sep="")
+  try(system(destDirFeatureCountsCount.create))
+}
+#
+if ("RSEM" %in% cAlgor){
+  destDirRSEMCount <-  paste(dest.dir, text.add, ".RSEM.counting/", sep="")
+  destDirRSEMCount.create <- paste("mkdir ", destDirRSEMCount, sep="")
+  try(system(destDirRSEMCount.create))
+}
+#
 #
 ###############
 # Log-tail command addition
@@ -290,9 +302,11 @@ fqfiles.table.pe.assemble <- function(fqfiles.base) {
 #
 if(dataPrepare == "nodataprep") {
   # copying the ready-to-process fastq files to the destination directory:
-  readyDataCopy <- paste("cp ", readyData.dir, "*.fq ", dest.dir, sep="")
-  system(readyDataCopy)
-  Sys.sleep(10)
+  if (alignment == "alignment"){
+    readyDataCopy <- paste("cp ", readyData.dir, "*.fq ", dest.dir, sep="")
+    system(readyDataCopy)
+    Sys.sleep(10)
+  }
   if (paired.end) {
     fqfiles <- dir(dest.dir) 
     fqfiles <- fqfiles[grep(".fq", fqfiles)]
@@ -310,7 +324,8 @@ if(dataPrepare == "nodataprep") {
   if (!(paired.end)) {
     fqfiles <- dir(dest.dir) 
     fqfiles <- fqfiles[grep(".fq", fqfiles)]
-    fqfiles.table <- cbind(NULL, fqfiles) }
+    fqfiles.table <- cbind(NULL, fqfiles) 
+  }
 } # if nodataprep
 #
 ##########################################################################
@@ -394,15 +409,22 @@ for (ii in 1:nStreams) assign(paste("range",ii,sep=""),rangelist[[ii]])
 # A good bit differently then all the other alignment protocols
 GPUspecialCase <- FALSE
 # Doesn't run the Alignment if no expresion calculation is desired
-if(alignment == "noalignment") qAlgor <- NULL
-if(counting == "nocounting") cAlgor <- NULL
+this.resName <- NULL
 #
 if (alignment == "alignment"){
   source("GLSeq.Alignment.R")
 } else{
   if(counting == "counting"){
-    # Maybe a for loop here of countable sams?
-    source("GLSeq.Counting.R")
+    comm.stack.pool <- "date"
+    #
+    countable.sams <- dir(countable.sams.dir)[grep("countable.sam", dir(countable.sams.dir))]
+    for (i in 1:length(countable.sams)){
+      countable.sam <- countable.sams[i]
+      copy.comm <- paste("cp",paste(countable.sams.dir,countable.sam,sep="/"),dest.dir)
+      system(copy.comm)
+      source("GLSeq.Counting.R")
+    }
+    comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm)
   }
 }
 #
