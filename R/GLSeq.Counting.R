@@ -1,5 +1,6 @@
 source ("GLSeq.Util.R")
 occured <- FALSE
+count.comm <- ""
 ################################################
 #HTSeq Counting Protocol
 ################################################
@@ -13,17 +14,19 @@ if ("HTSeq" %in% cAlgor){
 ################################################
 if ("FeatureCounts" %in% cAlgor){
   occured <- TRUE
+  setwd(base.dir)
+  if (is.null(this.resName)) this.resName <- text.add
   ##########
   # Make sure GTF file is copied
   ##########
-  setwd(base.dir)
   ref.dir <- paste(base.dir, rGenome, sep="")
   refCopy <- paste("cd ", ref.dir, " && cp ",refGFFname," ",dest.dir, sep="")
   system(refCopy)
   #
+  countfile <- paste(this.resName,"FeatureCounts","counts", sep=".") 
   script <- paste( "Rscript GLSeq.FeatureCounts.R",countable.sam,rGenome,refGFFname,dest.dir,this.resName,paired.end,sep=" ")
-  if (count.comm != "") count.comm <- paste(count.comm," && ","cd ", base.dir, " && ",script," && ","cd ",dest.dir) 
-  if (count.comm == "") count.comm <- paste("cd ", base.dir, " && ", "Rscript GLSeq.FeatureCounts.R"," && ","cd ",dest.dir)
+  if (count.comm != "") count.comm <- paste(count.comm," && ","cd ", base.dir, " && ",script," && ","cd ",dest.dir,"&&","mv",countfile,destDirFeatureCountsCount) 
+  if (count.comm == "") count.comm <- paste("cd ", base.dir, " && ",script," && ","cd ",dest.dir,"&&","mv",countfile,destDirFeatureCountsCount)
 }
 ################################################
 #RSEM Counting Protocol

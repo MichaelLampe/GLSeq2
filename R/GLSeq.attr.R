@@ -2,7 +2,7 @@
 # Great Lakes Seq package for low-level processing of RNA-Seq data
 #########################################################
 #
-# This is a user generated attribute file created on 2015.06.02
+# This is a user generated attribute file created on 2015.04.30
 #
 ##########################################################
 #
@@ -23,11 +23,8 @@ raw.dir <- NULL
 # Files in the raw dir are normally compressed but may be not:
 unzipped <- TRUE
 #
-# Paired end files that are already divided up into two files
-presplit <- FALSE
-#
 # directory contining ready-to-go (split+QC-processed) fq files (Oct 17, 2013)
-readyData.dir <- NULL
+readyData.dir <- "/home/GLBRCORG/omoskvin/testdata/Y127"
 #
 # raw file names: 
 raw.fNames <- NULL
@@ -53,22 +50,25 @@ libNchar <- 4
 # Subset of the libraries to process (optional; normally the list wil be generated from the actual directory content)
 libList <- NULL
 #
+# Takes a directory of files with the end title "countable.sam" and collects them for counting
+countable.sams.dir <- NULL
+#
 ###############################
 # REFERENCE OPTIONS
 ###############################
 #
 # reference genome - the index directory for the respective method (RSEM or BWA)
 # (must match the name of the  subfolder under base.dir):
-rGenome <- "K_12"
+rGenome <- "Y22-3.A144"
 #
 # name of the reference fasta file (may differ from the base name of the reference -
 # still, it should be located in the folder for the selected feference):
-refFASTAname <- "K_12.fasta"
+refFASTAname <- "Y22-3.assembly.2015_01_13.fasta"
 #
 # name of the reference genomic features file (may differ from the base name of the reference -
 # this will be eventually taken from the database); it should be located in the folder for the selected feference)
 # gtf files may be used instead of gff where applicable; the same object is used for both cases:
-refGFFname <- "K_12.gtf"
+refGFFname <- "Y22-3.A144c.gtf"
 # refGFFname <- "Novosphingobium_3replicons.Clean.gff"
 #
 # number of the column in GTF file with the gene / other IDs charachter string (9, unless the file is non-standard for some reason):
@@ -83,7 +83,7 @@ idAttr <- "gene_id"
 ###############################
 #
 # the directory containing the GLSeq scripts:
-base.dir <- NULL
+base.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Working_RScript_Files"
 #
 # Base of the destination directory (added May 9, 2013)
 # This should be located on a FAST volume (SCSI is recommended)
@@ -94,11 +94,11 @@ dest.dir.base <- NULL
 nCores <- 6
 #
 # number of parallel computation streams for expression computation
-nStreams <- 4
+nStreams <-4
 #
 # number of parallel computation streams for data preparation
 # (may differ from the number of streams for expression computation because of particular software demands) 
-nStreamsDataPrep <- 1
+nStreamsDataPrep <- 3
 #
 # the default run attempt
 runAttempt <- formatC(1, width=2, flag="0")
@@ -108,13 +108,11 @@ runAttempt <- formatC(1, width=2, flag="0")
 # now is being generated inside GLSeq.top.R
 #
 # *** quantification algorithm ***
-#
-# These will only be used if the top script is run with the
-# "alignment" or the "counting" options respectively
-#
-# Alignment Algorithm
-qAlgor <- "Cushaw"
-# Counting Algorithm
+# Supported values for qAlgor are: "CUSHAW","Bowtie","Bowtie2","BWA"
+qAlgor <- "BWA"
+#Supported values for cAlgor (These can be included with the list created by c())
+# are: "FeatureCounts","HTSeq", and (If using an ungapped aligner) "RSEM"
+# an example of this is shown below
 cAlgor <- c("FeatureCounts","HTSeq")
 #
 #  GPU acceleration option for CUSHAW
@@ -133,7 +131,7 @@ trimMin <- 36
 # trimmomatic parameter values for HEADCROP  
 trimhead <- 12
 #
-# name of the FASTA file with artificial sequences (adapters, primers etc) - must be located in the base.dir
+# name of the FASTA file with artificail sequences (adapters, primers etc) - must be located in the base.dir
 artificial.fq <- "JGI.clean2.fa"
 #
 ###############################
