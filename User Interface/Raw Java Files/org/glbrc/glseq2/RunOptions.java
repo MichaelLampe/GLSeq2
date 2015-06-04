@@ -1,4 +1,5 @@
 package org.glbrc.glseq2;
+
 ///////////////////////////////////////////////////////////////////////////////
 //                   
 // Main Class File:  UI.java
@@ -156,6 +157,10 @@ public class RunOptions {
 				writer.write(field[i].getName() + " = " + field[i].get(this)
 						+ "\n");
 			} catch (Exception e) {
+				// I know this doesn't look as good as it could, but it is just
+				// a way to make sure it gets written even if the user has weird
+				// stuff in the file. When reading the program won't care about
+				// that so it should be fine. (#FamousLastWords)
 				continue;
 			}
 		}
@@ -184,7 +189,8 @@ public class RunOptions {
 	public String getAlignment() {
 		return alignment;
 	}
-	public String getCounting(){
+
+	public String getCounting() {
 		return counting;
 	}
 
@@ -223,7 +229,8 @@ public class RunOptions {
 	public void setAlignment(String alignment) {
 		this.alignment = alignment;
 	}
-	public void setCounting(String counting){
+
+	public void setCounting(String counting) {
 		this.counting = counting;
 	}
 

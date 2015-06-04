@@ -1,4 +1,5 @@
 package org.glbrc.glseq2;
+
 ///////////////////////////////////////////////////////////////////////////////
 //                   
 // Main Class File:  GLSeq2_Main_Application.java
@@ -15,49 +16,50 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 // SwingWorker allows for parallel execution
-public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
+public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
 
 	@Override
 	protected List<Integer> doInBackground() throws IOException {
 		startScript();
-		GLSeq2_Main_Application.att.saveConfigFile(GLSeq2_Main_Application.run.getDestinationDirectory(GLSeq2_Main_Application.att
-				.getDestinationDirectory())
-				+ "/AttributesConfigFile_"
-				+ GLSeq2_Main_Application.att.runId + ".txt");
-		GLSeq2_Main_Application.run.saveConfigFile(GLSeq2_Main_Application.run.getDestinationDirectory(GLSeq2_Main_Application.att
-				.getDestinationDirectory())
-				+ "/RunConfigFile_"
-				+ GLSeq2_Main_Application.att.runId
-				+ ".txt");
 		return null;
 	}
 
 	private void startScript() {
+		/*
+		 * Saves both the attribute and run config file. This is just pulling
+		 * data from the correct sources to get a good file path for the saved
+		 * files.
+		 */
 		try {
 			GLSeq2_Main_Application.updating("Saving current inputs");
-			GLSeq2_Main_Application.att.saveConfigFile(GLSeq2_Main_Application.run.getDestinationDirectory(GLSeq2_Main_Application.att
-					.getDestinationDirectory())
-					+ "/AttributesConfigFile_"
-					+ GLSeq2_Main_Application.att.runId + ".txt");
-			GLSeq2_Main_Application.run.saveConfigFile(GLSeq2_Main_Application.run.getDestinationDirectory(GLSeq2_Main_Application.att
-					.getDestinationDirectory())
-					+ "/RunConfigFile_"
-					+ GLSeq2_Main_Application.att.runId + ".txt");
+			GLSeq2_Main_Application.att
+					.saveConfigFile(GLSeq2_Main_Application.run
+							.getDestinationDirectory(GLSeq2_Main_Application.att
+									.getDestinationDirectory())
+							+ "/AttributesConfigFile_"
+							+ GLSeq2_Main_Application.att.runId + ".txt");
+			GLSeq2_Main_Application.run
+					.saveConfigFile(GLSeq2_Main_Application.run
+							.getDestinationDirectory(GLSeq2_Main_Application.att
+									.getDestinationDirectory())
+							+ "/RunConfigFile_"
+							+ GLSeq2_Main_Application.att.runId + ".txt");
 		} catch (IOException e) {
-			GLSeq2_Main_Application.updating("Problem saving config files");
+			GLSeq2_Main_Application
+					.updating("Problem saving config files.  Files unable to be saved or written to.");
 		}
-		System.out.println("Started the script");
+		// Indicate to user that the script has started
+		GLSeq2_Main_Application.updating("Started GLSeq.top.R script. (Top Script which runs your input settings)");
 		List<String> args = GLSeq2_Main_Application.run.returnArgs();
 		// Script generated based on arguments from the RunOptions class.
 		// It calls the R script with the correct user parameters
-		GLSeq2_Main_Application.updating("Starting analysis script");
 		ProcessBuilder script = new ProcessBuilder(args);
-		script.directory(new File(GLSeq2_Main_Application.run.getScriptDirectory(GLSeq2_Main_Application.att
-				.getScriptDirectory())));
+		script.directory(new File(GLSeq2_Main_Application.run
+				.getScriptDirectory(GLSeq2_Main_Application.att
+						.getScriptDirectory())));
 		Process process = null;
 		try {
 			process = script.start();
@@ -70,11 +72,11 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
 								new InputStreamReader(is));
 						String line;
 						while ((line = reader.readLine()) != null) {
-							GLSeq2_Main_Application.updating(line);
+							GLSeq2_Main_Application.updating("Program: "+ line);
 						}
 						reader = new BufferedReader(new InputStreamReader(es));
 						while ((line = reader.readLine()) != null) {
-							GLSeq2_Main_Application.updating(line);
+							GLSeq2_Main_Application.updating("Error: " + line);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -90,7 +92,8 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
 			// Error message if the script is incorrectly run. Did not select
 			// directory or options are easy reasons for this error.
 		} catch (IOException e) {
-			GLSeq2_Main_Application.updating("Sorry, there was a problem running the script.  Please check that all the options have been correctly selected.");
+			GLSeq2_Main_Application
+					.updating("Sorry, there was a problem running the script.  Please check that all the options have been correctly selected.");
 			GLSeq2_Main_Application.updating(String.valueOf(e));
 		}
 		try {
@@ -98,7 +101,7 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
 			process.waitFor();
 			GLSeq2_Main_Application.updating("Process complete.");
 		} catch (InterruptedException e) {
-			GLSeq2_Main_Application.updating("Error running the script.");
-		} 
+			GLSeq2_Main_Application.updating("Error running the script. Script interrupted.");
+		}
 	}
 }

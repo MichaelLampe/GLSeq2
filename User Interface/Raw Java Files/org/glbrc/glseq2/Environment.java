@@ -11,23 +11,76 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 
 public class Environment extends JDialog {
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private final JTextArea trimmomatic = new JTextArea();
-	private final JTextArea fastqc = new JTextArea();
-	private final JTextArea picard = new JTextArea();
-	private final JTextArea cushaw_index = new JTextArea();
-	private final JTextArea cushaw = new JTextArea();
-	private final JTextArea bam2wig = new JTextArea();
-	private final JTextArea bwa = new JTextArea();
-	private final JTextArea cushaw_gpu = new JTextArea();
 
+
+	private final JTextPane txtchEnvironmentOptions = new JTextPane();
+	/*
+	 *  Picard tools menu
+	 */
+	private final JTextArea txtPicard = new JTextArea();
+	private final JPanel panelPicard = new JPanel();
+	private final JTextPane txtcPicard = new JTextPane();
+	/*
+	 * Fastqc menu
+	 */
+	private final JTextArea txtFastqc = new JTextArea();
+	private final JPanel panelFastqc = new JPanel();
+	private final JTextPane txtcFastqc = new JTextPane();
+	/*
+	 * Bam2wig menu
+	 */
+	private final JTextArea txtBam2Wig = new JTextArea();
+	private final JPanel panelBam2Wig = new JPanel();
+	private final JTextPane txtcBam2Wig = new JTextPane();
+	/*
+	 * Bwa menu
+	 */
+	private final JPanel panelBwa = new JPanel();
+	private final JTextPane txtcBwa = new JTextPane();
+	private final JTextArea txtBwa = new JTextArea();
+	/*
+	 * Trimmomatic menu
+	 */
+	private final JPanel panelTrimmomatic = new JPanel();
+	private final JTextArea txtTrimmomatic = new JTextArea();
+	private final JTextPane txtcTrimmomatic = new JTextPane();
+	/*
+	 * Cushaw menu
+	 */
+	private final JTextArea txtCushaw = new JTextArea();
+	private final JPanel panelCushaw = new JPanel();
+	private final JTextPane txtc_Cushaw = new JTextPane();
+	/*
+	 * Cushaw index menu
+	 */
+	private final JPanel panelCushaw_Index = new JPanel();
+	private final JTextPane txtcCushaw_Index = new JTextPane();
+	private final JTextArea txtCushawIndex = new JTextArea();
+	/*
+	 * Cushaw GPU menu
+	 */
+	private final JPanel panelCushaw_GPU = new JPanel();
+	private final JTextPane txtcCushaw_GPU = new JTextPane();
+	private final JTextArea txtCushaw_GPU = new JTextArea();
+	
+	/*
+	 * Movement options
+	 */
+	private final JPanel panelButton = new JPanel();
+	private final JButton okButton = new JButton("Apply and Close");
+	private final JButton cancelButton = new JButton("Cancel");
+	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -45,16 +98,17 @@ public class Environment extends JDialog {
 	 * Create the dialog.
 	 */
 	public Environment() {
+		setResizable(false);
 		initGUI();
 		// Initialize some variables
-		trimmomatic.setText(GLSeq2_Main_Application.att.getTrimPath());
-		picard.setText(GLSeq2_Main_Application.att.getPicardToolsPath());
-		fastqc.setText(GLSeq2_Main_Application.att.getFastqcPath());
-		bwa.setText(GLSeq2_Main_Application.att.getBwaPath());
-		bam2wig.setText(GLSeq2_Main_Application.att.getBam2WigPath());
-		cushaw.setText(GLSeq2_Main_Application.att.getCushawPath());
-		cushaw_index.setText(GLSeq2_Main_Application.att.getCushawIndexPath());
-		cushaw_gpu.setText(GLSeq2_Main_Application.att.getCushawGpuPath());
+		txtTrimmomatic.setText(GLSeq2_Main_Application.att.getTrimPath());
+		txtPicard.setText(GLSeq2_Main_Application.att.getPicardToolsPath());
+		txtFastqc.setText(GLSeq2_Main_Application.att.getFastqcPath());
+		txtBwa.setText(GLSeq2_Main_Application.att.getBwaPath());
+		txtBam2Wig.setText(GLSeq2_Main_Application.att.getBam2WigPath());
+		txtCushaw.setText(GLSeq2_Main_Application.att.getCushawPath());
+		txtCushawIndex.setText(GLSeq2_Main_Application.att.getCushawIndexPath());
+		txtCushaw_GPU.setText(GLSeq2_Main_Application.att.getCushawGpuPath());
 
 	}
 	private void initGUI() {
@@ -66,219 +120,199 @@ public class Environment extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 166, 496, 59);
-			contentPanel.add(panel);
+			panelFastqc.setForeground(Color.DARK_GRAY);
+			panelFastqc.setBackground(Color.LIGHT_GRAY);
+			panelFastqc.setLayout(null);
+			panelFastqc.setBounds(10, 166, 496, 59);
+			contentPanel.add(panelFastqc);
 			{
-				fastqc.setBounds(156, 11, 330, 37);
-				panel.add(fastqc);
+				txtFastqc.setBounds(156, 11, 330, 37);
+				panelFastqc.add(txtFastqc);
 			}
 			{
-				JTextPane txtpnPathToFastqc = new JTextPane();
-				txtpnPathToFastqc.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToFastqc);
-				txtpnPathToFastqc.setText("Path to Fastqc");
-				txtpnPathToFastqc.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToFastqc.setEditable(false);
-				txtpnPathToFastqc.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToFastqc);
+				txtcFastqc.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcFastqc);
+				txtcFastqc.setText("Path to Fastqc");
+				txtcFastqc.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcFastqc.setEditable(false);
+				txtcFastqc.setBounds(10, 11, 136, 37);
+				panelFastqc.add(txtcFastqc);
 			}
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 107, 496, 59);
-			contentPanel.add(panel);
+			panelPicard.setForeground(Color.DARK_GRAY);
+			panelPicard.setBackground(Color.LIGHT_GRAY);
+			panelPicard.setLayout(null);
+			panelPicard.setBounds(10, 107, 496, 59);
+			contentPanel.add(panelPicard);
 			{
-				picard.setBounds(156, 11, 330, 37);
-				panel.add(picard);
+				txtPicard.setBounds(156, 11, 330, 37);
+				panelPicard.add(txtPicard);
 			}
 			{
-				JTextPane txtpnPathToPicardtools = new JTextPane();
-				txtpnPathToPicardtools.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToPicardtools);
-				txtpnPathToPicardtools.setText("Path to PicardTools Jar Directory");
-				txtpnPathToPicardtools.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToPicardtools.setEditable(false);
-				txtpnPathToPicardtools.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToPicardtools);
+				txtcPicard.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcPicard);
+				txtcPicard.setText("Path to PicardTools Jar Directory");
+				txtcPicard.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcPicard.setEditable(false);
+				txtcPicard.setBounds(10, 11, 136, 37);
+				panelPicard.add(txtcPicard);
 			}
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 48, 496, 59);
-			contentPanel.add(panel);
+			panelTrimmomatic.setForeground(Color.DARK_GRAY);
+			panelTrimmomatic.setBackground(Color.LIGHT_GRAY);
+			panelTrimmomatic.setLayout(null);
+			panelTrimmomatic.setBounds(10, 48, 496, 59);
+			contentPanel.add(panelTrimmomatic);
 			{
-				trimmomatic.setBounds(156, 11, 330, 37);
-				panel.add(trimmomatic);
+				txtTrimmomatic.setBounds(156, 11, 330, 37);
+				panelTrimmomatic.add(txtTrimmomatic);
 			}
 			{
-				JTextPane txtpnPathToTrimmomatic = new JTextPane();
-				txtpnPathToTrimmomatic.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToTrimmomatic);
-				txtpnPathToTrimmomatic.setText("Path to Trimmomatic");
-				txtpnPathToTrimmomatic.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToTrimmomatic.setEditable(false);
-				txtpnPathToTrimmomatic.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToTrimmomatic);
+				txtcTrimmomatic.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcTrimmomatic);
+				txtcTrimmomatic.setText("Path to Trimmomatic");
+				txtcTrimmomatic.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcTrimmomatic.setEditable(false);
+				txtcTrimmomatic.setBounds(10, 11, 136, 37);
+				panelTrimmomatic.add(txtcTrimmomatic);
 			}
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 397, 496, 59);
-			contentPanel.add(panel);
+			panelCushaw.setForeground(Color.DARK_GRAY);
+			panelCushaw.setBackground(Color.LIGHT_GRAY);
+			panelCushaw.setLayout(null);
+			panelCushaw.setBounds(10, 397, 496, 59);
+			contentPanel.add(panelCushaw);
 			{
-				cushaw.setBounds(156, 11, 330, 37);
-				panel.add(cushaw);
+				txtCushaw.setBounds(156, 11, 330, 37);
+				panelCushaw.add(txtCushaw);
 			}
 			{
-				JTextPane txtpnPathToCushaw = new JTextPane();
-				txtpnPathToCushaw.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToCushaw);
-				txtpnPathToCushaw.setText("Path to CUSHAW");
-				txtpnPathToCushaw.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToCushaw.setEditable(false);
-				txtpnPathToCushaw.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToCushaw);
+				txtc_Cushaw.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtc_Cushaw);
+				txtc_Cushaw.setText("Path to CUSHAW");
+				txtc_Cushaw.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtc_Cushaw.setEditable(false);
+				txtc_Cushaw.setBounds(10, 11, 136, 37);
+				panelCushaw.add(txtc_Cushaw);
 			}
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 456, 496, 59);
-			contentPanel.add(panel);
+			panelCushaw_GPU.setForeground(Color.DARK_GRAY);
+			panelCushaw_GPU.setBackground(Color.LIGHT_GRAY);
+			panelCushaw_GPU.setLayout(null);
+			panelCushaw_GPU.setBounds(10, 456, 496, 59);
+			contentPanel.add(panelCushaw_GPU);
 			{
-				cushaw_gpu.setBounds(156, 11, 330, 37);
-				panel.add(cushaw_gpu);
+				txtCushaw_GPU.setBounds(156, 11, 330, 37);
+				panelCushaw_GPU.add(txtCushaw_GPU);
 			}
 			{
-				JTextPane txtpnPathToCushawgpu = new JTextPane();
-				txtpnPathToCushawgpu.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToCushawgpu);
-				txtpnPathToCushawgpu.setText("Path to CUSHAW-GPU");
-				txtpnPathToCushawgpu.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToCushawgpu.setEditable(false);
-				txtpnPathToCushawgpu.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToCushawgpu);
+				txtcCushaw_GPU.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcCushaw_GPU);
+				txtcCushaw_GPU.setText("Path to CUSHAW-GPU");
+				txtcCushaw_GPU.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcCushaw_GPU.setEditable(false);
+				txtcCushaw_GPU.setBounds(10, 11, 136, 37);
+				panelCushaw_GPU.add(txtcCushaw_GPU);
 			}
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 282, 496, 59);
-			contentPanel.add(panel);
+			panelBam2Wig.setForeground(Color.DARK_GRAY);
+			panelBam2Wig.setBackground(Color.LIGHT_GRAY);
+			panelBam2Wig.setLayout(null);
+			panelBam2Wig.setBounds(10, 282, 496, 59);
+			contentPanel.add(panelBam2Wig);
 			{
-				bam2wig.setBounds(156, 11, 330, 37);
-				panel.add(bam2wig);
+				txtBam2Wig.setBounds(156, 11, 330, 37);
+				panelBam2Wig.add(txtBam2Wig);
 			}
 			{
-				JTextPane txtpnPathToBamwig = new JTextPane();
-				txtpnPathToBamwig.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToBamwig);
-				txtpnPathToBamwig.setText("Path to Bam2Wig Shell Script");
-				txtpnPathToBamwig.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToBamwig.setEditable(false);
-				txtpnPathToBamwig.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToBamwig);
+				txtcBam2Wig.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcBam2Wig);
+				txtcBam2Wig.setText("Path to Bam2Wig Shell Script");
+				txtcBam2Wig.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcBam2Wig.setEditable(false);
+				txtcBam2Wig.setBounds(10, 11, 136, 37);
+				panelBam2Wig.add(txtcBam2Wig);
 			}
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(10, 225, 496, 59);
-			contentPanel.add(panel);
+			panelBwa.setForeground(Color.DARK_GRAY);
+			panelBwa.setBackground(Color.LIGHT_GRAY);
+			panelBwa.setLayout(null);
+			panelBwa.setBounds(10, 225, 496, 59);
+			contentPanel.add(panelBwa);
 			{
-				bwa.setBounds(156, 11, 330, 37);
-				panel.add(bwa);
+				txtBwa.setBounds(156, 11, 330, 37);
+				panelBwa.add(txtBwa);
 			}
 			{
-				JTextPane txtpnPathToBwa = new JTextPane();
-				txtpnPathToBwa.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToBwa);
-				txtpnPathToBwa.setText("Path to BWA");
-				txtpnPathToBwa.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToBwa.setEditable(false);
-				txtpnPathToBwa.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToBwa);
+				txtcBwa.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcBwa);
+				txtcBwa.setText("Path to BWA");
+				txtcBwa.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcBwa.setEditable(false);
+				txtcBwa.setBounds(10, 11, 136, 37);
+				panelBwa.add(txtcBwa);
 			}
 		}
 		{
-			JTextPane txtpnEnvironmentOptions = new JTextPane();
-			txtpnEnvironmentOptions.setFont(new Font("Arial", Font.PLAIN, 20));
-			txtpnEnvironmentOptions.setForeground(Color.DARK_GRAY);
-			nimbusFix(Color.LIGHT_GRAY,txtpnEnvironmentOptions);
-			txtpnEnvironmentOptions.setText("Environment Options");
-			txtpnEnvironmentOptions.setEditable(false);
-			txtpnEnvironmentOptions.setBounds(10, 4, 496, 33);
-			contentPanel.add(txtpnEnvironmentOptions);
+			txtchEnvironmentOptions.setFont(GLSeq2_Main_Application.HEADER_FONT);
+			txtchEnvironmentOptions.setForeground(Color.DARK_GRAY);
+			nimbusFix(Color.LIGHT_GRAY,txtchEnvironmentOptions);
+			txtchEnvironmentOptions.setText("Environment Options");
+			txtchEnvironmentOptions.setEditable(false);
+			txtchEnvironmentOptions.setBounds(10, 4, 496, 33);
+			contentPanel.add(txtchEnvironmentOptions);
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setLayout(null);
-			panel.setForeground(Color.DARK_GRAY);
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setBounds(10, 338, 496, 59);
-			contentPanel.add(panel);
+			panelCushaw_Index.setLayout(null);
+			panelCushaw_Index.setForeground(Color.DARK_GRAY);
+			panelCushaw_Index.setBackground(Color.LIGHT_GRAY);
+			panelCushaw_Index.setBounds(10, 338, 496, 59);
+			contentPanel.add(panelCushaw_Index);
 			{
-				cushaw_index.setBounds(156, 11, 330, 37);
-				panel.add(cushaw_index);
+				txtCushawIndex.setBounds(156, 11, 330, 37);
+				panelCushaw_Index.add(txtCushawIndex);
 			}
 			{
-				JTextPane txtpnPathToCushaw_1 = new JTextPane();
-				txtpnPathToCushaw_1.setText("Path to CUSHAW Index");
-				txtpnPathToCushaw_1.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY,txtpnPathToCushaw_1);
-				txtpnPathToCushaw_1.setFont(new Font("Arial", Font.PLAIN, 11));
-				txtpnPathToCushaw_1.setEditable(false);
-				txtpnPathToCushaw_1.setBounds(10, 11, 136, 37);
-				panel.add(txtpnPathToCushaw_1);
+				txtcCushaw_Index.setText("Path to CUSHAW Index");
+				txtcCushaw_Index.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY,txtcCushaw_Index);
+				txtcCushaw_Index.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				txtcCushaw_Index.setEditable(false);
+				txtcCushaw_Index.setBounds(10, 11, 136, 37);
+				panelCushaw_Index.add(txtcCushaw_Index);
 			}
 		}
 		{
-			JPanel buttonPane = new JPanel();
-			buttonPane.setBackground(Color.GRAY);
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			panelButton.setBackground(Color.GRAY);
+			panelButton.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(panelButton, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Apply and Close");
 				okButton.setActionCommand("OK");
 				okButton.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent arg0) {
-						GLSeq2_Main_Application.att.setTrimPath(trimmomatic.getText());
-						GLSeq2_Main_Application.att.setPicardToolsPath(picard.getText());
-						GLSeq2_Main_Application.att.setFastqcPath(fastqc.getText());
-						GLSeq2_Main_Application.att.setBwaPath(bwa.getText());
-						GLSeq2_Main_Application.att.setBam2WigPath(bam2wig.getText());
-						GLSeq2_Main_Application.att.setCushawPath(cushaw.getText());
-						GLSeq2_Main_Application.att.setCushawIndexPath(cushaw_index.getText());
-						GLSeq2_Main_Application.att.setCushawGpuPath(cushaw_gpu.getText());
+						GLSeq2_Main_Application.att.setTrimPath(txtTrimmomatic.getText());
+						GLSeq2_Main_Application.att.setPicardToolsPath(txtPicard.getText());
+						GLSeq2_Main_Application.att.setFastqcPath(txtFastqc.getText());
+						GLSeq2_Main_Application.att.setBwaPath(txtBwa.getText());
+						GLSeq2_Main_Application.att.setBam2WigPath(txtBam2Wig.getText());
+						GLSeq2_Main_Application.att.setCushawPath(txtCushaw.getText());
+						GLSeq2_Main_Application.att.setCushawIndexPath(txtCushawIndex.getText());
+						GLSeq2_Main_Application.att.setCushawGpuPath(txtCushaw_GPU.getText());
 						dispose();
 					}
 				});	
-				buttonPane.add(okButton);
+				panelButton.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+				panelButton.add(cancelButton);
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						dispose();
