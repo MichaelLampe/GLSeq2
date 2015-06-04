@@ -72,11 +72,11 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
 								new InputStreamReader(is));
 						String line;
 						while ((line = reader.readLine()) != null) {
-							GLSeq2_Main_Application.updating("Program: "+ line);
+							GLSeq2_Main_Application.updating("Program: " + line);
 						}
 						reader = new BufferedReader(new InputStreamReader(es));
 						while ((line = reader.readLine()) != null) {
-							GLSeq2_Main_Application.updating("Error: " + line);
+							GLSeq2_Main_Application.updating("Program: " + line);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
