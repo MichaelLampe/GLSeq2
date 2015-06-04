@@ -4,14 +4,14 @@ occured <- FALSE
 ################################################
 #BWA Alignment Protocol
 ################################################
-if (qAlgor == "BWA"){
+if (aAlgor == "BWA"){
   occured <- TRUE
   source ("GLSeq.BWA.R")
 }
 ################################################
 #Bowtie and Bowtie2 Alignment Protocol
 ################################################
-if (qAlgor == "Bowtie" || qAlgor == "Bowtie2"){
+if (aAlgor == "Bowtie" || aAlgor == "Bowtie2"){
   occured <- TRUE
   source ("GLSeq.Bowtie.R")
 }
@@ -19,7 +19,7 @@ if (qAlgor == "Bowtie" || qAlgor == "Bowtie2"){
 ################################################
 #Cushaw w/ and w/o GPU Accel Alignment Protocol
 ################################################
-if (qAlgor == "Cushaw"){
+if (aAlgor == "Cushaw"){
   occured <- TRUE
   source ("GLSeq.CUSHAW.R")
 }
