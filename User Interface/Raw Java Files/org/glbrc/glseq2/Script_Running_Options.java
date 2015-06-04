@@ -96,6 +96,11 @@ public class Script_Running_Options extends JDialog {
 			checkRsem.setSelected(false);
 			checkRsem.setEnabled(false);
 		}
+		if (String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("CUSHAW")){
+			if (GLSeq2_Main_Application.att.getGpuAccel().equals("TRUE")){
+				comboAlignmentAlgo.setSelectedItem("Cushaw-GPU");
+			}
+		}
 		spinNumberOfCores.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getCores()));
 		txtGlseqDirectory.setText(GLSeq2_Main_Application.att.getScriptDirectory());
 		comboAlignmentAlgo.setSelectedItem(GLSeq2_Main_Application.att.getaAlgor());
@@ -453,6 +458,11 @@ public class Script_Running_Options extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						GLSeq2_Main_Application.att.setaAlgor(String.valueOf(comboAlignmentAlgo.getSelectedItem()));
+						if (String.valueOf(comboAlignmentAlgo.getSelectedItem()).equals("Cushaw-GPU")){
+							GLSeq2_Main_Application.att.setGpuAccel("TRUE");
+						} else{
+							GLSeq2_Main_Application.att.setGpuAccel("FALSE");
+						}
 						GLSeq2_Main_Application.att.setCores(String.valueOf(spinNumberOfCores.getValue()));
 						GLSeq2_Main_Application.att.setScriptDirectory(txtGlseqDirectory.getText());
 						if (checkFeatureCount.isSelected()){

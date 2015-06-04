@@ -30,6 +30,7 @@ system(index)
 ### If using the GPU, alignment occurs in sequence so as to not overload the GPU memory (Each process is ~6GB)
 ### Our NVidia Titan can sometimes run two at a time without alignment corruption, but this is a safer route.
 ####################################
+sam.create <- NULL
 if (GPU.accel){
   for (zz in 1:nStreams) {
     for (i in rangelist[[zz]]) {
@@ -46,7 +47,6 @@ if (GPU.accel){
       ###################
       # CUSHAW alignment:
       ###################
-      sam.create <- NULL
       ############
       # I've tried to increase the cores to nStreams*nCores 
       # (That should be how many cores the user has available), 
@@ -76,8 +76,11 @@ if (GPU.accel){
       if (!(paired.end)) create <- paste(CUSHAW.GPU.path, "-r", refFASTAname, "-s", fq.left, "-o", unsorted.sam,"-t", nCores)
       # Checks to make sure that this process actually is GPU
       # The is.null is there for later on implementation of parallel GPU runs. (Hopefully!)
-      if (i == 1) sam.create <- paste(create)
-      if (i > 1) sam.create <- paste(sam.create,"&&",create)
+      if (is.null(sam.create)){
+        sam.create <- paste(create)
+      } else{
+        sam.create <- paste(sam.create,"&&",create)
+      }
       #
       # Fixes the order of processing so that
       # The SAM file gets created when the user
@@ -87,7 +90,9 @@ if (GPU.accel){
     } # i
   } #nStreams (zz)
 } #GPU.Accel
-if (!is.null(sam.create)) Cushawgpu.special.case <- paste(sam.create)
+if (!is.null(sam.create)) {
+  Cushawgpu.special.case <- paste(sam.create)
+}
 
 #################
 # Rest of the cleanup to get to counting, or CPU only CUSHAW

@@ -515,6 +515,9 @@ public class Attributes {
 		// Writes a new attribute file based on the current format that we have
 		// outlined.
 		// Saves it as an R file, with the current date.
+		if (aAlgor.equals("Cushaw-GPU")){
+			aAlgor = "Cushaw";
+		}
 		Date current = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd");
 		File attributeFile = new File("Attribute_" + ft.format(current) + ".R");
