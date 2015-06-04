@@ -29,23 +29,51 @@ import javax.swing.JCheckBox;
 
 public class Script_Running_Options extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	//
-	private final JSpinner numberOfCores = new JSpinner();
-	private final JTextArea glseqDirectory = new JTextArea();
-	private final JComboBox<String> alignmentAlgo = new JComboBox<String>();
-	private final JCheckBox featureCountBox = new JCheckBox("Feature Counts");
-	private final JCheckBox htseqBox = new JCheckBox("HTSeq");
-	private final JCheckBox rsemBox = new JCheckBox("RSEM");
-	private final JButton button = new JButton("");
-	private final JTextArea protocolID = new JTextArea();
-	private final JSpinner parallelStreamsExpression = new JSpinner();
-	private final JSpinner parallelStreamsData = new JSpinner();
-	private final JSpinner maxFragLength = new JSpinner();
-	private final JSpinner maxBufferConfInt = new JSpinner();
-	private final JButton extractCoverage = new JButton();
-	private final JButton computeConfIntervals = new JButton();
-	private final JButton outputGenomeBam = new JButton();
+	private final JSpinner spinNumberOfCores = new JSpinner();
+	private final JTextArea txtGlseqDirectory = new JTextArea();
+	private final JComboBox<String> comboAlignmentAlgo = new JComboBox<String>();
+	private final JCheckBox checkFeatureCount = new JCheckBox("Feature Counts");
+	private final JCheckBox checkHtSeq = new JCheckBox("HTSeq");
+	private final JCheckBox checkRsem = new JCheckBox("RSEM");
+	private final JButton btnScriptDirectory = new JButton("");
+	private final JTextArea txtProtocolID = new JTextArea();
+	private final JSpinner spinParallelExpression = new JSpinner();
+	private final JSpinner spinParallelDataPrep = new JSpinner();
+	private final JSpinner spinMaxFragLen = new JSpinner();
+	private final JSpinner spinMaxBuffer = new JSpinner();
+	private final JButton btnExtractCoverage = new JButton();
+	private final JButton btnComputeConfIntervals = new JButton();
+	private final JButton btnOutputGenomeBam = new JButton();
+	private final JPanel panelGlow = new JPanel();
+	private final JPanel panelManualHolder = new JPanel();
+	private final JPanel panelScript = new JPanel();
+	private final JTextPane txtcGlseqScriptDirectory = new JTextPane();
+	private final JPanel panelProtocol = new JPanel();
+	private final JTextPane txtcProtocolId = new JTextPane();
+	private final JPanel panelAlignment = new JPanel();
+	private final JTextPane txtcAlignmentAlgorithm = new JTextPane();
+	private final JPanel panelCounting = new JPanel();
+	private final JTextPane txtcCountingMethods = new JTextPane();
+	private final JTextPane txtchPipelineOptions = new JTextPane();
+	private final JPanel panelNumberOfCores = new JPanel();
+	private final JTextPane txtcNumberOfCores = new JTextPane();
+	private final JPanel panelParallelExpressionComp = new JPanel();
+	private final JTextPane txtcParallelComputationStreams = new JTextPane();
+	private final JPanel panelParallelDataComp = new JPanel();
+	private final JTextPane txtcParallelComputationStreams_1 = new JTextPane();
+	private final JPanel panelMaxFragLen = new JPanel();
+	private final JTextPane txtcMaximalFragmentLength = new JTextPane();
+	private final JPanel panelMaxBufferConfInts = new JPanel();
+	private final JTextPane txtcMaximumAuxiliaryBuffer = new JTextPane();
+	private final JPanel buttonPane = new JPanel();
+	private final JButton okButton = new JButton("Apply and Close");
+	private final JButton cancelButton = new JButton("Cancel");
 	/**
 	 * Launch the application.
 	 */
@@ -64,44 +92,44 @@ public class Script_Running_Options extends JDialog {
 	 */
 	public Script_Running_Options() {
 		initGUI();
-		if (!String.valueOf(alignmentAlgo.getSelectedItem()).contains("Bowtie")) {
-			rsemBox.setSelected(false);
-			rsemBox.setEnabled(false);
+		if (!String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("Bowtie")) {
+			checkRsem.setSelected(false);
+			checkRsem.setEnabled(false);
 		}
-		numberOfCores.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getCores()));
-		glseqDirectory.setText(GLSeq2_Main_Application.att.getScriptDirectory());
-		alignmentAlgo.setSelectedItem(GLSeq2_Main_Application.att.getaAlgor());
+		spinNumberOfCores.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getCores()));
+		txtGlseqDirectory.setText(GLSeq2_Main_Application.att.getScriptDirectory());
+		comboAlignmentAlgo.setSelectedItem(GLSeq2_Main_Application.att.getaAlgor());
 		if(GLSeq2_Main_Application.att.getFeatureCounts().contains("FeatureCounts")){
-			featureCountBox.setSelected(true);
+			checkFeatureCount.setSelected(true);
 		}
 		if(GLSeq2_Main_Application.att.getHTSeq().contains("HTSeq")){
-			htseqBox.setSelected(true);
+			checkHtSeq.setSelected(true);
 		}
-		if(GLSeq2_Main_Application.att.getRSEM().contains("RSEM") && String.valueOf(alignmentAlgo.getSelectedItem()).contains("Bowtie")){
-			rsemBox.setSelected(true);
+		if(GLSeq2_Main_Application.att.getRSEM().contains("RSEM") && String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("Bowtie")){
+			checkRsem.setSelected(true);
 		}
-		protocolID.setText(GLSeq2_Main_Application.run.getProtocolId());
-		parallelStreamsExpression.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getStreams()));
-		parallelStreamsData.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getStreamsDataPrep()));
-		maxFragLength.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getFragMaxLength()));
-		maxBufferConfInt.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getCiMem()));
+		txtProtocolID.setText(GLSeq2_Main_Application.run.getProtocolId());
+		spinParallelExpression.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getStreams()));
+		spinParallelDataPrep.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getStreamsDataPrep()));
+		spinMaxFragLen.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getFragMaxLength()));
+		spinMaxBuffer.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getCiMem()));
 		
 		if (GLSeq2_Main_Application.att.getStrandExtract().equals("TRUE")){
-			extractCoverage.setText("Extracting Forward and Reverse Coverage from Original BAM File");
+			btnExtractCoverage.setText(ButtonEnums.OptionButton.EXTRACT.value);
 		} else{
-			extractCoverage.setText("NOT Extracting Forward and Reverse Coverage from Original BAM File");
+			btnExtractCoverage.setText(ButtonEnums.OptionButton.NO_EXTRACT.value);
 		}
 		
 		if (GLSeq2_Main_Application.att.getCompConf().equals("TRUE")){
-			computeConfIntervals.setText("Computing Confidence Intervals");
+			btnComputeConfIntervals.setText(ButtonEnums.OptionButton.COMPUTE.value);
 		} else{
-			computeConfIntervals.setText("NOT Computing Confidence Intervals");
+			btnComputeConfIntervals.setText(ButtonEnums.OptionButton.NO_COMPUTE.value);
 		}
 		
 		if (GLSeq2_Main_Application.att.getGenoBam().equals("TRUE")){
-			outputGenomeBam.setText("Outputting Genome BAM");
+			btnOutputGenomeBam.setText(ButtonEnums.OptionButton.OUTPUT.value);
 		} else{
-			outputGenomeBam.setText("NOT Outputting Genome Bam");
+			btnOutputGenomeBam.setText(ButtonEnums.OptionButton.NO_OUTPUT.value);
 		}
 	}
 
@@ -114,376 +142,353 @@ public class Script_Running_Options extends JDialog {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		{
-			JPanel panel = new JPanel();
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setLayout(null);
-			panel.setBounds(0, 0, 298, 569);
-			contentPanel.add(panel);
+			panelGlow.setBackground(Color.LIGHT_GRAY);
+			panelGlow.setLayout(null);
+			panelGlow.setBounds(0, 0, 298, 569);
+			contentPanel.add(panelGlow);
 		}
 		{
-			JPanel panel = new JPanel();
-			panel.setBackground(Color.LIGHT_GRAY);
-			panel.setBounds(308, 0, 516, 569);
-			contentPanel.add(panel);
-			panel.setLayout(null);
+			panelManualHolder.setBackground(Color.LIGHT_GRAY);
+			panelManualHolder.setBounds(308, 0, 516, 569);
+			contentPanel.add(panelManualHolder);
+			panelManualHolder.setLayout(null);
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(10, 64, 496, 59);
-				panel.add(panel_1);
+				panelScript.setForeground(Color.DARK_GRAY);
+				panelScript.setBackground(Color.LIGHT_GRAY);
+				panelScript.setLayout(null);
+				panelScript.setBounds(10, 64, 496, 59);
+				panelManualHolder.add(panelScript);
 				{
-					button.setIcon(new ImageIcon(
+					btnScriptDirectory.setIcon(new ImageIcon(
 							Script_Running_Options.class
 									.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-					button.setBounds(132, 11, 38, 37);
-					button.addActionListener(new ActionListener() {
+					btnScriptDirectory.setBounds(132, 11, 38, 37);
+					btnScriptDirectory.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							final JFileChooser chooser = new JFileChooser();
 							chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-							chooser.showOpenDialog(glseqDirectory);
+							chooser.showOpenDialog(txtGlseqDirectory);
 							try {
 								File file = chooser.getSelectedFile();
-								glseqDirectory.setText(file.getAbsolutePath());
+								txtGlseqDirectory.setText(file.getAbsolutePath());
 							} catch (NullPointerException e) {
 							}
 						}
 					});
-					panel_1.add(button);
+					panelScript.add(btnScriptDirectory);
 				}
 				{
-					glseqDirectory.setBounds(180, 11, 306, 37);
-					panel_1.add(glseqDirectory);
+					txtGlseqDirectory.setBounds(180, 11, 306, 37);
+					panelScript.add(txtGlseqDirectory);
 				}
 				{
-					JTextPane txtpnGlseqScriptDirectory = new JTextPane();
-					txtpnGlseqScriptDirectory.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnGlseqScriptDirectory);
-					txtpnGlseqScriptDirectory.setText("GLSeq Script Directory");
-					txtpnGlseqScriptDirectory.setFont(new Font("Arial",
+					txtcGlseqScriptDirectory.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcGlseqScriptDirectory);
+					txtcGlseqScriptDirectory.setText("GLSeq Script Directory");
+					txtcGlseqScriptDirectory.setFont(new Font("Arial",
 							Font.PLAIN, 11));
-					txtpnGlseqScriptDirectory.setEditable(false);
-					txtpnGlseqScriptDirectory.setBounds(10, 11, 112, 37);
-					panel_1.add(txtpnGlseqScriptDirectory);
+					txtcGlseqScriptDirectory.setEditable(false);
+					txtcGlseqScriptDirectory.setBounds(10, 11, 112, 37);
+					panelScript.add(txtcGlseqScriptDirectory);
 				}
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(301, 0, 205, 59);
-				panel.add(panel_1);
+				panelProtocol.setForeground(Color.DARK_GRAY);
+				panelProtocol.setBackground(Color.LIGHT_GRAY);
+				panelProtocol.setLayout(null);
+				panelProtocol.setBounds(301, 0, 205, 59);
+				panelManualHolder.add(panelProtocol);
 				{
-					protocolID.setBounds(98, 11, 90, 37);
-					panel_1.add(protocolID);
+					txtProtocolID.setBounds(98, 11, 90, 37);
+					panelProtocol.add(txtProtocolID);
 				}
 				{
-					JTextPane txtpnProtocolId = new JTextPane();
-					txtpnProtocolId.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnProtocolId);
-					txtpnProtocolId.setText("Protocol ID");
-					txtpnProtocolId.setFont(new Font("Arial", Font.PLAIN, 11));
-					txtpnProtocolId.setEditable(false);
-					txtpnProtocolId.setBounds(10, 11, 73, 37);
-					panel_1.add(txtpnProtocolId);
+					txtcProtocolId.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcProtocolId);
+					txtcProtocolId.setText("Protocol ID");
+					txtcProtocolId.setFont(GLSeq2_Main_Application.TEXT_FONT);
+					txtcProtocolId.setEditable(false);
+					txtcProtocolId.setBounds(10, 11, 73, 37);
+					panelProtocol.add(txtcProtocolId);
 				}
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setBounds(10, 134, 240, 81);
-				panel.add(panel_1);
-				panel_1.setLayout(null);
+				panelAlignment.setForeground(Color.DARK_GRAY);
+				panelAlignment.setBackground(Color.LIGHT_GRAY);
+				panelAlignment.setBounds(10, 134, 240, 81);
+				panelManualHolder.add(panelAlignment);
+				panelAlignment.setLayout(null);
 				{
-					JTextPane txtpnAlignmentAlgorithm = new JTextPane();
-					txtpnAlignmentAlgorithm.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnAlignmentAlgorithm);
-					txtpnAlignmentAlgorithm.setText("Alignment Algorithm");
-					txtpnAlignmentAlgorithm.setEditable(false);
-					txtpnAlignmentAlgorithm.setBounds(10, 0, 220, 20);
-					panel_1.add(txtpnAlignmentAlgorithm);
+					txtcAlignmentAlgorithm.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcAlignmentAlgorithm);
+					txtcAlignmentAlgorithm.setText("Alignment Algorithm");
+					txtcAlignmentAlgorithm.setEditable(false);
+					txtcAlignmentAlgorithm.setBounds(10, 0, 220, 20);
+					panelAlignment.add(txtcAlignmentAlgorithm);
 				}
-				alignmentAlgo.setFont(new Font("Arial", Font.PLAIN, 11));
-				alignmentAlgo.setModel(new DefaultComboBoxModel<String>(
+				comboAlignmentAlgo.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				comboAlignmentAlgo.setModel(new DefaultComboBoxModel<String>(
 						new String[] { "BWA", "Bowtie", "Bowtie2", "Cushaw",
 								"Cushaw-GPU" }));
-				alignmentAlgo.setBounds(10, 28, 220, 42);
-				alignmentAlgo.addActionListener(new ActionListener() {
+				comboAlignmentAlgo.setBounds(10, 28, 220, 42);
+				comboAlignmentAlgo.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if (String.valueOf(alignmentAlgo.getSelectedItem())
+						if (String.valueOf(comboAlignmentAlgo.getSelectedItem())
 								.contains("Bowtie")) {
-							rsemBox.setEnabled(true);
+							checkRsem.setEnabled(true);
 						} else {
-							rsemBox.setSelected(false);
-							rsemBox.setEnabled(false);
+							checkRsem.setSelected(false);
+							checkRsem.setEnabled(false);
 						}
 					}
 				});
-				panel_1.add(alignmentAlgo);
+				panelAlignment.add(comboAlignmentAlgo);
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(266, 123, 240, 92);
-				panel.add(panel_1);
+				panelCounting.setForeground(Color.DARK_GRAY);
+				panelCounting.setBackground(Color.LIGHT_GRAY);
+				panelCounting.setLayout(null);
+				panelCounting.setBounds(266, 123, 240, 92);
+				panelManualHolder.add(panelCounting);
 				{
-					JTextPane txtpnCountingMethods = new JTextPane();
-					txtpnCountingMethods.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnCountingMethods);
-					txtpnCountingMethods.setText("Counting Methods");
-					txtpnCountingMethods.setEditable(false);
-					txtpnCountingMethods.setBounds(10, 0, 220, 20);
-					panel_1.add(txtpnCountingMethods);
+					txtcCountingMethods.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcCountingMethods);
+					txtcCountingMethods.setText("Counting Methods");
+					txtcCountingMethods.setEditable(false);
+					txtcCountingMethods.setBounds(10, 0, 220, 20);
+					panelCounting.add(txtcCountingMethods);
 				}
-				featureCountBox.setFont(new Font("Arial", Font.PLAIN, 11));
-				featureCountBox.setForeground(Color.DARK_GRAY);
-				featureCountBox.setBackground(Color.LIGHT_GRAY);
-				featureCountBox.setBounds(10, 27, 122, 23);
+				checkFeatureCount.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				checkFeatureCount.setForeground(Color.DARK_GRAY);
+				checkFeatureCount.setBackground(Color.LIGHT_GRAY);
+				checkFeatureCount.setBounds(10, 27, 122, 23);
 
-				panel_1.add(featureCountBox);
-				htseqBox.setFont(new Font("Arial", Font.PLAIN, 11));
-				htseqBox.setForeground(Color.DARK_GRAY);
-				htseqBox.setBackground(Color.LIGHT_GRAY);
-				htseqBox.setBounds(10, 48, 64, 23);
+				panelCounting.add(checkFeatureCount);
+				checkHtSeq.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				checkHtSeq.setForeground(Color.DARK_GRAY);
+				checkHtSeq.setBackground(Color.LIGHT_GRAY);
+				checkHtSeq.setBounds(10, 48, 64, 23);
 
-				panel_1.add(htseqBox);
-				rsemBox.setFont(new Font("Arial", Font.PLAIN, 11));
-				rsemBox.setForeground(Color.DARK_GRAY);
-				rsemBox.setBackground(Color.LIGHT_GRAY);
-				rsemBox.setBounds(10, 69, 64, 23);
+				panelCounting.add(checkHtSeq);
+				checkRsem.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				checkRsem.setForeground(Color.DARK_GRAY);
+				checkRsem.setBackground(Color.LIGHT_GRAY);
+				checkRsem.setBounds(10, 69, 64, 23);
 
-				panel_1.add(rsemBox);
+				panelCounting.add(checkRsem);
 			}
 			{
-				JTextPane txtpnPipelineOptions = new JTextPane();
-				txtpnPipelineOptions.setForeground(Color.DARK_GRAY);
-				nimbusFix(Color.LIGHT_GRAY, txtpnPipelineOptions);
-				txtpnPipelineOptions.setText("Pipeline Options");
-				txtpnPipelineOptions.setFont(new Font("Arial", Font.PLAIN, 20));
-				txtpnPipelineOptions.setEditable(false);
-				txtpnPipelineOptions.setBounds(10, 11, 284, 42);
-				panel.add(txtpnPipelineOptions);
+				txtchPipelineOptions.setForeground(Color.DARK_GRAY);
+				nimbusFix(Color.LIGHT_GRAY, txtchPipelineOptions);
+				txtchPipelineOptions.setText("Pipeline Options");
+				txtchPipelineOptions.setFont(GLSeq2_Main_Application.HEADER_FONT);
+				txtchPipelineOptions.setEditable(false);
+				txtchPipelineOptions.setBounds(10, 11, 284, 42);
+				panelManualHolder.add(txtchPipelineOptions);
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setBounds(10, 226, 496, 40);
-				panel.add(panel_1);
-				panel_1.setLayout(null);
-				numberOfCores.setModel(new SpinnerNumberModel(new Integer(4), new Integer(0), null, new Integer(1)));
-				numberOfCores.setBounds(310, 0, 98, 40);
+				panelNumberOfCores.setForeground(Color.DARK_GRAY);
+				panelNumberOfCores.setBackground(Color.LIGHT_GRAY);
+				panelNumberOfCores.setBounds(10, 226, 496, 40);
+				panelManualHolder.add(panelNumberOfCores);
+				panelNumberOfCores.setLayout(null);
+				spinNumberOfCores.setModel(new SpinnerNumberModel(new Integer(4), new Integer(0), null, new Integer(1)));
+				spinNumberOfCores.setBounds(310, 0, 98, 40);
 
-				panel_1.add(numberOfCores);
+				panelNumberOfCores.add(spinNumberOfCores);
 				{
-					JTextPane txtpnNumberOfCores = new JTextPane();
-					txtpnNumberOfCores.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnNumberOfCores);
-					txtpnNumberOfCores.setEditable(false);
-					txtpnNumberOfCores.setBounds(0, 0, 300, 40);
-					panel_1.add(txtpnNumberOfCores);
-					txtpnNumberOfCores.setText("Number of Cores to Use");
+					txtcNumberOfCores.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcNumberOfCores);
+					txtcNumberOfCores.setEditable(false);
+					txtcNumberOfCores.setBounds(0, 0, 300, 40);
+					panelNumberOfCores.add(txtcNumberOfCores);
+					txtcNumberOfCores.setText("Number of Cores to Use");
 				}
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(10, 277, 496, 40);
-				panel.add(panel_1);
+				panelParallelExpressionComp.setForeground(Color.DARK_GRAY);
+				panelParallelExpressionComp.setBackground(Color.LIGHT_GRAY);
+				panelParallelExpressionComp.setLayout(null);
+				panelParallelExpressionComp.setBounds(10, 277, 496, 40);
+				panelManualHolder.add(panelParallelExpressionComp);
 				{
-					parallelStreamsExpression.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
-					parallelStreamsExpression.setBounds(310, 0, 98, 40);
-					panel_1.add(parallelStreamsExpression);
+					spinParallelExpression.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
+					spinParallelExpression.setBounds(310, 0, 98, 40);
+					panelParallelExpressionComp.add(spinParallelExpression);
 				}
 				{
-					JTextPane txtpnParallelComputationStreams = new JTextPane();
-					txtpnParallelComputationStreams
+					txtcParallelComputationStreams
 							.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnParallelComputationStreams);
-					txtpnParallelComputationStreams.setEditable(false);
-					txtpnParallelComputationStreams
+					nimbusFix(Color.LIGHT_GRAY, txtcParallelComputationStreams);
+					txtcParallelComputationStreams.setEditable(false);
+					txtcParallelComputationStreams
 							.setText("Parallel Computation Streams for Expression Computation");
-					txtpnParallelComputationStreams.setBounds(0, 0, 303, 40);
-					panel_1.add(txtpnParallelComputationStreams);
+					txtcParallelComputationStreams.setBounds(0, 0, 303, 40);
+					panelParallelExpressionComp.add(txtcParallelComputationStreams);
 				}
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(10, 328, 496, 40);
-				panel.add(panel_1);
+				panelParallelDataComp.setForeground(Color.DARK_GRAY);
+				panelParallelDataComp.setBackground(Color.LIGHT_GRAY);
+				panelParallelDataComp.setLayout(null);
+				panelParallelDataComp.setBounds(10, 328, 496, 40);
+				panelManualHolder.add(panelParallelDataComp);
 				{
-					parallelStreamsData.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
-					parallelStreamsData.setBounds(310, 0, 98, 40);
-					panel_1.add(parallelStreamsData);
+					spinParallelDataPrep.setModel(new SpinnerNumberModel(new Integer(1), new Integer(0), null, new Integer(1)));
+					spinParallelDataPrep.setBounds(310, 0, 98, 40);
+					panelParallelDataComp.add(spinParallelDataPrep);
 				}
 				{
-					JTextPane txtpnParallelComputationStreams_1 = new JTextPane();
-					txtpnParallelComputationStreams_1
+					txtcParallelComputationStreams_1
 							.setForeground(Color.DARK_GRAY);
 					nimbusFix(Color.LIGHT_GRAY,
-							txtpnParallelComputationStreams_1);
-					txtpnParallelComputationStreams_1.setEditable(false);
-					txtpnParallelComputationStreams_1
+							txtcParallelComputationStreams_1);
+					txtcParallelComputationStreams_1.setEditable(false);
+					txtcParallelComputationStreams_1
 							.setText("Parallel Computation Streams for Data Preparation");
-					txtpnParallelComputationStreams_1.setBounds(0, 0, 302, 40);
-					panel_1.add(txtpnParallelComputationStreams_1);
+					txtcParallelComputationStreams_1.setBounds(0, 0, 302, 40);
+					panelParallelDataComp.add(txtcParallelComputationStreams_1);
 				}
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(10, 379, 496, 40);
-				panel.add(panel_1);
+				panelMaxFragLen.setForeground(Color.DARK_GRAY);
+				panelMaxFragLen.setBackground(Color.LIGHT_GRAY);
+				panelMaxFragLen.setLayout(null);
+				panelMaxFragLen.setBounds(10, 379, 496, 40);
+				panelManualHolder.add(panelMaxFragLen);
 				{
-					maxFragLength.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(0), null, new Integer(100)));
-					maxFragLength.setBounds(310, 0, 98, 40);
-					panel_1.add(maxFragLength);
+					spinMaxFragLen.setModel(new SpinnerNumberModel(new Integer(1000), new Integer(0), null, new Integer(100)));
+					spinMaxFragLen.setBounds(310, 0, 98, 40);
+					panelMaxFragLen.add(spinMaxFragLen);
 				}
 				{
-					JTextPane txtpnMaximalFragmentLength = new JTextPane();
-					txtpnMaximalFragmentLength.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnMaximalFragmentLength);
-					txtpnMaximalFragmentLength.setEditable(false);
-					txtpnMaximalFragmentLength
+					txtcMaximalFragmentLength.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcMaximalFragmentLength);
+					txtcMaximalFragmentLength.setEditable(false);
+					txtcMaximalFragmentLength
 							.setText("Maximal Fragment Length");
-					txtpnMaximalFragmentLength.setBounds(0, 0, 292, 40);
-					panel_1.add(txtpnMaximalFragmentLength);
+					txtcMaximalFragmentLength.setBounds(0, 0, 292, 40);
+					panelMaxFragLen.add(txtcMaximalFragmentLength);
 				}
 			}
 			{
-				JPanel panel_1 = new JPanel();
-				panel_1.setForeground(Color.DARK_GRAY);
-				panel_1.setBackground(Color.LIGHT_GRAY);
-				panel_1.setLayout(null);
-				panel_1.setBounds(10, 430, 496, 40);
-				panel.add(panel_1);
+				panelMaxBufferConfInts.setForeground(Color.DARK_GRAY);
+				panelMaxBufferConfInts.setBackground(Color.LIGHT_GRAY);
+				panelMaxBufferConfInts.setLayout(null);
+				panelMaxBufferConfInts.setBounds(10, 430, 496, 40);
+				panelManualHolder.add(panelMaxBufferConfInts);
 				{
-					maxBufferConfInt.setModel(new SpinnerNumberModel(new Integer(4096), new Integer(0), null, new Integer(1024)));
-					maxBufferConfInt.setBounds(310, 0, 98, 40);
-					panel_1.add(maxBufferConfInt);
+					spinMaxBuffer.setModel(new SpinnerNumberModel(new Integer(4096), new Integer(0), null, new Integer(1024)));
+					spinMaxBuffer.setBounds(310, 0, 98, 40);
+					panelMaxBufferConfInts.add(spinMaxBuffer);
 				}
 				{
-					JTextPane txtpnMaximumAuxiliaryBuffer = new JTextPane();
-					txtpnMaximumAuxiliaryBuffer.setForeground(Color.DARK_GRAY);
-					nimbusFix(Color.LIGHT_GRAY, txtpnMaximumAuxiliaryBuffer);
-					txtpnMaximumAuxiliaryBuffer.setEditable(false);
-					txtpnMaximumAuxiliaryBuffer
+					txtcMaximumAuxiliaryBuffer.setForeground(Color.DARK_GRAY);
+					nimbusFix(Color.LIGHT_GRAY, txtcMaximumAuxiliaryBuffer);
+					txtcMaximumAuxiliaryBuffer.setEditable(false);
+					txtcMaximumAuxiliaryBuffer
 							.setText("Maximum Auxiliary Buffer for Computing Credibility Intervals");
-					txtpnMaximumAuxiliaryBuffer.setBounds(0, 0, 307, 40);
-					panel_1.add(txtpnMaximumAuxiliaryBuffer);
+					txtcMaximumAuxiliaryBuffer.setBounds(0, 0, 307, 40);
+					panelMaxBufferConfInts.add(txtcMaximumAuxiliaryBuffer);
 				}
 			}
 			{
-				extractCoverage.setFont(new Font("Arial", Font.PLAIN, 11));
-				extractCoverage.setBounds(10, 481, 496, 33);
-				extractCoverage.addActionListener(new ActionListener() {
+				btnExtractCoverage.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				btnExtractCoverage.setBounds(10, 481, 496, 33);
+				btnExtractCoverage.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if (extractCoverage
+						if (btnExtractCoverage
 								.getText()
-								.equals("Extracting Forward and Reverse Coverage from Original BAM File")) {
-							extractCoverage
-									.setText("Not Extracting Forward and Reverse Coverage from Original BAM File");
+								.equals(ButtonEnums.OptionButton.EXTRACT.value)) {
+							btnExtractCoverage
+									.setText(ButtonEnums.OptionButton.NO_EXTRACT.value);
 						} else {
-							extractCoverage
-									.setText("Extracting Forward and Reverse Coverage from Original BAM File");
+							btnExtractCoverage
+									.setText(ButtonEnums.OptionButton.EXTRACT.value);
 						}
 					}
 				});
-				panel.add(extractCoverage);
+				panelManualHolder.add(btnExtractCoverage);
 			}
 			{
-				computeConfIntervals.setFont(new Font("Arial", Font.PLAIN, 11));
-				computeConfIntervals.setBounds(10, 525, 240, 33);
-				computeConfIntervals.addActionListener(new ActionListener() {
+				btnComputeConfIntervals.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				btnComputeConfIntervals.setBounds(10, 525, 240, 33);
+				btnComputeConfIntervals.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if (computeConfIntervals.getText().equals(
-								"Computing Confidence Intervals")) {
-							computeConfIntervals
-									.setText("Not Computing Confidence Intervals");
+						if (btnComputeConfIntervals.getText().equals(
+								ButtonEnums.OptionButton.COMPUTE.value)) {
+							btnComputeConfIntervals
+									.setText(ButtonEnums.OptionButton.NO_COMPUTE.value);
 						} else {
-							computeConfIntervals
-									.setText("Computing Confidence Intervals");
+							btnComputeConfIntervals
+									.setText(ButtonEnums.OptionButton.COMPUTE.value);
 						}
 					}
 				});
-				panel.add(computeConfIntervals);
+				panelManualHolder.add(btnComputeConfIntervals);
 			}
 			{
-				outputGenomeBam.setFont(new Font("Arial", Font.PLAIN, 11));
-				outputGenomeBam.setBounds(266, 525, 240, 33);
-				outputGenomeBam.addActionListener(new ActionListener() {
+				btnOutputGenomeBam.setFont(GLSeq2_Main_Application.TEXT_FONT);
+				btnOutputGenomeBam.setBounds(266, 525, 240, 33);
+				btnOutputGenomeBam.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						if (outputGenomeBam.getText().equals(
-								"Outputting Genome BAM")) {
-							outputGenomeBam
-									.setText("Not Outputting Genome BAM");
+						if (btnOutputGenomeBam.getText().equals(
+								ButtonEnums.OptionButton.OUTPUT.value)) {
+							btnOutputGenomeBam
+									.setText(ButtonEnums.OptionButton.NO_OUTPUT.value);
 						} else {
-							outputGenomeBam.setText("Outputting Genome BAM");
+							btnOutputGenomeBam.setText(ButtonEnums.OptionButton.OUTPUT.value);
 						}
 					}
 				});
-				panel.add(outputGenomeBam);
+				panelManualHolder.add(btnOutputGenomeBam);
 			}
 		}
 		{
-			JPanel buttonPane = new JPanel();
 			buttonPane.setBackground(Color.GRAY);
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Apply and Close");
 				okButton.setActionCommand("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						GLSeq2_Main_Application.att.setaAlgor(String.valueOf(alignmentAlgo.getSelectedItem()));
-						GLSeq2_Main_Application.att.setCores(String.valueOf(numberOfCores.getValue()));
-						GLSeq2_Main_Application.att.setScriptDirectory(glseqDirectory.getText());
-						if (featureCountBox.isSelected()){
+						GLSeq2_Main_Application.att.setaAlgor(String.valueOf(comboAlignmentAlgo.getSelectedItem()));
+						GLSeq2_Main_Application.att.setCores(String.valueOf(spinNumberOfCores.getValue()));
+						GLSeq2_Main_Application.att.setScriptDirectory(txtGlseqDirectory.getText());
+						if (checkFeatureCount.isSelected()){
 							GLSeq2_Main_Application.att.setFeatureCounts("FeatureCounts");
 						} else{
 							GLSeq2_Main_Application.att.setFeatureCounts("");
 						}
-						if (rsemBox.isSelected()){
+						if (checkRsem.isSelected()){
 							GLSeq2_Main_Application.att.setRSEM("RSEM");
 						} else{
 							GLSeq2_Main_Application.att.setRSEM("");
 						}
-						if (htseqBox.isSelected()){
+						if (checkHtSeq.isSelected()){
 							GLSeq2_Main_Application.att.setHTSeq("HTSeq");
 						} else{
 							GLSeq2_Main_Application.att.setHTSeq("");
 						}
-						GLSeq2_Main_Application.run.setProtocolId(protocolID.getText());
-						GLSeq2_Main_Application.att.setStreams(String.valueOf(parallelStreamsExpression.getValue()));
-						GLSeq2_Main_Application.att.setStreamsDataPrep(String.valueOf(parallelStreamsData.getValue()));
-						GLSeq2_Main_Application.att.setFragMaxLength(String.valueOf(maxFragLength.getValue()));
-						GLSeq2_Main_Application.att.setCiMem(String.valueOf(maxBufferConfInt.getValue()));
+						GLSeq2_Main_Application.run.setProtocolId(txtProtocolID.getText());
+						GLSeq2_Main_Application.att.setStreams(String.valueOf(spinParallelExpression.getValue()));
+						GLSeq2_Main_Application.att.setStreamsDataPrep(String.valueOf(spinParallelDataPrep.getValue()));
+						GLSeq2_Main_Application.att.setFragMaxLength(String.valueOf(spinMaxFragLen.getValue()));
+						GLSeq2_Main_Application.att.setCiMem(String.valueOf(spinMaxBuffer.getValue()));
 						
-						if (extractCoverage.getText().equals("Extracting Forward and Reverse Coverage from Original BAM File")){
+						if (btnExtractCoverage.getText().equals(ButtonEnums.OptionButton.EXTRACT.value)){
 							GLSeq2_Main_Application.att.setStrandExtract("TRUE");
 						} else{
 							GLSeq2_Main_Application.att.setStrandExtract("FALSE");
 						}
 						
-						if (computeConfIntervals.getText().equals("Computing Confidence Intervals")){
+						if (btnComputeConfIntervals.getText().equals(ButtonEnums.OptionButton.COMPUTE.value)){
 							GLSeq2_Main_Application.att.setCompConf("TRUE");
 						} else{
 							GLSeq2_Main_Application.att.setCompConf("FALSE");
 						}
 						
-						if (outputGenomeBam.getText().equals("Outputting Genome BAM")){
+						if (btnOutputGenomeBam.getText().equals(ButtonEnums.OptionButton.OUTPUT.value)){
 							GLSeq2_Main_Application.att.setGenoBam("TRUE");
 						} else{
 							GLSeq2_Main_Application.att.setGenoBam("FALSE");
@@ -495,7 +500,6 @@ public class Script_Running_Options extends JDialog {
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 				cancelButton.addActionListener(new ActionListener() {

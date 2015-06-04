@@ -45,7 +45,6 @@ public class Attributes {
 	private String nCores = "0";
 	private String nStreams = "0";
 	private String nStreamsDataPrep = "0";
-	private String qAlgor = "";
 	private String GPUaccel = "FALSE";
 
 	// Pre-Processing Attributes
@@ -94,7 +93,6 @@ public class Attributes {
 			config = new File("AttributesConfig.txt");
 			scnr = new Scanner(config);
 		} catch (Exception e) {
-			System.out.println("Attribute config file not found");
 		}
 		// Looks through the whole document for variables that match field names
 		while (scnr.hasNextLine()) {
@@ -104,7 +102,6 @@ public class Attributes {
 				try {
 				field = this.getClass().getDeclaredField(t[0]);
 				} catch (NoSuchFieldException e){
-					System.out.println("Field " + t[0] + " in attribute file does not exist");
 				}
 				try {
 					field.set(this, (t[1]));
@@ -113,7 +110,6 @@ public class Attributes {
 				} catch (IllegalArgumentException e){
 					e.printStackTrace();
 				} catch(ArrayIndexOutOfBoundsException e){
-					System.out.println("Field not set");
 				}
 			}
 		}
@@ -246,10 +242,6 @@ public class Attributes {
 
 	public void setStreamsDataPrep(String nStreamsDataPrep) {
 		this.nStreamsDataPrep = nStreamsDataPrep;
-	}
-
-	public void setQuantAlgor(String qAlgor) {
-		this.qAlgor = qAlgor;
 	}
 
 	public void setGpuAccel(String GPUaccel) {
@@ -448,10 +440,6 @@ public class Attributes {
 		return nStreamsDataPrep;
 	}
 
-	public String getQuantAlgor() {
-		return qAlgor;
-	}
-
 	public String getGpuAccel() {
 		return GPUaccel;
 	}
@@ -640,11 +628,12 @@ public class Attributes {
 		writer.write("# text.add <- paste(expID, runAttempt, sep=\".\")\n");
 		writer.write("# now is being generated inside GLSeq.top.R\n");
 		writer.write("#\n");
-		writer.write("# *** quantification algorithm ***\n");
+		writer.write("# *** Alignment Algorithm ***\n");
 		writer.write("aAlgor <- \"" + aAlgor + "\" \n");
 		writer.write("#\n");
 		writer.write("#\n");
 		// This is just assigning them as variables and just making them as a list in the R file
+		writer.write("# *** Counting Algorithm(s) ***\n");
 		writer.write("HTSeq <- \"" +HTSeq + "\"\n");
 		writer.write("FeatureCounts <- \"" + FeatureCounts + "\"\n");
 		writer.write("RSEM <- \"" + RSEM + "\"\n");
