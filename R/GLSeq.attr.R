@@ -2,7 +2,7 @@
 # Great Lakes Seq package for low-level processing of RNA-Seq data
 #########################################################
 #
-# This is a user generated attribute file created on 2015.04.30
+# This is a user generated attribute file created on 2015.06.04
 #
 ##########################################################
 #
@@ -18,19 +18,19 @@
 #
 # directory containing raw files
 # (may be non-writable!)
-raw.dir <- NULL
+raw.dir <-""
 #
 # Files in the raw dir are normally compressed but may be not:
-unzipped <- TRUE
+unzipped <- FALSE
 #
 # directory contining ready-to-go (split+QC-processed) fq files (Oct 17, 2013)
-readyData.dir <- "/home/GLBRCORG/omoskvin/testdata/Y127"
+readyData.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing/.Test_Cases/Test_Cushaw_526_HTSeq.02"
 #
 # raw file names: 
-raw.fNames <- NULL
+raw.fNames <- ""
 #
 # strain
-strain <- "null"
+strain <- ""
 #
 # single / paired end
 paired.end <- TRUE
@@ -48,10 +48,10 @@ libstrand <- "R"
 libNchar <- 4
 #
 # Subset of the libraries to process (optional; normally the list wil be generated from the actual directory content)
-libList <- NULL
+libList <- "NULL"
 #
 # Takes a directory of files with the end title "countable.sam" and collects them for counting
-countable.sams.dir <- NULL
+countable.sams.dir <- ""
 #
 ###############################
 # REFERENCE OPTIONS
@@ -88,35 +88,34 @@ base.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Working_RScript_Files"
 # Base of the destination directory (added May 9, 2013)
 # This should be located on a FAST volume (SCSI is recommended)
 # a particular subfolder names after the run ID will be created by GLSeq below this folder
-dest.dir.base <- NULL
+dest.dir.base <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing"
 #
 # number of cores to use
-nCores <- 6
+nCores <- 4
 #
 # number of parallel computation streams for expression computation
-nStreams <-4
+nStreams <-2
 #
 # number of parallel computation streams for data preparation
 # (may differ from the number of streams for expression computation because of particular software demands) 
-nStreamsDataPrep <- 3
-#
-# the default run attempt
-runAttempt <- formatC(1, width=2, flag="0")
+nStreamsDataPrep <- 1
 #
 # the actual unique run ID - 
 # text.add <- paste(expID, runAttempt, sep=".")
 # now is being generated inside GLSeq.top.R
 #
-# *** quantification algorithm ***
-# Supported values for qAlgor are: "CUSHAW","Bowtie","Bowtie2","BWA"
-qAlgor <- "BWA"
-#Supported values for cAlgor (These can be included with the list created by c())
-# are: "FeatureCounts","HTSeq", and (If using an ungapped aligner) "RSEM"
-# an example of this is shown below
-cAlgor <- c("FeatureCounts","HTSeq")
+# *** Alignment Algorithm ***
+aAlgor <- "Cushaw" 
+#
+#
+# *** Counting Algorithm(s) ***
+HTSeq <- "HTSeq"
+FeatureCounts <- "FeatureCounts"
+RSEM <- ""
+cAlgor <- c(HTSeq,RSEM,FeatureCounts)
 #
 #  GPU acceleration option for CUSHAW
-GPU.accel <- TRUE
+GPU.accel <- FALSE
 #
 ###############################
 # PRE-PROCESSING OPTIONS
@@ -126,27 +125,27 @@ GPU.accel <- TRUE
 readTrim <- FALSE
 #
 # minimum length of a trimmed read
-trimMin <- 36
+trimMin <- 0
 #
 # trimmomatic parameter values for HEADCROP  
-trimhead <- 12
+trimhead <- 0
 #
 # name of the FASTA file with artificail sequences (adapters, primers etc) - must be located in the base.dir
-artificial.fq <- "JGI.clean2.fa"
+artificial.fq <- ""
 #
 ###############################
 # COMMON PROCESSING OPTIONS
 ###############################
 #
 # Extract explicit forward and reverse coverage from the original BAM file? 
-strandExtract <- TRUE
+strandExtract <- FALSE
 #
 ################################
 # RSEM OPTIONS
 ################################
 #
 # compute confidence intervals? 
-compConf <- TRUE
+compConf <- FALSE
 #
 # Maximal length of fragment (for paired-end libraries)
 fragMaxLength <- 1000
@@ -155,7 +154,7 @@ fragMaxLength <- 1000
 ciMem <- 4096
 #
 # Output genome bam
-genobam <- TRUE
+genobam <- FALSE
 #
 ################################
 # ENVIRONMENT
