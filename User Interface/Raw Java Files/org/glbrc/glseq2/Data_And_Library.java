@@ -137,6 +137,9 @@ public class Data_And_Library extends JDialog {
 				buttonPane.add(okButton);
 				okButton.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent arg0) {
+						/*
+						 * Assigns all the values to the attribute file's fields
+						 */
 						GLSeq2_Main_Application.att.setDirectory(txtrawDirectory.getText());
 						GLSeq2_Main_Application.att.setDirectoryFq(txtPreProcessedFiles.getText());
 						GLSeq2_Main_Application.att.setDestinationDirectory(txtDestinationDirectory.getText());

@@ -31,37 +31,44 @@ public class Environment extends JDialog {
 	/*/
 	 * GLSEQ Script
 	 */
-	
+	private final JTextArea txtGlSeqDirectory = new JTextArea();
+	private final JTextPane txtcGlSeqDirectory = new JTextPane();
+	private final JButton btnGlSeqDirectory = new JButton("");
 	/*
 	 *  Picard tools menu
 	 */
 	private final JTextArea txtPicard = new JTextArea();
 	private final JPanel panelPicard = new JPanel();
 	private final JTextPane txtcPicard = new JTextPane();
+	private final JButton btnPicard = new JButton("");
 	/*
 	 * Fastqc menu
 	 */
 	private final JTextArea txtFastqc = new JTextArea();
 	private final JPanel panelFastqc = new JPanel();
 	private final JTextPane txtcFastqc = new JTextPane();
+	private final JButton btnFastqc = new JButton("");
 	/*
 	 * Bam2wig menu
 	 */
 	private final JTextArea txtBam2Wig = new JTextArea();
 	private final JPanel panelBam2Wig = new JPanel();
 	private final JTextPane txtcBam2Wig = new JTextPane();
+	private final JButton btnBam2Wig = new JButton("");
 	/*
 	 * Bwa menu
 	 */
 	private final JPanel panelBwa = new JPanel();
 	private final JTextPane txtcBwa = new JTextPane();
 	private final JTextArea txtBwa = new JTextArea();
+	private final JButton btnBWA = new JButton("");
 	/*
 	 * Trimmomatic menu
 	 */
 	private final JPanel panelTrimmomatic = new JPanel();
 	private final JTextArea txtTrimmomatic = new JTextArea();
 	private final JTextPane txtcTrimmomatic = new JTextPane();
+	private final JButton btnTrimmomatic = new JButton("");
 	/*
 	 * Cushaw menu
 	 */
@@ -74,13 +81,15 @@ public class Environment extends JDialog {
 	private final JPanel panelCushaw_Index = new JPanel();
 	private final JTextPane txtcCushaw_Index = new JTextPane();
 	private final JTextArea txtCushawIndex = new JTextArea();
+	private final JButton btnCushawIndex = new JButton("");
+	private final JButton btnCushaw = new JButton("");
 	/*
 	 * Cushaw GPU menu
 	 */
 	private final JPanel panelCushaw_GPU = new JPanel();
 	private final JTextPane txtcCushaw_GPU = new JTextPane();
 	private final JTextArea txtCushaw_GPU = new JTextArea();
-	
+	private final JButton btnCushawGPU = new JButton("");
 	/*
 	 * Movement options
 	 */
@@ -88,17 +97,6 @@ public class Environment extends JDialog {
 	private final JButton okButton = new JButton("Apply and Close");
 	private final JButton cancelButton = new JButton("Cancel");
 	private final JPanel panel = new JPanel();
-	private final JTextArea txtGlSeqDirectory = new JTextArea();
-	private final JTextPane txtcGlSeqDirectory = new JTextPane();
-	private final JButton btnGlSeqDirectory = new JButton("");
-	private final JButton btnTrimmomatic = new JButton("");
-	private final JButton btnPicard = new JButton("");
-	private final JButton btnFastqc = new JButton("");
-	private final JButton btnBWA = new JButton("");
-	private final JButton btnBam2Wig = new JButton("");
-	private final JButton btnCushawIndex = new JButton("");
-	private final JButton btnCushaw = new JButton("");
-	private final JButton btnCushawGPU = new JButton("");
 	
 	/**
 	 * Launch the application.
