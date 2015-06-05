@@ -508,4 +508,4 @@ if (DataIsWaiting) {
   # Base case
   try(system(comm.stack.pool)) 
 }
-warning("Script finished")
+NULL
