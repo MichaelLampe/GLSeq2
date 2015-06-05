@@ -173,7 +173,6 @@ if (updateFromDb == "update") {
   nStreams <- as.numeric(protocolData$nstreams) 
   compConf <- as.logical(as.character(protocolData$compconf))
   rawGen <- as.logical(as.character(protocolData$rawgen))
-  qAlgor <- as.character(protocolData$qalgor)
   genobam <- as.logical(as.character(protocolData$genobam)) 
   libstrand.prot <- as.character(protocolData$libstrand)
   strandBase <- as.character(protocolData$strandbase)
@@ -505,10 +504,8 @@ if (DataIsWaiting) {
   # Special case for CUSHAW-GPU to make it align sequentially
   # The specialCase variable would be set to true in the
   # GLSeq.CUSHAW.R file for reference.
-  if (GPUspecialCase) {
-    system(Cushawgpu.special.case)
-  }
   #
   # Base case
   try(system(comm.stack.pool)) 
 }
+NULL

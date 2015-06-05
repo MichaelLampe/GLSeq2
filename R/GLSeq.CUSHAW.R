@@ -93,7 +93,10 @@ if (GPU.accel){
 if (!is.null(sam.create)) {
   Cushawgpu.special.case <- paste(sam.create)
 }
-
+if (GPUspecialCase) {
+  system(Cushawgpu.special.case)
+}
+warning("PAST GPU")
 #################
 # Rest of the cleanup to get to counting, or CPU only CUSHAW
 #################
