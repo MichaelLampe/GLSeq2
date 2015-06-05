@@ -24,7 +24,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
 public final class GLSeq2_Main_Application {
 	/*
@@ -34,8 +33,8 @@ public final class GLSeq2_Main_Application {
 	/*
 	 * Consistent fond scheming
 	 */
-	public static final Font HEADER_FONT = new Font("Arial", Font.PLAIN, 26);
-	public static final Font TEXT_FONT = new Font("Arial", Font.PLAIN, 11);
+	public static final Font HEADER_FONT = new Font("Courier", Font.PLAIN, 26);
+	public static final Font TEXT_FONT = new Font("Courier", Font.PLAIN, 11);
 	
 	// Used to write updates to the panel in the UI
 	public static final JTextPane txtCurrentUpdates = new JTextPane();
@@ -71,8 +70,7 @@ public final class GLSeq2_Main_Application {
 	private final JPanel attributeFileContainer = new JPanel();
 	// Various buttons associated with subsets of the main page
 	private final JButton btnDataAndLibrary = new JButton("Data Sources");
-	private final JButton btnPipeline = new JButton("Pipeline");
-	private final JButton btnReference = new JButton("Reference");
+	private final JButton btnPipeline = new JButton("Algorithms and Reference");
 	private final JButton btnProcessing = new JButton("Trimming and Processing");
 	private final JButton btnEnvironment = new JButton("Environment");
 	private final JButton btnGenerateAttributeFile = new JButton(
@@ -228,7 +226,7 @@ public final class GLSeq2_Main_Application {
 		frame.getContentPane().add(attributeFileContainer);
 		attributeFileContainer.setLayout(null);
 
-		btnDataAndLibrary.setBounds(33, 40, 300, 70);
+		btnDataAndLibrary.setBounds(33, 43, 300, 70);
 		attributeFileContainer.add(btnDataAndLibrary);
 		btnDataAndLibrary.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -237,7 +235,7 @@ public final class GLSeq2_Main_Application {
 			}
 		});
 
-		btnPipeline.setBounds(33, 120, 300, 70);
+		btnPipeline.setBounds(33, 124, 300, 70);
 		attributeFileContainer.add(btnPipeline);
 		btnPipeline.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -246,16 +244,7 @@ public final class GLSeq2_Main_Application {
 			}
 		});
 
-		btnReference.setBounds(33, 200, 300, 70);
-		attributeFileContainer.add(btnReference);
-		btnReference.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Reference reference = new Reference();
-				reference.setVisible(true);
-			}
-		});
-
-		btnProcessing.setBounds(33, 280, 300, 70);
+		btnProcessing.setBounds(33, 205, 300, 70);
 		attributeFileContainer.add(btnProcessing);
 		btnProcessing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -264,7 +253,7 @@ public final class GLSeq2_Main_Application {
 			}
 		});
 
-		btnEnvironment.setBounds(33, 360, 300, 70);
+		btnEnvironment.setBounds(33, 285, 300, 70);
 		attributeFileContainer.add(btnEnvironment);
 		btnEnvironment.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -289,7 +278,7 @@ public final class GLSeq2_Main_Application {
 		txtchAttributeFileTitle.setEditable(false);
 		txtchAttributeFileTitle.setBounds(10, 5, 347, 48);
 		attributeFileTitleContainer.add(txtchAttributeFileTitle);
-		btnGenerateAttributeFile.setBounds(33, 499, 300, 70);
+		btnGenerateAttributeFile.setBounds(33, 463, 300, 106);
 		attributeFileContainer.add(btnGenerateAttributeFile);
 		btnGenerateAttributeFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -304,13 +293,13 @@ public final class GLSeq2_Main_Application {
 			}
 		});
 
-		txtAttributeFile.setBounds(33, 450, 298, 38);
+		txtAttributeFile.setBounds(33, 396, 298, 56);
 		attributeFileContainer.add(txtAttributeFile);
 		txtAttributeFile.setWrapStyleWord(true);
 		txtAttributeFile.setLineWrap(true);
 		txtAttributeFile.setFont(TEXT_FONT);
 
-		txtcAttributeFilePath.setBounds(135, 430, 91, 19);
+		txtcAttributeFilePath.setBounds(135, 366, 91, 19);
 		attributeFileContainer.add(txtcAttributeFilePath);
 		txtcAttributeFilePath.setText("Attribute File Path");
 		txtcAttributeFilePath.setForeground(Color.WHITE);
@@ -446,7 +435,6 @@ public final class GLSeq2_Main_Application {
 		 */
 		runContainer.add(panel);
 		panel.setLayout(null);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(10, 11, 321, 418);
 
 		panel.add(scrollPane);

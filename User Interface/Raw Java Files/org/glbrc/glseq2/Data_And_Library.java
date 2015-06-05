@@ -123,12 +123,12 @@ public class Data_And_Library extends JDialog {
 	private void initGUI() {
 		getContentPane().setBackground(Color.LIGHT_GRAY);
 		setResizable(false);
-		setBounds(100, 100, 840, 629);
+		setBounds(100, 100, 1065, 648);
 		getContentPane().setLayout(null);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setBackground(Color.GRAY);
-			buttonPane.setBounds(0, 568, 834, 33);
+			buttonPane.setBounds(0, 587, 1059, 33);
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane);
 			{
@@ -192,7 +192,7 @@ public class Data_And_Library extends JDialog {
 		{
 			JPanel panelZipAndStrain = new JPanel();
 			panelZipAndStrain.setBackground(Color.LIGHT_GRAY);
-			panelZipAndStrain.setBounds(308, 0, 516, 569);
+			panelZipAndStrain.setBounds(308, 0, 729, 587);
 			getContentPane().add(panelZipAndStrain);
 			panelZipAndStrain.setLayout(null);
 			{
@@ -201,20 +201,20 @@ public class Data_And_Library extends JDialog {
 				txtchCurrentDataAnd.setFont(GLSeq2_Main_Application.HEADER_FONT);
 				txtchCurrentDataAnd.setEditable(false);
 				txtchCurrentDataAnd.setText("Current Data and Library Options");
-				txtchCurrentDataAnd.setBounds(10, 5, 444, 31);
+				txtchCurrentDataAnd.setBounds(10, 5, 444, 48);
 				panelZipAndStrain.add(txtchCurrentDataAnd);
 			}
 			{
 				JPanel panelRawDirectory = new JPanel();
 				panelRawDirectory.setForeground(Color.DARK_GRAY);
 				panelRawDirectory.setBackground(Color.LIGHT_GRAY);
-				panelRawDirectory.setBounds(10, 42, 496, 42);
+				panelRawDirectory.setBounds(10, 60, 719, 42);
 				panelZipAndStrain.add(panelRawDirectory);
 				panelRawDirectory.setLayout(null);
 				{
 					JButton btnRawDir = new JButton("");
 					btnRawDir.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-					btnRawDir.setBounds(132, 0, 38, 37);
+					btnRawDir.setBounds(271, 0, 38, 37);
 					btnRawDir.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0) {
 							final JFileChooser chooser = new JFileChooser();
@@ -229,7 +229,7 @@ public class Data_And_Library extends JDialog {
 					});
 					panelRawDirectory.add(btnRawDir);
 				}
-				txtrawDirectory.setBounds(180, 0, 306, 37);
+				txtrawDirectory.setBounds(319, 0, 400, 37);
 				
 				panelRawDirectory.add(txtrawDirectory);
 				txtcDirectoryContainingRaw.setForeground(Color.DARK_GRAY);
@@ -237,30 +237,30 @@ public class Data_And_Library extends JDialog {
 				txtcDirectoryContainingRaw.setEditable(false);
 				txtcDirectoryContainingRaw.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcDirectoryContainingRaw.setText("Directory Containing Raw Files");
-				txtcDirectoryContainingRaw.setBounds(0, 0, 112, 37);
+				txtcDirectoryContainingRaw.setBounds(0, 0, 261, 37);
 				
 				panelRawDirectory.add(txtcDirectoryContainingRaw);
 			}
 			panelPreProcessedFiles.setForeground(Color.DARK_GRAY);
 			panelPreProcessedFiles.setBackground(Color.LIGHT_GRAY);
 			panelPreProcessedFiles.setLayout(null);
-			panelPreProcessedFiles.setBounds(10, 91, 496, 42);
+			panelPreProcessedFiles.setBounds(10, 109, 719, 42);
 			
 			panelZipAndStrain.add(panelPreProcessedFiles);
 			panelDestinationDir.setForeground(Color.DARK_GRAY);
 			panelDestinationDir.setBackground(Color.LIGHT_GRAY);
 			panelDestinationDir.setLayout(null);
-			panelDestinationDir.setBounds(10, 144, 496, 42);
+			panelDestinationDir.setBounds(10, 162, 719, 42);
 			
 			panelZipAndStrain.add(panelDestinationDir);
 			panelRawFiles.setForeground(Color.DARK_GRAY);
 			panelRawFiles.setBackground(Color.LIGHT_GRAY);
 			panelRawFiles.setLayout(null);
-			panelRawFiles.setBounds(10, 197, 496, 42);
+			panelRawFiles.setBounds(10, 215, 719, 42);
 			
 			panelZipAndStrain.add(panelRawFiles);
 			btnZipped.setFont(new Font("Arial", Font.PLAIN, 15));
-			btnZipped.setBounds(10, 295, 226, 59);
+			btnZipped.setBounds(10, 313, 354, 59);
 			btnZipped.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					if (btnZipped.getText().equals(ButtonEnums.OptionButton.ZIPPED.value)){
@@ -274,7 +274,7 @@ public class Data_And_Library extends JDialog {
 			
 			panelZipAndStrain.add(btnZipped);
 			btnEnded.setFont(new Font("Arial", Font.PLAIN, 15));
-			btnEnded.setBounds(280, 295, 226, 59);
+			btnEnded.setBounds(375, 313, 354, 59);
 			btnEnded.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					if (btnEnded.getText().equals(ButtonEnums.OptionButton.PAIRED.value)){
@@ -290,18 +290,18 @@ public class Data_And_Library extends JDialog {
 			panelStrain.setForeground(Color.DARK_GRAY);
 			panelStrain.setBackground(Color.LIGHT_GRAY);
 			panelStrain.setLayout(null);
-			panelStrain.setBounds(10, 359, 496, 42);
+			panelStrain.setBounds(10, 377, 719, 42);
 			
 			panelZipAndStrain.add(panelStrain);
 			panelSubsetOfLibraries.setForeground(Color.DARK_GRAY);
 			panelSubsetOfLibraries.setBackground(Color.LIGHT_GRAY);
 			panelSubsetOfLibraries.setLayout(null);
-			panelSubsetOfLibraries.setBounds(10, 398, 496, 42);
+			panelSubsetOfLibraries.setBounds(10, 416, 719, 42);
 			
 			panelZipAndStrain.add(panelSubsetOfLibraries);
 			panelQualityScores.setForeground(Color.DARK_GRAY);
 			panelQualityScores.setBackground(Color.LIGHT_GRAY);
-			panelQualityScores.setBounds(10, 451, 240, 48);
+			panelQualityScores.setBounds(10, 469, 354, 48);
 			
 			panelZipAndStrain.add(panelQualityScores);
 			panelQualityScores.setLayout(null);
@@ -310,16 +310,16 @@ public class Data_And_Library extends JDialog {
 			txtcQualityScores.setEditable(false);
 			txtcQualityScores.setFont(GLSeq2_Main_Application.TEXT_FONT);
 			txtcQualityScores.setText("Quality Scores Format");
-			txtcQualityScores.setBounds(10, 0, 220, 20);
+			txtcQualityScores.setBounds(10, 0, 334, 20);
 			
 			panelQualityScores.add(txtcQualityScores);
 			comboQualityScores.setModel(new DefaultComboBoxModel<String>(new String[] {"phred33", "phred64"}));
-			comboQualityScores.setBounds(10, 28, 220, 20);
+			comboQualityScores.setBounds(10, 28, 334, 20);
 			
 			panelQualityScores.add(comboQualityScores);
 			panelSequencing.setForeground(Color.DARK_GRAY);
 			panelSequencing.setBackground(Color.LIGHT_GRAY);
-			panelSequencing.setBounds(266, 451, 240, 48);
+			panelSequencing.setBounds(375, 469, 354, 48);
 			
 			panelZipAndStrain.add(panelSequencing);
 			panelSequencing.setLayout(null);
@@ -328,16 +328,16 @@ public class Data_And_Library extends JDialog {
 			txtcSequencingPlatforms.setEditable(false);
 			txtcSequencingPlatforms.setText("Supported Sequencing Platforms");
 			txtcSequencingPlatforms.setFont(GLSeq2_Main_Application.TEXT_FONT);
-			txtcSequencingPlatforms.setBounds(10, 0, 220, 20);
+			txtcSequencingPlatforms.setBounds(10, 0, 334, 20);
 			
 			panelSequencing.add(txtcSequencingPlatforms);
 			comboSequencingPlatforms.setModel(new DefaultComboBoxModel<String>(new String[] {"illumina", "capillary", "ls454", "solid", "helicos", "iontorrent", "pacbio"}));
-			comboSequencingPlatforms.setBounds(10, 28, 220, 20);
+			comboSequencingPlatforms.setBounds(10, 28, 334, 20);
 			
 			panelSequencing.add(comboSequencingPlatforms);
 			panelStrandedness.setForeground(Color.DARK_GRAY);
 			panelStrandedness.setBackground(Color.LIGHT_GRAY);
-			panelStrandedness.setBounds(10, 510, 240, 48);
+			panelStrandedness.setBounds(10, 528, 354, 48);
 			
 			panelZipAndStrain.add(panelStrandedness);
 			panelStrandedness.setLayout(null);
@@ -346,22 +346,22 @@ public class Data_And_Library extends JDialog {
 			txtcStrandedness.setEditable(false);
 			txtcStrandedness.setText("Strandedness of the Library");
 			txtcStrandedness.setFont(GLSeq2_Main_Application.TEXT_FONT);
-			txtcStrandedness.setBounds(10, 0, 220, 20);
+			txtcStrandedness.setBounds(10, 0, 334, 20);
 			
 			panelStrandedness.add(txtcStrandedness);
 			comboStrandedness.setModel(new DefaultComboBoxModel<String>(new String[] {"R", "F", "NULL"}));
-			comboStrandedness.setBounds(10, 28, 220, 20);
+			comboStrandedness.setBounds(10, 28, 334, 20);
 			
 			panelStrandedness.add(comboStrandedness);
 			panelLibraryIdLength.setForeground(Color.DARK_GRAY);
 			panelLibraryIdLength.setBackground(Color.LIGHT_GRAY);
-			panelLibraryIdLength.setBounds(266, 510, 240, 48);
+			panelLibraryIdLength.setBounds(385, 528, 344, 48);
 			
 			panelZipAndStrain.add(panelLibraryIdLength);
 			panelCountableSam.setLayout(null);
 			panelCountableSam.setForeground(Color.DARK_GRAY);
 			panelCountableSam.setBackground(Color.LIGHT_GRAY);
-			panelCountableSam.setBounds(10, 250, 496, 42);
+			panelCountableSam.setBounds(10, 268, 719, 42);
 			
 			panelZipAndStrain.add(panelCountableSam);
 		}
@@ -378,10 +378,10 @@ public class Data_And_Library extends JDialog {
 				}
 			}
 		});
-		btnCountableSam.setBounds(132, 0, 38, 37);
+		btnCountableSam.setBounds(271, 0, 38, 37);
 		
 		panelCountableSam.add(btnCountableSam);
-		txtCountableSamDirectory.setBounds(180, 0, 306, 37);
+		txtCountableSamDirectory.setBounds(319, 0, 400, 37);
 		
 		panelCountableSam.add(txtCountableSamDirectory);
 		txtcCountableSamFile.setText("Countable SAM File Directory");
@@ -389,7 +389,7 @@ public class Data_And_Library extends JDialog {
 		nimbusFix(Color.LIGHT_GRAY,txtcCountableSamFile);
 		txtcCountableSamFile.setFont(GLSeq2_Main_Application.TEXT_FONT);
 		txtcCountableSamFile.setEditable(false);
-		txtcCountableSamFile.setBounds(0, 0, 112, 37);
+		txtcCountableSamFile.setBounds(0, 0, 261, 37);
 		
 		panelCountableSam.add(txtcCountableSamFile);
 		panelLibraryIdLength.setLayout(null);
@@ -405,7 +405,7 @@ public class Data_And_Library extends JDialog {
 		spinLibraryIdLen.setBounds(169, 0, 61, 48);
 		
 		panelLibraryIdLength.add(spinLibraryIdLen);
-		txtSubsetOfLibraries.setBounds(180, 11, 306, 31);
+		txtSubsetOfLibraries.setBounds(319, 11, 400, 31);
 		
 		panelSubsetOfLibraries.add(txtSubsetOfLibraries);
 		txtcSubsetOfLibraries.setForeground(Color.DARK_GRAY);
@@ -413,10 +413,10 @@ public class Data_And_Library extends JDialog {
 		txtcSubsetOfLibraries.setEditable(false);
 		txtcSubsetOfLibraries.setText("Subset of Libraries to Process");
 		txtcSubsetOfLibraries.setFont(GLSeq2_Main_Application.TEXT_FONT);
-		txtcSubsetOfLibraries.setBounds(10, 11, 160, 31);
+		txtcSubsetOfLibraries.setBounds(10, 11, 299, 31);
 		
 		panelSubsetOfLibraries.add(txtcSubsetOfLibraries);
-		txtStrain.setBounds(180, 11, 306, 31);
+		txtStrain.setBounds(319, 11, 400, 31);
 		
 		panelStrain.add(txtStrain);
 		txtcStrain.setForeground(Color.DARK_GRAY);
@@ -424,11 +424,11 @@ public class Data_And_Library extends JDialog {
 		txtcStrain.setEditable(false);
 		txtcStrain.setText("Strain");
 		txtcStrain.setFont(GLSeq2_Main_Application.TEXT_FONT);
-		txtcStrain.setBounds(10, 11, 160, 31);
+		txtcStrain.setBounds(10, 11, 299, 31);
 		
 		panelStrain.add(txtcStrain);
 		btnRawFiles.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-		btnRawFiles.setBounds(132, 0, 38, 37);
+		btnRawFiles.setBounds(271, 0, 38, 37);
 		btnRawFiles.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				final JFileChooser chooser = new JFileChooser();
@@ -443,18 +443,18 @@ public class Data_And_Library extends JDialog {
 		});
 		
 		panelRawFiles.add(btnRawFiles);
-		txtRawFileNames.setBounds(180, 0, 306, 37);
+		txtRawFileNames.setBounds(319, 0, 400, 37);
 		panelRawFiles.add(txtRawFileNames);
 		txtcRawFileNames.setForeground(Color.DARK_GRAY);
 		nimbusFix(Color.LIGHT_GRAY,txtcRawFileNames);
 		txtcRawFileNames.setEditable(false);
 		txtcRawFileNames.setText("Raw File Names");
 		txtcRawFileNames.setFont(GLSeq2_Main_Application.TEXT_FONT);
-		txtcRawFileNames.setBounds(0, 0, 112, 37);
+		txtcRawFileNames.setBounds(0, 0, 261, 37);
 		
 		panelRawFiles.add(txtcRawFileNames);
 		btnBaseDir.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-		btnBaseDir.setBounds(132, 0, 38, 37);
+		btnBaseDir.setBounds(271, 0, 38, 37);
 		btnBaseDir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				final JFileChooser chooser = new JFileChooser();
@@ -469,7 +469,7 @@ public class Data_And_Library extends JDialog {
 		});
 		
 		panelDestinationDir.add(btnBaseDir);
-		txtDestinationDirectory.setBounds(180, 0, 306, 37);
+		txtDestinationDirectory.setBounds(319, 0, 400, 37);
 		
 		panelDestinationDir.add(txtDestinationDirectory);
 		txtcBaseOfDestination.setForeground(Color.DARK_GRAY);
@@ -477,11 +477,11 @@ public class Data_And_Library extends JDialog {
 		txtcBaseOfDestination.setEditable(false);
 		txtcBaseOfDestination.setText("Base of Destination Directory");
 		txtcBaseOfDestination.setFont(GLSeq2_Main_Application.TEXT_FONT);
-		txtcBaseOfDestination.setBounds(0, 0, 112, 37);
+		txtcBaseOfDestination.setBounds(0, 0, 261, 37);
 		
 		panelDestinationDir.add(txtcBaseOfDestination);
 		btnPreProcFiles.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
-		btnPreProcFiles.setBounds(132, 0, 38, 37);
+		btnPreProcFiles.setBounds(271, 0, 38, 37);
 		btnPreProcFiles.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				final JFileChooser chooser = new JFileChooser();
@@ -496,15 +496,15 @@ public class Data_And_Library extends JDialog {
 		});
 		
 		panelPreProcessedFiles.add(btnPreProcFiles);
-		txtPreProcessedFiles.setBounds(180, 0, 306, 37);
+		txtPreProcessedFiles.setBounds(319, 0, 400, 37);
 		
 		panelPreProcessedFiles.add(txtPreProcessedFiles);
 		txtcDirectoryContainingPreprocessed.setForeground(Color.DARK_GRAY);
 		nimbusFix(Color.LIGHT_GRAY,txtcDirectoryContainingPreprocessed);
 		txtcDirectoryContainingPreprocessed.setEditable(false);
 		txtcDirectoryContainingPreprocessed.setText("Directory Containing Pre-Processed Files");
-		txtcDirectoryContainingPreprocessed.setFont(GLSeq2_Main_Application.TEXT_FONT);
-		txtcDirectoryContainingPreprocessed.setBounds(0, 0, 112, 37);
+		txtcDirectoryContainingPreprocessed.setFont(new Font("Courier New", Font.PLAIN, 11));
+		txtcDirectoryContainingPreprocessed.setBounds(0, 0, 261, 37);
 		
 		panelPreProcessedFiles.add(txtcDirectoryContainingPreprocessed);
 	}

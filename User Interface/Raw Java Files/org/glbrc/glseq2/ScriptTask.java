@@ -99,7 +99,7 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
 		try {
 			// Script is done when it says done
 			process.waitFor();
-			GLSeq2_Main_Application.updating("Process complete.");
+			GLSeq2_Main_Application.updating("The Top Script has now completely executed.  Processing will continue in your destination folder until complete.");
 		} catch (InterruptedException e) {
 			GLSeq2_Main_Application.updating("Error running the script. Script interrupted.");
 		}
