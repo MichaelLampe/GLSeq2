@@ -36,7 +36,6 @@ public class Attributes {
 	private String idAttr = "";
 
 	// Run Attributes
-	private String scriptDirectory = "";
 	private String destinationDirectory = "";
 	private String FeatureCounts = "";
 	private String RSEM = "";
@@ -63,6 +62,7 @@ public class Attributes {
 	private String genobam = "FALSE";
 
 	// Environment Attributes
+	private String scriptDirectory = "";
 	private String trimPath = "";
 	private String picardToolsPath = "";
 	private String fastqcPath = "";

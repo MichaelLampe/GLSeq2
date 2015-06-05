@@ -498,14 +498,12 @@ while(!(DataIsWaiting)) {
 if (DataIsWaiting) {
   Sys.sleep(10) 
   #
-  ##################################
-  ###  RUNNING THE COMPUTATION #####
-  ##################################
-  # Special case for CUSHAW-GPU to make it align sequentially
-  # The specialCase variable would be set to true in the
-  # GLSeq.CUSHAW.R file for reference.
   #
   # Base case
-  try(system(comm.stack.pool)) 
+  warning("Now initiating the full command stack.")
+  warning("A message will appear when it has completed.")
+  try(system(comm.stack.pool,intern = TRUE))
+  warning(comm.stack.pool)
+  warning("Common pool completed.")
 }
 NULL

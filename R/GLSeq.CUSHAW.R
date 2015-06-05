@@ -95,8 +95,8 @@ if (!is.null(sam.create)) {
 }
 if (GPUspecialCase) {
   system(Cushawgpu.special.case)
+  warning("The alignment step has now completed.")
 }
-warning("PAST GPU")
 #################
 # Rest of the cleanup to get to counting, or CPU only CUSHAW
 #################

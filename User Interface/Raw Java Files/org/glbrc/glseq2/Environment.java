@@ -3,8 +3,10 @@ package org.glbrc.glseq2;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 import javax.swing.border.EmptyBorder;
@@ -14,6 +16,8 @@ import javax.swing.JTextPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
+import java.awt.Font;
+import java.io.File;
 
 public class Environment extends JDialog {
 	/**
@@ -24,6 +28,10 @@ public class Environment extends JDialog {
 
 
 	private final JTextPane txtchEnvironmentOptions = new JTextPane();
+	/*/
+	 * GLSEQ Script
+	 */
+	
 	/*
 	 *  Picard tools menu
 	 */
@@ -79,7 +87,18 @@ public class Environment extends JDialog {
 	private final JPanel panelButton = new JPanel();
 	private final JButton okButton = new JButton("Apply and Close");
 	private final JButton cancelButton = new JButton("Cancel");
-	
+	private final JPanel panel = new JPanel();
+	private final JTextArea txtGlSeqDirectory = new JTextArea();
+	private final JTextPane txtcGlSeqDirectory = new JTextPane();
+	private final JButton btnGlSeqDirectory = new JButton("");
+	private final JButton btnTrimmomatic = new JButton("");
+	private final JButton btnPicard = new JButton("");
+	private final JButton btnFastqc = new JButton("");
+	private final JButton btnBWA = new JButton("");
+	private final JButton btnBam2Wig = new JButton("");
+	private final JButton btnCushawIndex = new JButton("");
+	private final JButton btnCushaw = new JButton("");
+	private final JButton btnCushawGPU = new JButton("");
 	
 	/**
 	 * Launch the application.
@@ -102,18 +121,179 @@ public class Environment extends JDialog {
 		initGUI();
 		// Initialize some variables
 		txtTrimmomatic.setText(GLSeq2_Main_Application.att.getTrimPath());
+		btnTrimmomatic.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnTrimmomatic.setBounds(191, 12, 38, 37);
+		btnTrimmomatic.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtTrimmomatic);
+				try {
+					File file = chooser.getSelectedFile();
+					txtTrimmomatic.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelTrimmomatic.add(btnTrimmomatic);
 		txtPicard.setText(GLSeq2_Main_Application.att.getPicardToolsPath());
+		btnPicard.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnPicard.setBounds(191, 12, 38, 37);
+		btnPicard.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtPicard);
+				try {
+					File file = chooser.getSelectedFile();
+					txtPicard.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelPicard.add(btnPicard);
 		txtFastqc.setText(GLSeq2_Main_Application.att.getFastqcPath());
+		btnFastqc.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnFastqc.setBounds(191, 12, 38, 37);
+		btnFastqc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtFastqc);
+				try {
+					File file = chooser.getSelectedFile();
+					txtFastqc.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelFastqc.add(btnFastqc);
 		txtBwa.setText(GLSeq2_Main_Application.att.getBwaPath());
+		btnBWA.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnBWA.setBounds(191, 12, 38, 37);
+		btnBWA.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtBwa);
+				try {
+					File file = chooser.getSelectedFile();
+					txtBwa.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelBwa.add(btnBWA);
 		txtBam2Wig.setText(GLSeq2_Main_Application.att.getBam2WigPath());
+		btnBam2Wig.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnBam2Wig.setBounds(191, 12, 38, 37);
+		btnBam2Wig.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtBam2Wig);
+				try {
+					File file = chooser.getSelectedFile();
+					txtBam2Wig.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelBam2Wig.add(btnBam2Wig);
 		txtCushaw.setText(GLSeq2_Main_Application.att.getCushawPath());
+		btnCushaw.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnCushaw.setBounds(191, 12, 38, 37);
+		btnCushaw.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtCushaw);
+				try {
+					File file = chooser.getSelectedFile();
+					txtCushaw.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelCushaw.add(btnCushaw);
 		txtCushawIndex.setText(GLSeq2_Main_Application.att.getCushawIndexPath());
+		btnCushawIndex.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnCushawIndex.setBounds(191, 12, 38, 37);
+		btnCushawIndex.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtCushawIndex);
+				try {
+					File file = chooser.getSelectedFile();
+					txtCushawIndex.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelCushaw_Index.add(btnCushawIndex);
 		txtCushaw_GPU.setText(GLSeq2_Main_Application.att.getCushawGpuPath());
+		btnCushawGPU.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnCushawGPU.setBounds(191, 11, 38, 37);
+		btnCushawGPU.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtCushaw_GPU);
+				try {
+					File file = chooser.getSelectedFile();
+					txtCushaw_GPU.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		
+		panelCushaw_GPU.add(btnCushawGPU);
+		panel.setLayout(null);
+		panel.setForeground(Color.DARK_GRAY);
+		panel.setBackground(Color.LIGHT_GRAY);
+		panel.setBounds(10, 48, 803, 59);
+		
+		contentPanel.add(panel);
+		txtGlSeqDirectory.setText(GLSeq2_Main_Application.att.getScriptDirectory());
+		txtGlSeqDirectory.setBounds(239, 11, 554, 37);
+		
+		panel.add(txtGlSeqDirectory);
+		txtcGlSeqDirectory.setText("Path to GLSeq Scripts");
+		txtcGlSeqDirectory.setForeground(Color.DARK_GRAY);
+		nimbusFix(Color.LIGHT_GRAY,txtcGlSeqDirectory);
+		txtcGlSeqDirectory.setFont(new Font("Monospaced", Font.PLAIN, 11));
+		txtcGlSeqDirectory.setEditable(false);
+		txtcGlSeqDirectory.setBounds(10, 11, 171, 37);
+		
+		panel.add(txtcGlSeqDirectory);
+		btnGlSeqDirectory.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+		btnGlSeqDirectory.setBounds(191, 11, 38, 37);
+		btnGlSeqDirectory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				final JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				chooser.showOpenDialog(txtGlSeqDirectory);
+				try {
+					File file = chooser.getSelectedFile();
+					txtGlSeqDirectory.setText(file.getAbsolutePath());
+				} catch (NullPointerException e) {
+				}
+			}
+		});
+		panel.add(btnGlSeqDirectory);
 
 	}
 	private void initGUI() {
 		setBackground(Color.LIGHT_GRAY);
-		setBounds(100, 100, 535, 608);
+		setBounds(100, 100, 829, 663);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBackground(Color.LIGHT_GRAY);
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -123,10 +303,10 @@ public class Environment extends JDialog {
 			panelFastqc.setForeground(Color.DARK_GRAY);
 			panelFastqc.setBackground(Color.LIGHT_GRAY);
 			panelFastqc.setLayout(null);
-			panelFastqc.setBounds(10, 166, 496, 59);
+			panelFastqc.setBounds(10, 236, 803, 59);
 			contentPanel.add(panelFastqc);
 			{
-				txtFastqc.setBounds(156, 11, 330, 37);
+				txtFastqc.setBounds(239, 11, 554, 37);
 				panelFastqc.add(txtFastqc);
 			}
 			{
@@ -135,7 +315,7 @@ public class Environment extends JDialog {
 				txtcFastqc.setText("Path to Fastqc");
 				txtcFastqc.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcFastqc.setEditable(false);
-				txtcFastqc.setBounds(10, 11, 136, 37);
+				txtcFastqc.setBounds(10, 11, 171, 37);
 				panelFastqc.add(txtcFastqc);
 			}
 		}
@@ -143,10 +323,10 @@ public class Environment extends JDialog {
 			panelPicard.setForeground(Color.DARK_GRAY);
 			panelPicard.setBackground(Color.LIGHT_GRAY);
 			panelPicard.setLayout(null);
-			panelPicard.setBounds(10, 107, 496, 59);
+			panelPicard.setBounds(10, 177, 803, 59);
 			contentPanel.add(panelPicard);
 			{
-				txtPicard.setBounds(156, 11, 330, 37);
+				txtPicard.setBounds(239, 11, 554, 37);
 				panelPicard.add(txtPicard);
 			}
 			{
@@ -155,7 +335,7 @@ public class Environment extends JDialog {
 				txtcPicard.setText("Path to PicardTools Jar Directory");
 				txtcPicard.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcPicard.setEditable(false);
-				txtcPicard.setBounds(10, 11, 136, 37);
+				txtcPicard.setBounds(10, 11, 171, 37);
 				panelPicard.add(txtcPicard);
 			}
 		}
@@ -163,10 +343,10 @@ public class Environment extends JDialog {
 			panelTrimmomatic.setForeground(Color.DARK_GRAY);
 			panelTrimmomatic.setBackground(Color.LIGHT_GRAY);
 			panelTrimmomatic.setLayout(null);
-			panelTrimmomatic.setBounds(10, 48, 496, 59);
+			panelTrimmomatic.setBounds(10, 118, 803, 59);
 			contentPanel.add(panelTrimmomatic);
 			{
-				txtTrimmomatic.setBounds(156, 11, 330, 37);
+				txtTrimmomatic.setBounds(239, 11, 554, 37);
 				panelTrimmomatic.add(txtTrimmomatic);
 			}
 			{
@@ -175,7 +355,7 @@ public class Environment extends JDialog {
 				txtcTrimmomatic.setText("Path to Trimmomatic");
 				txtcTrimmomatic.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcTrimmomatic.setEditable(false);
-				txtcTrimmomatic.setBounds(10, 11, 136, 37);
+				txtcTrimmomatic.setBounds(10, 11, 171, 37);
 				panelTrimmomatic.add(txtcTrimmomatic);
 			}
 		}
@@ -183,10 +363,10 @@ public class Environment extends JDialog {
 			panelCushaw.setForeground(Color.DARK_GRAY);
 			panelCushaw.setBackground(Color.LIGHT_GRAY);
 			panelCushaw.setLayout(null);
-			panelCushaw.setBounds(10, 397, 496, 59);
+			panelCushaw.setBounds(10, 467, 803, 59);
 			contentPanel.add(panelCushaw);
 			{
-				txtCushaw.setBounds(156, 11, 330, 37);
+				txtCushaw.setBounds(239, 11, 554, 37);
 				panelCushaw.add(txtCushaw);
 			}
 			{
@@ -195,7 +375,7 @@ public class Environment extends JDialog {
 				txtc_Cushaw.setText("Path to CUSHAW");
 				txtc_Cushaw.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtc_Cushaw.setEditable(false);
-				txtc_Cushaw.setBounds(10, 11, 136, 37);
+				txtc_Cushaw.setBounds(10, 11, 171, 37);
 				panelCushaw.add(txtc_Cushaw);
 			}
 		}
@@ -203,10 +383,10 @@ public class Environment extends JDialog {
 			panelCushaw_GPU.setForeground(Color.DARK_GRAY);
 			panelCushaw_GPU.setBackground(Color.LIGHT_GRAY);
 			panelCushaw_GPU.setLayout(null);
-			panelCushaw_GPU.setBounds(10, 456, 496, 59);
+			panelCushaw_GPU.setBounds(10, 526, 803, 59);
 			contentPanel.add(panelCushaw_GPU);
 			{
-				txtCushaw_GPU.setBounds(156, 11, 330, 37);
+				txtCushaw_GPU.setBounds(239, 11, 554, 37);
 				panelCushaw_GPU.add(txtCushaw_GPU);
 			}
 			{
@@ -215,7 +395,7 @@ public class Environment extends JDialog {
 				txtcCushaw_GPU.setText("Path to CUSHAW-GPU");
 				txtcCushaw_GPU.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcCushaw_GPU.setEditable(false);
-				txtcCushaw_GPU.setBounds(10, 11, 136, 37);
+				txtcCushaw_GPU.setBounds(10, 11, 171, 37);
 				panelCushaw_GPU.add(txtcCushaw_GPU);
 			}
 		}
@@ -223,10 +403,10 @@ public class Environment extends JDialog {
 			panelBam2Wig.setForeground(Color.DARK_GRAY);
 			panelBam2Wig.setBackground(Color.LIGHT_GRAY);
 			panelBam2Wig.setLayout(null);
-			panelBam2Wig.setBounds(10, 282, 496, 59);
+			panelBam2Wig.setBounds(10, 352, 803, 59);
 			contentPanel.add(panelBam2Wig);
 			{
-				txtBam2Wig.setBounds(156, 11, 330, 37);
+				txtBam2Wig.setBounds(239, 11, 554, 37);
 				panelBam2Wig.add(txtBam2Wig);
 			}
 			{
@@ -235,7 +415,7 @@ public class Environment extends JDialog {
 				txtcBam2Wig.setText("Path to Bam2Wig Shell Script");
 				txtcBam2Wig.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcBam2Wig.setEditable(false);
-				txtcBam2Wig.setBounds(10, 11, 136, 37);
+				txtcBam2Wig.setBounds(10, 11, 171, 37);
 				panelBam2Wig.add(txtcBam2Wig);
 			}
 		}
@@ -243,10 +423,10 @@ public class Environment extends JDialog {
 			panelBwa.setForeground(Color.DARK_GRAY);
 			panelBwa.setBackground(Color.LIGHT_GRAY);
 			panelBwa.setLayout(null);
-			panelBwa.setBounds(10, 225, 496, 59);
+			panelBwa.setBounds(10, 295, 803, 59);
 			contentPanel.add(panelBwa);
 			{
-				txtBwa.setBounds(156, 11, 330, 37);
+				txtBwa.setBounds(239, 11, 554, 37);
 				panelBwa.add(txtBwa);
 			}
 			{
@@ -255,7 +435,7 @@ public class Environment extends JDialog {
 				txtcBwa.setText("Path to BWA");
 				txtcBwa.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcBwa.setEditable(false);
-				txtcBwa.setBounds(10, 11, 136, 37);
+				txtcBwa.setBounds(10, 11, 171, 37);
 				panelBwa.add(txtcBwa);
 			}
 		}
@@ -272,10 +452,10 @@ public class Environment extends JDialog {
 			panelCushaw_Index.setLayout(null);
 			panelCushaw_Index.setForeground(Color.DARK_GRAY);
 			panelCushaw_Index.setBackground(Color.LIGHT_GRAY);
-			panelCushaw_Index.setBounds(10, 338, 496, 59);
+			panelCushaw_Index.setBounds(10, 408, 803, 59);
 			contentPanel.add(panelCushaw_Index);
 			{
-				txtCushawIndex.setBounds(156, 11, 330, 37);
+				txtCushawIndex.setBounds(239, 11, 554, 37);
 				panelCushaw_Index.add(txtCushawIndex);
 			}
 			{
@@ -284,7 +464,7 @@ public class Environment extends JDialog {
 				nimbusFix(Color.LIGHT_GRAY,txtcCushaw_Index);
 				txtcCushaw_Index.setFont(GLSeq2_Main_Application.TEXT_FONT);
 				txtcCushaw_Index.setEditable(false);
-				txtcCushaw_Index.setBounds(10, 11, 136, 37);
+				txtcCushaw_Index.setBounds(10, 11, 171, 37);
 				panelCushaw_Index.add(txtcCushaw_Index);
 			}
 		}
@@ -304,6 +484,7 @@ public class Environment extends JDialog {
 						GLSeq2_Main_Application.att.setCushawPath(txtCushaw.getText());
 						GLSeq2_Main_Application.att.setCushawIndexPath(txtCushawIndex.getText());
 						GLSeq2_Main_Application.att.setCushawGpuPath(txtCushaw_GPU.getText());
+						GLSeq2_Main_Application.att.setScriptDirectory(txtGlSeqDirectory.getText());
 						dispose();
 					}
 				});	
@@ -330,5 +511,4 @@ public class Environment extends JDialog {
 		  pane.putClientProperty("Nimbus.Overrides.InheritDefaults", true);
 		  pane.setBackground(background);
 	}
-
 }

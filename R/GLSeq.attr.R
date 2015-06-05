@@ -2,7 +2,7 @@
 # Great Lakes Seq package for low-level processing of RNA-Seq data
 #########################################################
 #
-# This is a user generated attribute file created on 2015.06.04
+# This is a user generated attribute file created on 2015.06.05
 #
 ##########################################################
 #
@@ -24,7 +24,7 @@ raw.dir <-""
 unzipped <- FALSE
 #
 # directory contining ready-to-go (split+QC-processed) fq files (Oct 17, 2013)
-readyData.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing/.Test_Cases/Test_Cushaw_526_HTSeq.02"
+readyData.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing/.Test_Cases/Test_CushawGPU_527_HTSeq_FeatureCounts.05"
 #
 # raw file names: 
 raw.fNames <- ""
@@ -91,10 +91,10 @@ base.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Working_RScript_Files"
 dest.dir.base <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing"
 #
 # number of cores to use
-nCores <- 4
+nCores <- 7
 #
 # number of parallel computation streams for expression computation
-nStreams <-2
+nStreams <-3
 #
 # number of parallel computation streams for data preparation
 # (may differ from the number of streams for expression computation because of particular software demands) 
@@ -115,14 +115,14 @@ RSEM <- ""
 cAlgor <- c(HTSeq,RSEM,FeatureCounts)
 #
 #  GPU acceleration option for CUSHAW
-GPU.accel <- FALSE
+GPU.accel <- TRUE
 #
 ###############################
 # PRE-PROCESSING OPTIONS
 ###############################
 #
 # trim the reads and generate QC reports for before- and after-trimming FASTQ files? 
-readTrim <- FALSE
+readTrim <- TRUE
 #
 # minimum length of a trimmed read
 trimMin <- 0
