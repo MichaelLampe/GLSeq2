@@ -149,6 +149,20 @@ public class Attributes {
 			scnr.close();
 		}
 	}
+	
+	// Future use case for possible SSH construction of AttributeFiles in a programatic manner.  
+	public void setAttributse(String[] inputArgs){
+		Field field;
+		for (String param : inputArgs){
+			String[] parts = param.split("=");
+			try{
+				field = this.getClass().getDeclaredField(parts[0]);
+				field.set(this,parts[1]);
+			} catch (Exception e){
+				System.out.println("Invalid field param");
+			}
+		}
+	}
 
 	// Overloaded for user to provide file location
 	public void setAttributes(String s) {

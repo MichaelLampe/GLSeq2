@@ -35,7 +35,6 @@ public final class GLSeq2_Main_Application {
 	 */
 	public static final Font HEADER_FONT = new Font("Courier", Font.PLAIN, 26);
 	public static final Font TEXT_FONT = new Font("Courier", Font.PLAIN, 11);
-
 	// Used to write updates to the panel in the UI
 	public static final JTextPane txtCurrentUpdates = new JTextPane();
 	private final JScrollPane scrollPane = new JScrollPane();
@@ -90,6 +89,8 @@ public final class GLSeq2_Main_Application {
 	 * Launch the application.
 	 */
 	public final static void main(String[] args) {
+		att = new Attributes();
+		run = new RunOptions();
 		if (args.length > 0) {
 			System.out
 					.println("Generating attribute file from command line arguments.");
@@ -144,8 +145,6 @@ public final class GLSeq2_Main_Application {
 	public GLSeq2_Main_Application() {
 		// Makes it so we can center items
 		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-		att = new Attributes();
-		run = new RunOptions();
 		/*
 		 * Both the attribute and run class should save a text file after each
 		 * run. This calls functions within those classes that loads up the
@@ -228,7 +227,6 @@ public final class GLSeq2_Main_Application {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(PROGRAM_NAME);
 		frame.getContentPane().setLayout(null);
-
 		/*
 		 * These are the attribute file option buttons and containers
 		 * 
@@ -249,7 +247,6 @@ public final class GLSeq2_Main_Application {
 				data_and_library.setVisible(true);
 			}
 		});
-
 		btnPipeline.setBounds(33, 124, 300, 70);
 		attributeFileContainer.add(btnPipeline);
 		btnPipeline.addActionListener(new ActionListener() {
@@ -258,7 +255,6 @@ public final class GLSeq2_Main_Application {
 				script_running.setVisible(true);
 			}
 		});
-
 		btnProcessing.setBounds(33, 205, 300, 70);
 		attributeFileContainer.add(btnProcessing);
 		btnProcessing.addActionListener(new ActionListener() {
@@ -267,7 +263,6 @@ public final class GLSeq2_Main_Application {
 				processing.setVisible(true);
 			}
 		});
-
 		btnEnvironment.setBounds(33, 285, 300, 70);
 		attributeFileContainer.add(btnEnvironment);
 		btnEnvironment.addActionListener(new ActionListener() {
@@ -323,7 +318,7 @@ public final class GLSeq2_Main_Application {
 		txtcAttributeFilePath.setBackground(Color.GRAY);
 
 		/*
-		 * This is where the run option buttons and text boxes are helds
+		 * This is where the run option buttons and text boxes are held
 		 */
 		runOptionsContainer.setBackground(Color.GRAY);
 		runOptionsContainer.setBounds(367, 40, 367, 532);
@@ -478,7 +473,6 @@ public final class GLSeq2_Main_Application {
 			}
 		});
 		runContainer.add(btnRun);
-
 		txtchRunningUpdates.setText("Running Updates");
 		StyledDocument docs = txtchRunningUpdates.getStyledDocument();
 		docs.setParagraphAttributes(0, docs.getLength(), center, false);
@@ -488,12 +482,10 @@ public final class GLSeq2_Main_Application {
 		txtchRunningUpdates.setBackground(Color.GRAY);
 		txtchRunningUpdates.setBounds(10, 5, 341, 48);
 		runContainer.add(txtchRunningUpdates);
-
 		runOptionsTitleContainer.setBounds(367, 0, 379, 213);
 		frame.getContentPane().add(runOptionsTitleContainer);
 		runOptionsTitleContainer.setBackground(Color.GRAY);
 		runOptionsTitleContainer.setLayout(null);
-
 		txtchRunOptions.setBounds(10, 5, 347, 48);
 		runOptionsTitleContainer.add(txtchRunOptions);
 		txtchRunOptions.setParagraphAttributes(center, false);
@@ -503,7 +495,9 @@ public final class GLSeq2_Main_Application {
 		txtchRunOptions.setText("Run Options");
 		txtchRunOptions.setEditable(false);
 	}
-
+	/*
+	 * Allows for various portions of the program to update the text data.
+	 */
 	public final static void updating(String the_update) {
 		String current = txtCurrentUpdates.getText();
 		txtCurrentUpdates.setText(current + "\n" + the_update
