@@ -35,7 +35,7 @@ public final class GLSeq2_Main_Application {
 	 */
 	public static final Font HEADER_FONT = new Font("Courier", Font.PLAIN, 26);
 	public static final Font TEXT_FONT = new Font("Courier", Font.PLAIN, 11);
-	
+
 	// Used to write updates to the panel in the UI
 	public static final JTextPane txtCurrentUpdates = new JTextPane();
 	private final JScrollPane scrollPane = new JScrollPane();
@@ -51,8 +51,8 @@ public final class GLSeq2_Main_Application {
 	/*
 	 * Most naming conventions I use are standard for SWING. One exception is
 	 * that text fields are distinguished between text expected to be constant
-	 * (txtc prefix) and text that may change throughout use (txt prefix)
-	 * If there is an h after the prefix (lower case) it is a header.
+	 * (txtc prefix) and text that may change throughout use (txt prefix) If
+	 * there is an h after the prefix (lower case) it is a header.
 	 */
 	// The location of the newly generated or input attribute file
 	private final JTextPane txtcAttributeFilePath = new JTextPane();
@@ -90,6 +90,19 @@ public final class GLSeq2_Main_Application {
 	 * Launch the application.
 	 */
 	public final static void main(String[] args) {
+		if (args.length > 0) {
+			System.out
+					.println("Generating attribute file from command line arguments.");
+			att.setAttributse(args);
+			try {
+				att.writeAttributesFile();
+			} catch (IOException e) {
+				System.out.println("Error constructing attribute file");
+			}
+			// Exit program
+			System.out.println("Program is now exiting.");
+			return;
+		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				GLSeq2_Main_Application window = new GLSeq2_Main_Application();
@@ -158,13 +171,15 @@ public final class GLSeq2_Main_Application {
 		 * 
 		 * Enums are derived from the ButtonEnum class
 		 */
-		if (run.getUpdateFromDatabase().equals(ButtonEnums.Attribute.UPDATE.value)) {
+		if (run.getUpdateFromDatabase().equals(
+				ButtonEnums.Attribute.UPDATE.value)) {
 			btnDatabase.setText(ButtonEnums.AttributeButton.UPDATE.value);
 		} else {
 			btnDatabase.setText(ButtonEnums.AttributeButton.NO_UPDATE.value);
 		}
 		//
-		if (run.getProcessedData().equals(ButtonEnums.Attribute.PREPROCESSING.value)) {
+		if (run.getProcessedData().equals(
+				ButtonEnums.Attribute.PREPROCESSING.value)) {
 			btnPreProcessing
 					.setText(ButtonEnums.AttributeButton.PREPROCESSING.value);
 		} else {
@@ -445,13 +460,21 @@ public final class GLSeq2_Main_Application {
 		btnRun.setBounds(10, 491, 341, 70);
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				run.setAttributeFilePath(txtAttributeFile.getText());
-				run.setRunId(txtRunName.getText());
-				txtCurrentUpdates.setEnabled(true);
-				updating("Now running script with arguments: "
-						+ String.valueOf(run.returnArgs()));
-				startGlseq = new ScriptTask();
-				startGlseq.execute();
+				if (txtRunName.getText().length() > 0) {
+					if (txtAttributeFile.getText().length() > 0) {
+						run.setAttributeFilePath(txtAttributeFile.getText());
+						run.setRunId(txtRunName.getText());
+						txtCurrentUpdates.setEnabled(true);
+						updating("Now running script with arguments: "
+								+ String.valueOf(run.returnArgs()));
+						startGlseq = new ScriptTask();
+						startGlseq.execute();
+					} else {
+						updating("Please either generate a new attribute file or enter a path to a previously generated file.");
+					}
+				} else {
+					updating("Please name your run in the textbox to the left of the run button");
+				}
 			}
 		});
 		runContainer.add(btnRun);
@@ -483,6 +506,7 @@ public final class GLSeq2_Main_Application {
 
 	public final static void updating(String the_update) {
 		String current = txtCurrentUpdates.getText();
-		txtCurrentUpdates.setText(current + "\n" + the_update + "\n#########################################");
+		txtCurrentUpdates.setText(current + "\n" + the_update
+				+ "\n#########################################");
 	}
 }
