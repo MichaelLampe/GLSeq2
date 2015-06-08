@@ -431,7 +431,7 @@ if (alignment == "alignment"){
 ###################### COLLECT ###########################################
 ###########################################################################
 #
-if (resCollect == "collect"){
+if (resCollect == "collect" && alignment == "noalignment" && counting == "nocounting"){
   collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
   collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
   collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, " &", sep="")
@@ -473,7 +473,8 @@ if (dataPrepare  == "dataprep") {
   dataPrepLog <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")
   dataPrepErr <- paste(destDirLog, text.add, ".DataPrepErr.txt", sep="")
   dataPrep <- paste("Rscript GLSeq.dataprep.R ", text.add, " 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="") 
-  system(dataPrep) 
+  print("Starting Data Preparation")
+  system(dataPrep)
 }
 #
 #################
@@ -503,7 +504,6 @@ if (DataIsWaiting) {
   warning("Now initiating the full command stack.")
   warning("A message will appear when it has completed.")
   try(system(comm.stack.pool,intern = TRUE))
+  warning("Here is the command that was run:")
   warning(comm.stack.pool)
-  warning("Common pool completed.")
 }
-NULL

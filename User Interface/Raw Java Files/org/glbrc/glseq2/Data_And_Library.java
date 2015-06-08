@@ -71,6 +71,7 @@ public class Data_And_Library extends JDialog {
 	private final JButton btnCountableSam = new JButton("");
 	private final JTextArea txtCountableSamDirectory = new JTextArea(GLSeq2_Main_Application.att.getCountableSamDir());
 	private final JTextPane txtcCountableSamFile = new JTextPane();
+	private final JButton btnPresplit = new JButton();
 
 	/**
 	 * Launch the application.
@@ -119,6 +120,11 @@ public class Data_And_Library extends JDialog {
 		} else{
 			btnEnded.setText(ButtonEnums.OptionButton.PAIRED.value);
 		}
+		if (GLSeq2_Main_Application.att.getPresplit().equals("FALSE")){
+			btnPresplit.setText(ButtonEnums.OptionButton.NO_PRESPLIT.value);
+		} else{
+			btnPresplit.setText(ButtonEnums.OptionButton.PRESPLIT.value);
+		}
 	}
 	private void initGUI() {
 		getContentPane().setBackground(Color.LIGHT_GRAY);
@@ -145,9 +151,7 @@ public class Data_And_Library extends JDialog {
 						GLSeq2_Main_Application.att.setDestinationDirectory(txtDestinationDirectory.getText());
 						GLSeq2_Main_Application.att.setRawFileNames(txtRawFileNames.getText());	
 						GLSeq2_Main_Application.att.setCountableSamDir(txtCountableSamDirectory.getText());
-						//
-						//private final JButton zippedButton = new JButton("Using Zipped Files (.gz)");
-						//private final JButton endButton = new JButton("Using Paired Ended Data");
+
 						if (btnEnded.getText().equals(ButtonEnums.OptionButton.PAIRED.value)){
 							GLSeq2_Main_Application.att.setPairedEnd("TRUE");
 						}else{
@@ -159,9 +163,13 @@ public class Data_And_Library extends JDialog {
 						} else{
 							GLSeq2_Main_Application.att.setUnzipped("TRUE");
 						}
-						//GLSeq2_Main_Application.att.setUnzipped(unzipped);
-						//GLSeq2_Main_Application.att.setPairedEnd(pairedEnd);
 						//
+						if (btnPresplit.getText().equals(ButtonEnums.OptionButton.PRESPLIT.value)){
+							GLSeq2_Main_Application.att.setPresplit("TRUE");
+						}else{
+							GLSeq2_Main_Application.att.setPresplit("FALSE");
+						}
+	
 						GLSeq2_Main_Application.att.setStrain(txtStrain.getText());
 						GLSeq2_Main_Application.att.setLibList(txtSubsetOfLibraries.getText());
 						GLSeq2_Main_Application.att.setQScores(String.valueOf(comboQualityScores.getSelectedItem()));
@@ -204,7 +212,7 @@ public class Data_And_Library extends JDialog {
 				txtchCurrentDataAnd.setFont(GLSeq2_Main_Application.HEADER_FONT);
 				txtchCurrentDataAnd.setEditable(false);
 				txtchCurrentDataAnd.setText("Current Data and Library Options");
-				txtchCurrentDataAnd.setBounds(10, 5, 444, 48);
+				txtchCurrentDataAnd.setBounds(10, 5, 719, 48);
 				panelZipAndStrain.add(txtchCurrentDataAnd);
 			}
 			{
@@ -263,7 +271,7 @@ public class Data_And_Library extends JDialog {
 			
 			panelZipAndStrain.add(panelRawFiles);
 			btnZipped.setFont(new Font("Arial", Font.PLAIN, 15));
-			btnZipped.setBounds(10, 313, 354, 59);
+			btnZipped.setBounds(10, 313, 243, 59);
 			btnZipped.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					if (btnZipped.getText().equals(ButtonEnums.OptionButton.ZIPPED.value)){
@@ -277,7 +285,7 @@ public class Data_And_Library extends JDialog {
 			
 			panelZipAndStrain.add(btnZipped);
 			btnEnded.setFont(new Font("Arial", Font.PLAIN, 15));
-			btnEnded.setBounds(375, 313, 354, 59);
+			btnEnded.setBounds(263, 313, 240, 59);
 			btnEnded.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					if (btnEnded.getText().equals(ButtonEnums.OptionButton.PAIRED.value)){
@@ -367,6 +375,19 @@ public class Data_And_Library extends JDialog {
 			panelCountableSam.setBounds(10, 268, 719, 42);
 			
 			panelZipAndStrain.add(panelCountableSam);
+			btnPresplit.setText("NOT Presplit");
+			btnPresplit.setFont(new Font("Arial", Font.PLAIN, 15));
+			btnPresplit.setBounds(513, 313, 205, 59);
+			btnPresplit.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					if (btnPresplit.getText().equals(ButtonEnums.OptionButton.PRESPLIT.value)){
+						btnPresplit.setText(ButtonEnums.OptionButton.NO_PRESPLIT.value);
+					}else{
+						btnPresplit.setText(ButtonEnums.OptionButton.PRESPLIT.value);
+					}
+				}
+			});
+			panelZipAndStrain.add(btnPresplit);
 		}
 		btnCountableSam.setIcon(new ImageIcon(Data_And_Library.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
 		btnCountableSam.addActionListener(new ActionListener(){
