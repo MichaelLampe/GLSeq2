@@ -95,7 +95,10 @@ fqFiles.unzip <- NULL
 ###########################
 #
 if (unzipped){
-  if (!(is.null(libList))) fqFiles.unzip <- libList
+  if (!(is.null(libList))) {
+    fqFiles.unzip <- libList
+    print(libList)
+  }
 }
 #
 if (!unzipped){
@@ -107,10 +110,12 @@ if (!unzipped){
 # and the list of files is not explicitly supplied (the situation we had before introducing a route of communication with CBDB): 
 ###########################
 #
-if (unzipped){
-  if (length(unique(raw.dir)) == 1 & is.null(libList)){  
-    # Now takes either .fq or .fastq
-    fqFiles.unzip <- dir(raw.dir[1])[grep(".fq|.fastq", dir(raw.dir[1]))]
+if (unzipped){  
+  if (length(unique(raw.dir)) == 1){
+    if (is.null(libList)){
+      # Now takes either .fq or .fastq
+      fqFiles.unzip <- dir(raw.dir[1])[grep(".fq", dir(raw.dir[1]))]
+    }
   }
 }
 #
@@ -136,7 +141,7 @@ if (unzipped){
   # Thus, the file example.1.fq along with its pair of example.2.fq
   # would become example.1.fq and example.2.fq
   # and an unsplit file example.fq would become example.fq
-  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-0)
+  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-3)
 }
 #
 if (!unzipped){
@@ -144,7 +149,7 @@ if (!unzipped){
   # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
   # would become example.1.fq and example.2.fq
   # and an unsplit file example.fq.gz would become example.fq
-  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-3)
+  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-6)
 }
 
 #

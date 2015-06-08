@@ -459,6 +459,11 @@ public final class GLSeq2_Main_Application {
 					if (txtAttributeFile.getText().length() > 0) {
 						run.setAttributeFilePath(txtAttributeFile.getText());
 						run.setRunId(txtRunName.getText());
+						try{
+							run.saveConfigFile("RunConfig.txt");
+						} catch (IOException error){
+							System.out.println("Problem saving run configuration file.");
+						}
 						txtCurrentUpdates.setEnabled(true);
 						updating("Now running script with arguments: "
 								+ String.valueOf(run.returnArgs()));

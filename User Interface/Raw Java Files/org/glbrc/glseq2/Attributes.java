@@ -25,9 +25,9 @@ public class Attributes {
 	private String qScores = "";
 	private String libstrands = "";
 	private String libNchar = "0";
-	private String libList = "\"NULL\"";
+	private String libList = "NULL";
 	private String countableSamDir = "";
-
+	private String presplit = "FALSE";
 	// Reference Attributes
 	private String rGenome = "";
 	private String refFASTAname = "";
@@ -214,6 +214,9 @@ public class Attributes {
 	}
 	public void setCountableSamDir(String countableSamDir){
 		this.countableSamDir = countableSamDir;
+	}
+	public void setPresplit(String presplit){
+		this.presplit = presplit;
 	}
 
 	// Reference Attribute Setters
@@ -411,7 +414,9 @@ public class Attributes {
 	public String getCountableSamDir(){
 		return countableSamDir;
 	}
-
+	public String getPresplit(){
+		return presplit;
+	}
 	// Reference Attribute Getters
 	public String getRGenome() {
 		return rGenome;
@@ -575,6 +580,8 @@ public class Attributes {
 		writer.write("#\n");
 		writer.write("# single / paired end\n");
 		writer.write("paired.end <- " + pairedEnd.toUpperCase() + "\n");
+		writer.write("#\n");
+		writer.write("presplit <- " + presplit.toUpperCase() + "\n");
 		writer.write("#\n");
 		writer.write("# sequencing platform (used by CUSHAW, supported values: capillary, ls454, illumina, solid, helicos, iontorrent, pacbio)\n");
 		writer.write("seqPlatform <- \"" + seqPlatform + "\"\n");
