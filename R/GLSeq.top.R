@@ -360,11 +360,21 @@ if(dataPrepare == "dataprep") {
     # Raw Directory of files supplied 
     #
     if(updateFromDb == "noupdate") {
-      gzfiles <- dir(raw.dir) 
-      gzfiles <- gzfiles[grep(".gz", gzfiles)]
-      if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
-      if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 8)
-      fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
+      gzfiles <- dir(raw.dir)
+      fqfiles <- dir(raw.dir)
+      if (!unzipped) {
+        gzfiles <- gzfiles[grep(".gz", gzfiles)]
+        if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
+        if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 8)
+        fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
+      }
+      #
+      if (unzipped) {
+        fqfiles <- fqfiles[grep(".fq",fqfiles)]
+        if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 0)
+        if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 5)
+        fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
+      }
     }
   }
   #
@@ -372,17 +382,19 @@ if(dataPrepare == "dataprep") {
   # Single End
   ##############
   if (!(paired.end))  {
+    gzfiles <- dir(raw.dir)
+    fqfiles <- dir(raw.dir)
     if (unzipped){
-      gzfiles <- dir(raw.dir) 
-      gzfiles <- gzfiles[grep(".fq", gzfiles)] # just in case raw.dir has somethig else besides .gz files
-      fqfiles <- substr(gzfiles, 1, nchar(gzfiles)-3)
+      fqfiles <- dir(raw.dir) 
+      fqfiles <- fqfiles[grep(".fq", fqfiles)] # just in case raw.dir has somethig else besides .fq files
+      fqfiles <- substr(gzfiles, 1, nchar(fqfiles)-0)
       fqfiles.table <- cbind(NULL, fqfiles) 
     }
     if (!unzipped){
       gzfiles <- dir(raw.dir) 
       gzfiles <- gzfiles[grep(".gz", gzfiles)] # just in case raw.dir has somethig else besides .gz files
       fqfiles <- substr(gzfiles, 1, nchar(gzfiles)-3)
-      fqfiles.table <- cbind(NULL, fqfiles) 
+      fqfiles.table <- cbind(NULL, fqfiles)
     }
   }
 }
@@ -501,6 +513,12 @@ if (DataIsWaiting) {
   #
   #
   # Base case
+  if (GPUspecialCase) {
+    if (dataPrepare == "dataprep"){
+      system(Cushawgpu.special.case)
+      warning("The alignment step has now completed.")
+    }
+  }
   warning("Now initiating the full command stack.")
   warning("A message will appear when it has completed.")
   try(system(comm.stack.pool,intern = TRUE))

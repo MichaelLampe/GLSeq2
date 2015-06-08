@@ -57,6 +57,9 @@ for (zz in 1:nStreams) {
     headersortSAM <- paste("java -Xmx2g -jar ",picardToolsPath, "AddOrReplaceReadGroups.jar", sep="")
     # name of the processed (final) SAM file:
     final.sam <- paste(this.resName, "final.sam", sep=".")
+    # 
+    # Implement the logic for sequencer specificity here.  
+    #
     finalsam.comm <- paste(headersortSAM, " I=", cleaned.sam, " O=", final.sam, " SO=coordinate LB=", refFASTAname, " PL=ILLUMINA PU=unknown SM=", this.resName, " VALIDATION_STRINGENCY=LENIENT", sep="") # System command #5
     #
     ###################
@@ -108,6 +111,13 @@ for (zz in 1:nStreams) {
     # for subsequent assemblies of every stack: 
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
     # system(comm.i)
+    if (resCollect == "collect"){
+      collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
+      collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
+      collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, sep="")
+      if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
+      if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
+    }
   } # for i 
   if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")
   comm.stack.pool <- paste(comm.stack.pool,  " && echo  >  ", fileCompletenessID, ".", zz, " & ", sep="")

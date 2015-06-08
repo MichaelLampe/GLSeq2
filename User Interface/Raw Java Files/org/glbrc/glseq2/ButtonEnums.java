@@ -25,14 +25,15 @@ public final class ButtonEnums {
 	}
 	public enum OptionButton {
 		// Data and Library
-		ZIPPED("Using Unzipped Files (.fq)"),UNZIPPED("Using Zipped Files (.gz)"),
+		ZIPPED("Using Zipped Files (.gz)"),UNZIPPED("Using Unzipped Files (.fq)"),
 		SINGLE("Using Single Ended Data"),PAIRED("Using Paired Ended Data"),
 		// Processing
 		TRIMMING("Trimming Raw Reads"),	NO_TRIMMING("Not Trimming Raw Reads"),
 		// Script Running Options
 		EXTRACT("Extracting Forward and Reverse Coverage from Original BAM File"),NO_EXTRACT("NOT Extracting Forward and Reverse Coverage from Original BAM File"),
 		COMPUTE("Computing Confidence Intervals"),NO_COMPUTE("NOT Computing Confidence Intervals"),
-		OUTPUT("Outputting Genome BAM"),NO_OUTPUT("NOT Outputting Genome Bam");
+		OUTPUT("Outputting Genome BAM"),NO_OUTPUT("NOT Outputting Genome Bam"), 
+		PRESPLIT("Presplit"),NO_PRESPLIT("NOT Presplit");
 		
 		public final String value;
 		

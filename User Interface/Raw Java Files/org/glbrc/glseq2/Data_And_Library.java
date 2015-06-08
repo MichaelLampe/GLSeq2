@@ -151,7 +151,7 @@ public class Data_And_Library extends JDialog {
 						GLSeq2_Main_Application.att.setDestinationDirectory(txtDestinationDirectory.getText());
 						GLSeq2_Main_Application.att.setRawFileNames(txtRawFileNames.getText());	
 						GLSeq2_Main_Application.att.setCountableSamDir(txtCountableSamDirectory.getText());
-
+						//
 						if (btnEnded.getText().equals(ButtonEnums.OptionButton.PAIRED.value)){
 							GLSeq2_Main_Application.att.setPairedEnd("TRUE");
 						}else{
@@ -169,13 +169,14 @@ public class Data_And_Library extends JDialog {
 						}else{
 							GLSeq2_Main_Application.att.setPresplit("FALSE");
 						}
-	
+						//
 						GLSeq2_Main_Application.att.setStrain(txtStrain.getText());
 						GLSeq2_Main_Application.att.setLibList(txtSubsetOfLibraries.getText());
 						GLSeq2_Main_Application.att.setQScores(String.valueOf(comboQualityScores.getSelectedItem()));
 						GLSeq2_Main_Application.att.setSeqPlatform(String.valueOf(comboSequencingPlatforms.getSelectedItem()));
 						GLSeq2_Main_Application.att.setLibstrand(String.valueOf(comboStrandedness.getSelectedItem()));
-						GLSeq2_Main_Application.att.setLibNchar(String.valueOf(spinLibraryIdLen.getValue()));					
+						GLSeq2_Main_Application.att.setLibNchar(String.valueOf(spinLibraryIdLen.getValue()));		
+						//
 						dispose();
 					}
 					
@@ -375,7 +376,6 @@ public class Data_And_Library extends JDialog {
 			panelCountableSam.setBounds(10, 268, 719, 42);
 			
 			panelZipAndStrain.add(panelCountableSam);
-			btnPresplit.setText("NOT Presplit");
 			btnPresplit.setFont(new Font("Arial", Font.PLAIN, 15));
 			btnPresplit.setBounds(513, 313, 205, 59);
 			btnPresplit.addActionListener(new ActionListener() {

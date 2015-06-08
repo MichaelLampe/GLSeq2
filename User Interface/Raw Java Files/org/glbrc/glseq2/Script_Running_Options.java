@@ -108,7 +108,6 @@ public class Script_Running_Options extends JDialog {
 		spinMaxFragLen.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getFragMaxLength()));
 		spinMaxBuffer.setValue(Integer.valueOf(GLSeq2_Main_Application.att.getCiMem()));
 		txtReferenceGenome.setText(GLSeq2_Main_Application.att.getRGenome());
-		System.out.println(GLSeq2_Main_Application.att.getRGenome());
 		txtReferenceFasta.setText(GLSeq2_Main_Application.att.getFASTAname());
 		txtReferenceFeatures.setText(GLSeq2_Main_Application.att.getGFFname());
 		txtReferenceID.setText(GLSeq2_Main_Application.att.getIdAttr());

@@ -73,7 +73,7 @@ if (GPU.accel){
         warning("Too many cores can slow alignment.  Adjusting maximum cores to 6.")
       }
       if (paired.end)  create <- paste(CUSHAW.GPU.path, "-r", refFASTAname, "-q", fq.right, fq.left, "-o", unsorted.sam,"-t", nCores)
-      if (!(paired.end)) create <- paste(CUSHAW.GPU.path, "-r", refFASTAname, "-s", fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (!(paired.end)) create <- paste(CUSHAW.GPU.path, "-r", refFASTAname, "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
       # Checks to make sure that this process actually is GPU
       # The is.null is there for later on implementation of parallel GPU runs. (Hopefully!)
       if (is.null(sam.create)){
@@ -94,8 +94,10 @@ if (!is.null(sam.create)) {
   Cushawgpu.special.case <- paste(sam.create)
 }
 if (GPUspecialCase) {
-  system(Cushawgpu.special.case)
-  warning("The alignment step has now completed.")
+  if (dataPrepare == "nodataprep"){
+    system(Cushawgpu.special.case)
+    warning("The alignment step has now completed.")
+  }
 }
 #################
 # Rest of the cleanup to get to counting, or CPU only CUSHAW
@@ -118,7 +120,7 @@ for (zz in 1:nStreams) {
     ###################
     if (!GPU.accel){
       if (paired.end) sam.create<- paste(CUSHAW.path, "-r", refFASTAname, "-q", fq.left, fq.right, "-o", unsorted.sam , "-t", nCores,"-t", nCores) 
-      if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", refFASTAname, "-s", fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", refFASTAname, "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
     }
     ###################
     # Convert BAM to sorted BAM file
@@ -140,7 +142,8 @@ for (zz in 1:nStreams) {
     # This removes certain read errors that can cause counting programs to crash
     remove <- paste("'!/\t\\*\t/'")
     sorted.bam <- paste(this.resName,"sorted.bam",sep=".")
-    convert.to.sam <- paste ("samtools view -h",sorted.bam,"|","awk",remove,">",countable.sam)
+    if(paired.end) convert.to.sam <- paste ("samtools view -h",sorted.bam,"|","awk",remove,">",countable.sam)
+    if (!paired.end) convert.to.sam <- paste("samtools view -h", sorted.bam,">",countable.sam)
     ###################
     # Counting Step
     ###################
@@ -162,6 +165,18 @@ for (zz in 1:nStreams) {
     #
     # For subsequent assemblies of every stack (i > 1)
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
+    #
+    ###########################################################################
+    ###################### COLLECT ###########################################
+    ###########################################################################
+    #
+    if (resCollect == "collect"){
+      collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
+      collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
+      collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, sep="")
+      if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
+      if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
+    }
     # system(comm.i)
   } # for i 
   if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")

@@ -82,6 +82,13 @@ for (zz in 1:nStreams) {
     if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " date && ", comm.i)
     # for subsequent assemblies of every stack: 
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
+    if (resCollect == "collect"){
+      collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
+      collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
+      collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, sep="")
+      if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
+      if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
+    }
     
   }
   if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")

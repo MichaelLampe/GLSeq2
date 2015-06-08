@@ -536,6 +536,7 @@ public class Attributes {
 		// Saves it as an R file, with the current date.
 		if (aAlgor.equals("Cushaw-GPU")){
 			aAlgor = "Cushaw";
+			GPUaccel = "TRUE";
 		}
 		Date current = new Date();
 		SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd");
