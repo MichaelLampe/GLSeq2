@@ -1,6 +1,7 @@
 package org.glbrc.glseq2;
 
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
@@ -9,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import java.awt.Color;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -507,5 +507,7 @@ public final class GLSeq2_Main_Application {
 		String current = txtCurrentUpdates.getText();
 		txtCurrentUpdates.setText(current + "\n" + the_update
 				+ "\n#########################################");
+		// Keep the scrollbar at the bottom
+		txtCurrentUpdates.setCaretPosition(txtCurrentUpdates.getDocument().getLength());
 	}
 }
