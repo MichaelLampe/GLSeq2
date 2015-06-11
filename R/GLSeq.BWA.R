@@ -91,9 +91,11 @@ for (zz in 1:nStreams) {
     # Counting Step
     ###################
     #
+    count <- FALSE
     count.comm <- paste ("")
     if (counting == "counting"){
       setwd(base.dir)
+      count <- TRUE
       source("GLSeq.Counting.R")
     }
     ###################
@@ -102,12 +104,26 @@ for (zz in 1:nStreams) {
     if (paired.end) spaceCleanup <- paste("rm", sainame.left, "&& rm", sainame.right, "&& rm", unsorted.sam, "&& rm", cleaned.sam, "&& rm", final.sam, "&& rm", paired.bam) # System command #10
     if (!(paired.end)) spaceCleanup <- paste("rm", sainame.left, "&& rm", unsorted.sam, "&& rm", cleaned.sam, "&& rm", final.sam, "&& rm", paired.bam) # System command #10
     #
-    # current command:
-    # Removes all files added except for the final countable file.  
-    if (paired.end) comm.i <- paste(aln.left, "&&", aln.right, "&&", sam.create, "&&", cleansam.comm, "&&", finalsam.comm, "&&", bam.create, "&&", bam.index, "&&", countable.comm, "&&", count.comm,"&&", spaceCleanup)
-    if (!(paired.end)) comm.i <- paste(aln.left, "&&", sam.create, "&&", cleansam.comm, "&&", finalsam.comm, "&&", bam.create, "&&", bam.index, "&&", countable.comm, "&&", count.comm, "&&", spaceCleanup)
+    # Paired Ended Samples vs Unpaired
+    #
+      if (paired.end){
+        comm.i <- paste(aln.left,"&&",aln.right)
+      }
+      if (!paired.end){
+        comm.i <- paste(aln.left)
+      }
+      comm.i <- paste(comm.i,"&&",sam.create,"&&",cleansam.comm,"&&",finalsam.comm,"&&",bam.create,"&&",bam.index,"&&",countable.comm)
+    #
+    # Counting
+    # 
+    if (count) comm.i <- paste(comm.i,"&&",count.comm)
+    #
+    # Cleanup File 
+    #
+    comm.i <- paste(comm.i,"&&",spaceCleanup)
+    #
     # for the very first assembly in the stack: 
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " date && ", comm.i)
+    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "date && ", comm.i)
     # for subsequent assemblies of every stack: 
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
     # system(comm.i)

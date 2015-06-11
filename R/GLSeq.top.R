@@ -417,7 +417,7 @@ for (ii in 1:nStreams) assign(paste("range",ii,sep=""),rangelist[[ii]])
 # This will allow for that to be done in the top script
 #
 # This special case is to facilitate CUSHAW-GPU which processes data
-# A good bit differently then all the other alignment protocols
+# A bit differently then all the other alignment protocols
 GPUspecialCase <- FALSE
 # Doesn't run the Alignment if no expresion calculation is desired
 this.resName <- NULL
@@ -433,24 +433,39 @@ if (alignment == "alignment"){
       countable.sam <- countable.sams[i]
       copy.comm <- paste("cp",paste(countable.sams.dir,countable.sam,sep="/"),dest.dir)
       system(copy.comm)
+      setwd(base.dir)
       source("GLSeq.Counting.R")
     }
     comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm)
   }
 }
 #
+if ("RSEM" %in% cAlgor){
+  comm.stack.pool <- paste(comm.stack.pool,"wait")
+  comm.stack.pool <- paste(comm.stack.pool,"&&","mv",paste("*.RSEM.counts.*"),destDirRSEMCount)
+  comm.stack.pool <- paste(comm.stack.pool,"&&","mv","*.index.*",destDirRSEMCount)
+}
+#
 ###########################################################################
-###################### COLLECT ###########################################
+###################### COLLECT ############################################
 ###########################################################################
 #
 if (resCollect == "collect" && alignment == "noalignment" && counting == "nocounting"){
   collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
   collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
-  collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, " &", sep="")
+  # Gets converted to a logical (0 = FALSE, 1 = TRUE)
+  forceStart = 0
+  collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add," ",base.dir," ",dest.dir," ",alignment," ",counting," ",attrPath," ",forceStart," 1>> ", collLog, " 2>> ", collerr, " &", sep="")
   if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
   if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
 }
-# 
+#
+###########################################################################
+###################### Final File Move ####################################
+###########################################################################
+#
+#final.file.move <- paste("cd",dest.dir.base,"mv",paste("AttributeConfig",expID,"*",sep=""),dest.dir,"mv",paste("RunConfig",expID,"*",sep=""),dest.dir)
+#comm.stack.pool <- comm.stack.pool <- paste(comm.stack.pool,"&&",final.file.move)
 ##########################################################################
 ####################### SAVE RUN VARIABLES ###############################
 ##########################################################################
@@ -463,7 +478,8 @@ if (currentRun.dataFile %in% dir(base.dir)) {
 # saving a version of the attribute file with numeric addon:nStreams
 while(currentRun.dataFile %in% dir(base.dir)) {
   currentRun.dataFile <- paste(currentRun.dataFile.base, add.num, "rda", sep=".")
-  add.num <- add.num+1 }
+  add.num <- add.num+1 
+}
 if (!(currentRun.dataFile %in% dir(base.dir))) save.image(file=currentRun.dataFile)
 #
 ##################
@@ -501,9 +517,10 @@ dataReady.ind <- paste(text.add, ".DataReady", sep="")
 # Waiting
 #
 while(!(DataIsWaiting)) {
-  Sys.sleep(21) 
-  DataIsWaiting <- dataReady.ind %in% dir(dest.dir) 
+  Sys.sleep(21)
+  DataIsWaiting <- dataReady.ind %in% dir(dest.dir)
 }
+print("Data Preparation Complete")
 #
 ##########################################################################
 #################### EXPRESSION CALCULATION ##############################
@@ -511,17 +528,18 @@ while(!(DataIsWaiting)) {
 if (DataIsWaiting) {
   Sys.sleep(10) 
   #
-  #
   # Base case
-  if (GPUspecialCase) {
-    if (dataPrepare == "dataprep"){
+  if (GPUspecialCase) 
+  {
+    if (dataPrepare == "dataprep")
+    {
       system(Cushawgpu.special.case)
       warning("The alignment step has now completed.")
     }
   }
   warning("Now initiating the full command stack.")
   warning("A message will appear when it has completed.")
-  try(system(comm.stack.pool,intern = TRUE))
-  warning("Here is the command that was run:")
+  warning("Here is the command that is being run:")
   warning(comm.stack.pool)
+  try(system(comm.stack.pool,intern = TRUE))
 }
