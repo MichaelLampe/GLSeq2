@@ -15,10 +15,10 @@ comm.stack.pool <- NULL #
 #-f means FASTA input
 ####################
 IndexOptions <- paste("-f")
-if (qAlgor == "Bowtie"){
+if (aAlgor == "Bowtie"){
   index <- paste("bowtie-build",IndexOptions,refFASTAname,rGenome)
 }
-if (qAlgor == "Bowtie2"){
+if (aAlgor == "Bowtie2"){
   index <- paste("bowtie2-build",IndexOptions,refFASTAname,rGenome)
 }
 system(index)
@@ -42,7 +42,7 @@ for (zz in 1:nStreams) {
     # --chunkmbs may fix paired end read problems skipping reads due to memory exhaustion
     # Default for chunkmbs = 64, 512 is 8x larger.  No known problems created by this option.
     ###################
-    if (qAlgor == "Bowtie"){
+    if (aAlgor == "Bowtie"){
       BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
       if (paired.end){
         align <- paste("bowtie",BowtieOptions,rGenome,"-1",fq.left,"-2",fq.right,countable.sam)
@@ -55,10 +55,14 @@ for (zz in 1:nStreams) {
     # It gets hung soemtimes, though I'm not sure 
     # if it is the same issue as in the Bowtie algo
     ###################
-    if (qAlgor == "Bowtie2"){
-      Bowtie2Options <- paste ("-t","-q")
+    if (aAlgor == "Bowtie2"){
+      #
+      # All these options are necessary just to get it to conform with the RSEM counting protocol... (Except -t and -q)
+      # 
+      Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
       if (paired.end){
-        align <- paste("bowtie2","-fr",Bowtie2Options,rGenome,"-1",fq.left,"-2",fq.right,"-S",countable.sam)
+        Bowtie2Options <- paste(Bowtie2Options,"--no-mixed","--no-discordant")
+        align <- paste("bowtie2",Bowtie2Options,rGenome,"-1",fq.left,"-2",fq.right,"-S",countable.sam)
       }else{
         align <- paste("bowtie2",Bowtie2Options,rGenome,"-U",fq.left,"-S",countable.sam)
       }
@@ -82,6 +86,7 @@ for (zz in 1:nStreams) {
     if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " date && ", comm.i)
     # for subsequent assemblies of every stack: 
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
+    #
     if (resCollect == "collect"){
       collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
       collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")

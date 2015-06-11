@@ -137,7 +137,7 @@ if (is.null(fqFiles.zip) && is.null(fqFiles.unzip)) stop("Please check the list 
 ###########################
 #
 if (unzipped){
-  # Assumse the file is in the format of {name}.#.fq (Presplit) OR {name}.fq
+  # Assumes the file is in the format of {name}_#.fq (Presplit) OR {name}_fq
   # Thus, the file example.1.fq along with its pair of example.2.fq
   # would become example.1.fq and example.2.fq
   # and an unsplit file example.fq would become example.fq
@@ -145,7 +145,7 @@ if (unzipped){
 }
 #
 if (!unzipped){
-  # Assumes file is in the format of {name}.#.fq.gz (Presplit) OR {name}.fq.gz (Unsplit)
+  # Assumes file is in the format of {name}_#.fq.gz (Presplit) OR {name}.fq.gz (Unsplit)
   # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
   # would become example.1.fq and example.2.fq
   # and an unsplit file example.fq.gz would become example.fq
@@ -160,12 +160,14 @@ if (!unzipped){
 # This is to make it so the user doesn't have to care about the presplit command
 # When working with SE data
 #
+if (nStreamsDataPrep > length(fqFiles)) nStreamsDatapPep <- length(fqFiles)
 if (!paired.end) presplit <- FALSE
 if (presplit) rangelist.Dataprep <- chunk(2*(1:(length(fqFiles)/2)), nStreamsDataPrep)
 if (!presplit) rangelist.Dataprep <- chunk(1:length(fqFiles), nStreamsDataPrep)
 #
 for (zz in 1:nStreamsDataPrep) {
-  comm.pool <- "date " # separate command pool for every stream
+  if (zz==1) comm.pool <- "date"
+  if (zz!=1) comm.pool <- paste(comm.pool,"date")
   #
   ############################################################################################################
   ######################################## UNSPLIT PRESPLIT FILES ############################################
@@ -184,6 +186,8 @@ for (zz in 1:nStreamsDataPrep) {
       # Copy and Unzip files (If necessary)
       ###########################
       #
+      # Gunzip is what does the unzipping, just use cp to copy.
+      #
       if (unzipped){
         copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.unzip[j-1],sep=""),dest.dir,";","cp",paste(raw.dir,fqFiles.unzip[j],sep=""),dest.dir)
       }
@@ -198,9 +202,6 @@ for (zz in 1:nStreamsDataPrep) {
       ###########################
       # Trimming Reads
       ###########################
-      # While I know this could be done in fewer lines of code, I think just making
-      # Two paths for the Read Trim and Non-ReadTrim makes it more clear
-      # What is actually going on here.
       #
       if (readTrim) {
         leftDirtyFname <-  paste("dirty.", fqFile.base[j-1], ".fq", sep="")
@@ -216,15 +217,7 @@ for (zz in 1:nStreamsDataPrep) {
       if (!readTrim){
         preQC <- paste(fastqcPath, first.read.filename, second.read.filename)
       }
-      ###########################
-      # Ready Signals
-      ###########################
-      # Creates a file after each file has been prepared
       #
-      readyfile.j1 <- paste(fqFiles[j-1], ".ready", sep="")
-      readyfile.j2 <- paste(fqFiles[j], ".ready", sep="")
-      files2watch.dataprep <- c(files2watch.dataprep, readyfile.j1,readyfile.j2)
-      ready.comm <- paste("echo > ", readyfile.j1,";","echo > ",readyfile.j2, sep="")
       ###########################
       # Construct Command Stack
       ###########################
@@ -235,7 +228,7 @@ for (zz in 1:nStreamsDataPrep) {
       if (readTrim) comm.pool <- paste(comm.pool,"&&",trimCommand,"&&",fileShuffle)
       comm.pool <- paste(comm.pool,"&&",preQC)
       if(readTrim) comm.pool <- paste(comm.pool,"&&",postQC)
-      comm.pool <- paste(comm.pool,"&&",ready.comm)
+      comm.pool <- paste(comm.pool)
     }
   }
   #
@@ -285,14 +278,6 @@ for (zz in 1:nStreamsDataPrep) {
       # (The ruby code incorporated into the line above was adapted from SeqAnsweres forum (seqanswers.com))
       split.comm <- paste("cat ", dest.dir, fqFiles[j], " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[1234]/; @i = 0 if @i == 8' > ", first.read.filename, " && cat ",   dest.dir, fqFiles[j], " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[5678]/; @i = 0 if @i == 8' > ", second.read.filename, sep="")
       #
-      ##########################
-      # READY FILE
-      ##########################
-      # Will create a file when all the data prep has been done
-      readyfile.j <- paste(fqFiles[j], ".ready", sep="")
-      files2watch.dataprep <- c(files2watch.dataprep, readyfile.j)
-      ready.comm <- paste("echo > ", readyfile.j, sep="")
-      #
       ##################
       # READ TRIM
       ##################
@@ -310,7 +295,7 @@ for (zz in 1:nStreamsDataPrep) {
         #
         postQC <- paste(fastqcPath, first.read.filename, second.read.filename)
         #
-        comm.pool <- paste(comm.pool,"&&",split.comm,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC,"&&",ready.comm)
+        comm.pool <- paste(comm.pool,"&&",copy.comm,"&&",split.comm,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC)
       }
       #
       ##################
@@ -318,7 +303,7 @@ for (zz in 1:nStreamsDataPrep) {
       ##################
       if (!readTrim){
         preQC <- paste(fastqcPath, first.read.filename, second.read.filename)
-        comm.pool <- paste(comm.pool,"&&",copy.comm,"&&",split.comm,"&&",preQC,"&&",ready.comm)
+        comm.pool <- paste(comm.pool,"&&",copy.comm,"&&",split.comm,"&&",preQC)
       }  
     }
   }
@@ -359,13 +344,6 @@ for (zz in 1:nStreamsDataPrep) {
       }
       #
       ####################
-      # File Ready
-      ####################
-      readyfile.j <- paste(fqFile.base[j], ".ready", sep="")
-      files2watch.dataprep <- c(files2watch.dataprep, readyfile.j)
-      ready.comm <- paste("echo > ", readyfile.j, sep="")
-      #
-      ####################
       # Trimming
       ####################
       if(readTrim){
@@ -380,8 +358,8 @@ for (zz in 1:nStreamsDataPrep) {
         preQC <- paste(fastqcPath, SE.dirtyFname)
         #
         postQC <- paste(fastqcPath, unpaired.fq)
-        #
-        comm.pool <- paste(comm.pool,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC,"&&",ready.comm)
+       # moba
+        comm.pool <- paste(comm.pool,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC)
       }
       #
       ####################
@@ -390,39 +368,12 @@ for (zz in 1:nStreamsDataPrep) {
       if (!readTrim){
         unpaired.fq <- paste(fqFile.base[j], ".fq", sep="") 
         preQC <- paste(fastqcPath, unpaired.fq)
-        comm.pool <- paste(comm.pool,"&&",preQC,"&&",ready.comm)
+        comm.pool <- paste(comm.pool,"&&",preQC)
       }
     }
     comm.pool <- paste(comm.pool,"&")
   }
 }
+dataReady.signal <- paste("echo > ", text.add, ".DataReady", sep="") 
+comm.pool <- paste(comm.pool,"wait","&&",dataReady.signal)
 system(comm.pool)
-#
-#
-#
-###########################
-# Checking for completeness: 
-###########################
-# When all the ready.comm files are created
-# the program will be able to continue
-#
-dataReady <- FALSE 
-while(!(dataReady)) {
-  Sys.sleep(20)
-  nProcessed.data <- sum(files2watch.dataprep %in% dir(dest.dir))
-  dataReady <-  nProcessed.data  == length(files2watch.dataprep)
-  #
-  ###########################
-  # number of libraries already processed:
-  ###########################
-  #
-  if (!(dataReady)) cat(timestamp(), " Data preparation is not completed yet", " \n", nProcessed.data, " libraries are prepared so far", "\n")
-  if (dataReady) cat(timestamp(), " Data preparation is completed!", " \n",  nProcessed.data, " libraries are ready to go", "\n") 
-}
-####################
-# Creates data ready file when everything is complete
-####################
-if (dataReady) {
-  dataReady.signal <- paste("echo > ", text.add, ".DataReady", sep="") 
-  system(dataReady.signal) 
-}
