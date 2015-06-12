@@ -20,6 +20,13 @@ import javax.swing.SwingWorker;
 
 // SwingWorker allows for parallel execution
 public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
+  private Run localRun;
+  private Attributes localAttributes;
+
+  public ScriptTask(Run localRun, Attributes localAttributes) {
+    this.localRun = localRun;
+    this.localAttributes = localAttributes;
+  }
 
   @Override
   protected List<Integer> doInBackground() throws IOException {
@@ -33,22 +40,19 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
      * from the correct sources to get a good file path for the saved files.
      */
     try {
-      Application.updating("Saving current inputs");
-      Application.att.saveConfigFile(Application.run.getDestinationDirectory(Application.att
-          .getDestinationDirectory()) + "/AttributesConfigFile_" + Application.att.runId + ".txt");
-      Application.run.saveConfigFile(Application.run.getDestinationDirectory(Application.att
-          .getDestinationDirectory()) + "/RunConfigFile_" + Application.att.runId + ".txt");
+      localAttributes.saveConfigFile(localRun.getDestinationDirectory(localAttributes
+          .getDestinationDirectory()) + "/AttributesConfigFile_" + localAttributes.runId + ".txt");
+      localRun.saveConfigFile(localRun.getDestinationDirectory(localAttributes
+          .getDestinationDirectory()) + "/RunConfigFile_" + localAttributes.runId + ".txt");
     } catch (IOException e) {
-      Application.updating("Problem saving config files.  Files unable to be saved or written to.");
+      // This is meant to be here
     }
     // Indicate to user that the script has started
-    Application.updating("Started GLSeq.top.R script. (Top Script which runs your input settings)");
-    List<String> args = Application.run.returnArgs();
+    List<String> args = localRun.returnArgs();
     // Script generated based on arguments from the RunOptions class.
     // It calls the R script with the correct user parameters
     ProcessBuilder script = new ProcessBuilder(args);
-    script.directory(new File(Application.run.getScriptDirectory(Application.att
-        .getScriptDirectory())));
+    script.directory(new File(localRun.getScriptDirectory(localAttributes.getScriptDirectory())));
     Process process = null;
     try {
       process = script.start();
@@ -60,11 +64,11 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = reader.readLine()) != null) {
-              Application.updating("Program: " + line);
+              System.out.println(line);
             }
             reader = new BufferedReader(new InputStreamReader(es));
             while ((line = reader.readLine()) != null) {
-              Application.updating("Program: " + line);
+              System.out.println(line);
             }
           } catch (IOException e) {
             e.printStackTrace();
@@ -80,17 +84,15 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
       // Error message if the script is incorrectly run. Did not select
       // directory or options are easy reasons for this error.
     } catch (IOException e) {
-      Application
-          .updating("Sorry, there was a problem running the script. "
-              + " Please check that all the options have been correctly selected.");
+      Application.updating("Sorry, there was a problem running the script. "
+          + " Please check that all the options have been correctly selected.");
       Application.updating(String.valueOf(e));
     }
     try {
       // Script is done when it says done
       process.waitFor();
-      Application
-          .updating("The Top Script has now completely executed. "
-              + "Processing will continue in your destination folder until complete.");
+      Application.updating("The Top Script has now completely executed. "
+          + "Processing will continue in your destination folder until complete.");
     } catch (InterruptedException e) {
       Application.updating("Error running the script. Script interrupted.");
     }

@@ -125,7 +125,8 @@ Names of the input FASTQ files need to have the same length. If this is not the 
 
 You will need to change the values in the ```GLSeq2.attr.R``` file before the run. Locations of all the relevant directories, processing methods and their parameters are located there. The file is extensively commented and self-descriptive. 
 
-A user interface to satisfy this is coming soon.
+A user interface is also available to easily prepare attribute files and generate runs.
+![GLSeq2 User Interface](User_Interface.png)
 
 #### Quick start: "1 click mode" of pipeline execution 
 
