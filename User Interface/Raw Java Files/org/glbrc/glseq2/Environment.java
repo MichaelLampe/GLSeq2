@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.UIDefaults;
@@ -93,6 +94,20 @@ public class Environment extends JDialog {
   private final JButton okButton = new JButton("Apply and Close");
   private final JButton cancelButton = new JButton("Cancel");
   private final JPanel panel = new JPanel();
+  private final JScrollPane scrollPane = new JScrollPane();
+  private final JScrollPane scrollPane1 = new JScrollPane();
+  private final JScrollPane scrollPane2 = new JScrollPane();
+  private final JScrollPane scrollPane3 = new JScrollPane();
+  private final JScrollPane scrollPane4 = new JScrollPane();
+  private final JScrollPane scrollPane5 = new JScrollPane();
+  private final JScrollPane scrollPane6 = new JScrollPane();
+  private final JScrollPane scrollPane7 = new JScrollPane();
+  private final JScrollPane scrollPane8 = new JScrollPane();
+  private final JPanel tophatPanel = new JPanel();
+  private final JTextPane txtpnPathToTophat = new JTextPane();
+  private final JButton btnTopHat = new JButton("");
+  private final JScrollPane scrollPane9 = new JScrollPane();
+  private final JTextArea txtTopHat = new JTextArea();
 
   /**
    * Launch the application.
@@ -113,8 +128,6 @@ public class Environment extends JDialog {
   public Environment() {
     setResizable(false);
     initGui();
-    // Initialize some variables
-    txtTrimmomatic.setText(Application.att.getTrimPath());
     btnTrimmomatic.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnTrimmomatic.setBounds(191, 12, 38, 37);
@@ -133,7 +146,12 @@ public class Environment extends JDialog {
     });
 
     panelTrimmomatic.add(btnTrimmomatic);
-    txtPicard.setText(Application.att.getPicardToolsPath());
+    scrollPane1.setBounds(239, 11, 151, 37);
+
+    panelTrimmomatic.add(scrollPane1);
+    scrollPane1.setViewportView(txtTrimmomatic);
+    // Initialize some variables
+    txtTrimmomatic.setText(Application.att.getTrimPath());
     btnPicard.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnPicard.setBounds(191, 12, 38, 37);
@@ -152,7 +170,11 @@ public class Environment extends JDialog {
     });
 
     panelPicard.add(btnPicard);
-    txtFastqc.setText(Application.att.getFastqcPath());
+    scrollPane2.setBounds(239, 11, 151, 37);
+
+    panelPicard.add(scrollPane2);
+    scrollPane2.setViewportView(txtPicard);
+    txtPicard.setText(Application.att.getPicardToolsPath());
     btnFastqc.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnFastqc.setBounds(191, 12, 38, 37);
@@ -171,7 +193,11 @@ public class Environment extends JDialog {
     });
 
     panelFastqc.add(btnFastqc);
-    txtBwa.setText(Application.att.getBwaPath());
+    scrollPane3.setBounds(239, 11, 151, 37);
+
+    panelFastqc.add(scrollPane3);
+    scrollPane3.setViewportView(txtFastqc);
+    txtFastqc.setText(Application.att.getFastqcPath());
     btnBwa.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnBwa.setBounds(191, 12, 38, 37);
@@ -190,7 +216,11 @@ public class Environment extends JDialog {
     });
 
     panelBwa.add(btnBwa);
-    txtBam2Wig.setText(Application.att.getBam2WigPath());
+    scrollPane4.setBounds(239, 11, 151, 37);
+
+    panelBwa.add(scrollPane4);
+    scrollPane4.setViewportView(txtBwa);
+    txtBwa.setText(Application.att.getBwaPath());
     btnBam2Wig.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnBam2Wig.setBounds(191, 12, 38, 37);
@@ -209,7 +239,11 @@ public class Environment extends JDialog {
     });
 
     panelBam2Wig.add(btnBam2Wig);
-    txtCushaw.setText(Application.att.getCushawPath());
+    scrollPane5.setBounds(239, 11, 151, 37);
+
+    panelBam2Wig.add(scrollPane5);
+    scrollPane5.setViewportView(txtBam2Wig);
+    txtBam2Wig.setText(Application.att.getBam2WigPath());
     btnCushaw.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnCushaw.setBounds(191, 12, 38, 37);
@@ -228,7 +262,11 @@ public class Environment extends JDialog {
     });
 
     panelCushaw.add(btnCushaw);
-    txtCushawIndex.setText(Application.att.getCushawIndexPath());
+    scrollPane7.setBounds(239, 11, 151, 37);
+
+    panelCushaw.add(scrollPane7);
+    scrollPane7.setViewportView(txtCushaw);
+    txtCushaw.setText(Application.att.getCushawPath());
     btnCushawIndex.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnCushawIndex.setBounds(191, 12, 38, 37);
@@ -247,7 +285,11 @@ public class Environment extends JDialog {
     });
 
     panelCushawIndex.add(btnCushawIndex);
-    txtCushawGpu.setText(Application.att.getCushawGpuPath());
+    scrollPane6.setBounds(239, 11, 151, 37);
+
+    panelCushawIndex.add(scrollPane6);
+    scrollPane6.setViewportView(txtCushawIndex);
+    txtCushawIndex.setText(Application.att.getCushawIndexPath());
     btnCushawGpu.setIcon(new ImageIcon(Environment.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnCushawGpu.setBounds(191, 11, 38, 37);
@@ -266,16 +308,17 @@ public class Environment extends JDialog {
     });
 
     panelCushawGpu.add(btnCushawGpu);
+    scrollPane8.setBounds(239, 11, 151, 37);
+
+    panelCushawGpu.add(scrollPane8);
+    scrollPane8.setViewportView(txtCushawGpu);
+    txtCushawGpu.setText(Application.att.getCushawGpuPath());
     panel.setLayout(null);
     panel.setForeground(Color.DARK_GRAY);
     panel.setBackground(Color.LIGHT_GRAY);
-    panel.setBounds(10, 48, 803, 59);
+    panel.setBounds(10, 48, 400, 59);
 
     contentPanel.add(panel);
-    txtGlSeqDirectory.setText(Application.att.getScriptDirectory());
-    txtGlSeqDirectory.setBounds(239, 11, 554, 37);
-
-    panel.add(txtGlSeqDirectory);
     txtcGlSeqDirectory.setText("Path to GLSeq Scripts");
     txtcGlSeqDirectory.setForeground(Color.DARK_GRAY);
     nimbusFix(Color.LIGHT_GRAY, txtcGlSeqDirectory);
@@ -301,6 +344,47 @@ public class Environment extends JDialog {
       }
     });
     panel.add(btnGlSeqDirectory);
+    scrollPane.setBounds(239, 11, 151, 37);
+
+    panel.add(scrollPane);
+    scrollPane.setViewportView(txtGlSeqDirectory);
+    txtGlSeqDirectory.setText(Application.att.getScriptDirectory());
+    tophatPanel.setLayout(null);
+    tophatPanel.setForeground(Color.DARK_GRAY);
+    tophatPanel.setBackground(Color.LIGHT_GRAY);
+    tophatPanel.setBounds(413, 48, 400, 59);
+
+    contentPanel.add(tophatPanel);
+    txtpnPathToTophat.setText("Path to TopHat");
+    txtpnPathToTophat.setForeground(Color.DARK_GRAY);
+    txtpnPathToTophat.setFont(new Font("Monospaced", Font.PLAIN, 11));
+    txtpnPathToTophat.setEditable(false);
+    txtpnPathToTophat.setBounds(10, 11, 171, 37);
+
+    tophatPanel.add(txtpnPathToTophat);
+    btnTopHat.setIcon(new ImageIcon(Environment.class
+        .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+    btnTopHat.setBounds(191, 11, 38, 37);
+    btnTopHat.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        final JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.showOpenDialog(txtTopHat);
+        try {
+          File file = chooser.getSelectedFile();
+          txtTopHat.setText(file.getAbsolutePath());
+        } catch (NullPointerException e) {
+          // This is meant to be here.
+        }
+      }
+    });
+    tophatPanel.add(btnTopHat);
+    scrollPane9.setBounds(239, 11, 151, 37);
+
+    tophatPanel.add(scrollPane9);
+    txtTopHat.setText(Application.att.getTopHatPath());
+
+    scrollPane9.setViewportView(txtTopHat);
 
   }
 
@@ -316,12 +400,8 @@ public class Environment extends JDialog {
       panelFastqc.setForeground(Color.DARK_GRAY);
       panelFastqc.setBackground(Color.LIGHT_GRAY);
       panelFastqc.setLayout(null);
-      panelFastqc.setBounds(10, 236, 803, 59);
+      panelFastqc.setBounds(10, 236, 400, 59);
       contentPanel.add(panelFastqc);
-      {
-        txtFastqc.setBounds(239, 11, 554, 37);
-        panelFastqc.add(txtFastqc);
-      }
       {
         txtcFastqc.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcFastqc);
@@ -336,12 +416,8 @@ public class Environment extends JDialog {
       panelPicard.setForeground(Color.DARK_GRAY);
       panelPicard.setBackground(Color.LIGHT_GRAY);
       panelPicard.setLayout(null);
-      panelPicard.setBounds(10, 177, 803, 59);
+      panelPicard.setBounds(10, 177, 400, 59);
       contentPanel.add(panelPicard);
-      {
-        txtPicard.setBounds(239, 11, 554, 37);
-        panelPicard.add(txtPicard);
-      }
       {
         txtcPicard.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcPicard);
@@ -356,12 +432,8 @@ public class Environment extends JDialog {
       panelTrimmomatic.setForeground(Color.DARK_GRAY);
       panelTrimmomatic.setBackground(Color.LIGHT_GRAY);
       panelTrimmomatic.setLayout(null);
-      panelTrimmomatic.setBounds(10, 118, 803, 59);
+      panelTrimmomatic.setBounds(10, 118, 400, 59);
       contentPanel.add(panelTrimmomatic);
-      {
-        txtTrimmomatic.setBounds(239, 11, 554, 37);
-        panelTrimmomatic.add(txtTrimmomatic);
-      }
       {
         txtcTrimmomatic.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcTrimmomatic);
@@ -376,12 +448,8 @@ public class Environment extends JDialog {
       panelCushaw.setForeground(Color.DARK_GRAY);
       panelCushaw.setBackground(Color.LIGHT_GRAY);
       panelCushaw.setLayout(null);
-      panelCushaw.setBounds(10, 467, 803, 59);
+      panelCushaw.setBounds(10, 467, 400, 59);
       contentPanel.add(panelCushaw);
-      {
-        txtCushaw.setBounds(239, 11, 554, 37);
-        panelCushaw.add(txtCushaw);
-      }
       {
         txtcCushaw.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcCushaw);
@@ -396,12 +464,8 @@ public class Environment extends JDialog {
       panelCushawGpu.setForeground(Color.DARK_GRAY);
       panelCushawGpu.setBackground(Color.LIGHT_GRAY);
       panelCushawGpu.setLayout(null);
-      panelCushawGpu.setBounds(10, 526, 803, 59);
+      panelCushawGpu.setBounds(10, 526, 400, 59);
       contentPanel.add(panelCushawGpu);
-      {
-        txtCushawGpu.setBounds(239, 11, 554, 37);
-        panelCushawGpu.add(txtCushawGpu);
-      }
       {
         txtcCushawGpu.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcCushawGpu);
@@ -416,12 +480,8 @@ public class Environment extends JDialog {
       panelBam2Wig.setForeground(Color.DARK_GRAY);
       panelBam2Wig.setBackground(Color.LIGHT_GRAY);
       panelBam2Wig.setLayout(null);
-      panelBam2Wig.setBounds(10, 352, 803, 59);
+      panelBam2Wig.setBounds(10, 352, 400, 59);
       contentPanel.add(panelBam2Wig);
-      {
-        txtBam2Wig.setBounds(239, 11, 554, 37);
-        panelBam2Wig.add(txtBam2Wig);
-      }
       {
         txtcBam2Wig.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcBam2Wig);
@@ -436,12 +496,8 @@ public class Environment extends JDialog {
       panelBwa.setForeground(Color.DARK_GRAY);
       panelBwa.setBackground(Color.LIGHT_GRAY);
       panelBwa.setLayout(null);
-      panelBwa.setBounds(10, 295, 803, 59);
+      panelBwa.setBounds(10, 295, 400, 59);
       contentPanel.add(panelBwa);
-      {
-        txtBwa.setBounds(239, 11, 554, 37);
-        panelBwa.add(txtBwa);
-      }
       {
         txtcBwa.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcBwa);
@@ -465,12 +521,8 @@ public class Environment extends JDialog {
       panelCushawIndex.setLayout(null);
       panelCushawIndex.setForeground(Color.DARK_GRAY);
       panelCushawIndex.setBackground(Color.LIGHT_GRAY);
-      panelCushawIndex.setBounds(10, 408, 803, 59);
+      panelCushawIndex.setBounds(10, 408, 400, 59);
       contentPanel.add(panelCushawIndex);
-      {
-        txtCushawIndex.setBounds(239, 11, 554, 37);
-        panelCushawIndex.add(txtCushawIndex);
-      }
       {
         txtcCushawIndex.setText("Path to CUSHAW Index");
         txtcCushawIndex.setForeground(Color.DARK_GRAY);
@@ -498,6 +550,7 @@ public class Environment extends JDialog {
             Application.att.setCushawIndexPath(txtCushawIndex.getText());
             Application.att.setCushawGpuPath(txtCushawGpu.getText());
             Application.att.setScriptDirectory(txtGlSeqDirectory.getText());
+            Application.att.setTopHatPath(txtTopHat.getText());
             dispose();
           }
         });

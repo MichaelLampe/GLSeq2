@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
@@ -40,8 +41,6 @@ public final class Application {
   // And config saves
   public static Attributes att;
   public static Run run;
-  // Script that runs the GLSeq.top.R script
-  private ScriptTask startGlseq;
   /*
    * Most naming conventions I use are standard for SWING. One exception is that
    * text fields are distinguished between text expected to be constant (txtc
@@ -74,9 +73,11 @@ public final class Application {
   private final JButton btnCounting = new JButton("Counting");
   private final JButton btnCollecting = new JButton("Collecting Results");
   private final JButton btnBackground = new JButton("Running in the Background");
-  private final JButton btnRun = new JButton("Run");
+  private final JButton btnRun = new JButton("Run Current Selection");
   // Allows for text styling, mainly centering
   private final SimpleAttributeSet center = new SimpleAttributeSet();
+  private final JTabbedPane tabsRun = new JTabbedPane(JTabbedPane.RIGHT);
+  private final JButton btnQueue = new JButton("Add to Queue");
 
   /**
    * Launch the application.
@@ -84,9 +85,10 @@ public final class Application {
   public static final void main(String[] args) {
     att = new Attributes();
     run = new Run();
+    // Checks if there are command line arguments
     if (args.length > 0) {
       System.out.println("Generating attribute file from command line arguments.");
-      att.setAttributse(args);
+      att.setAttributes(args);
       try {
         att.writeAttributesFile();
       } catch (IOException e) {
@@ -94,6 +96,11 @@ public final class Application {
       }
       // Exit program
       System.out.println("Program is now exiting.");
+      //
+      //
+      // Will need to add logic to tell the Glow_Database where this went.
+      //
+      //
       return;
     }
     EventQueue.invokeLater(new Runnable() {
@@ -330,7 +337,7 @@ public final class Application {
       }
     });
     runOptionsContainer.add(btnPreProcessing);
-    btnAlignment.setBounds(10, 162, 347, 70);
+    btnAlignment.setBounds(10, 162, 160, 70);
     btnAlignment.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent buttonAction) {
         if (btnAlignment.getText().equals(ButtonEnums.AttributeButton.ALIGNMENT.value)) {
@@ -343,7 +350,7 @@ public final class Application {
       }
     });
     runOptionsContainer.add(btnAlignment);
-    btnCounting.setBounds(10, 243, 347, 70);
+    btnCounting.setBounds(197, 162, 160, 70);
     btnCounting.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent buttonAction) {
         if (btnCounting.getText().equals(ButtonEnums.AttributeButton.COUNT.value)) {
@@ -356,7 +363,7 @@ public final class Application {
       }
     });
     runOptionsContainer.add(btnCounting);
-    btnCollecting.setBounds(10, 324, 347, 70);
+    btnCollecting.setBounds(10, 243, 347, 70);
     btnCollecting.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent buttonAction) {
         if (btnCollecting.getText().equals(ButtonEnums.AttributeButton.COLLECT.value)) {
@@ -369,7 +376,7 @@ public final class Application {
       }
     });
     runOptionsContainer.add(btnCollecting);
-    btnBackground.setBounds(10, 405, 347, 70);
+    btnBackground.setBounds(10, 324, 347, 70);
     btnBackground.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent buttonAction) {
         if (btnBackground.getText().equals(ButtonEnums.AttributeButton.BACKGROUND.value)) {
@@ -383,24 +390,46 @@ public final class Application {
     });
     runOptionsContainer.add(btnBackground);
 
-    txtRunName.setBounds(111, 495, 246, 19);
+    txtRunName.setBounds(111, 418, 246, 19);
     runOptionsContainer.add(txtRunName);
     txtRunName.setFont(TEXT_FONT);
 
-    txtcRunName.setBounds(10, 495, 91, 19);
+    txtcRunName.setBounds(10, 418, 91, 19);
     runOptionsContainer.add(txtcRunName);
     txtcRunName.setForeground(Color.WHITE);
     txtcRunName.setBackground(Color.GRAY);
     txtcRunName.setText("Unique Run Name");
     txtcRunName.setFont(TEXT_FONT);
     txtcRunName.setEditable(false);
+    btnQueue.setBounds(10, 448, 347, 73);
+    btnQueue.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        if (QueuedRun.count < 12) {
+          if (txtAttributeFile.getText().length() > 0) {
+            if (txtRunName.getText().length() > 0) {
+              run.setRunId(txtRunName.getText());
+              run.setAttributeFilePath(txtAttributeFile.getText());
+              tabsRun.add(new QueuedRun(run, att));
+              btnRun.setEnabled(true);
+            } else {
+              updating("Please give your run a unique name");
+            }
+          } else {
+            updating("Please generate an attribute file to use.");
+          }
+        } else {
+          updating("Too many runs queued to add another.");
+        }
+      }
+    });
+    runOptionsContainer.add(btnQueue);
 
     runContainer.setBackground(Color.GRAY);
     runContainer.setBounds(734, 0, 361, 572);
     frame.getContentPane().add(runContainer);
     runContainer.setLayout(null);
     panel.setBackground(Color.LIGHT_GRAY);
-    panel.setBounds(10, 40, 341, 440);
+    panel.setBounds(10, 40, 341, 183);
     /*
      * 
      * The run button and the constantly updating text box scroll thing are
@@ -408,7 +437,7 @@ public final class Application {
      */
     runContainer.add(panel);
     panel.setLayout(null);
-    scrollPane.setBounds(10, 11, 321, 418);
+    scrollPane.setBounds(10, 11, 321, 160);
 
     panel.add(scrollPane);
     txtCurrentUpdates.setFont(TEXT_FONT);
@@ -416,22 +445,31 @@ public final class Application {
 
     scrollPane.setViewportView(txtCurrentUpdates);
     btnRun.setBounds(10, 491, 341, 70);
+    btnRun.setEnabled(false);
     btnRun.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent buttonAction) {
         if (txtRunName.getText().length() > 0) {
           if (txtAttributeFile.getText().length() > 0) {
-            run.setAttributeFilePath(txtAttributeFile.getText());
-            run.setRunId(txtRunName.getText());
+            int index = tabsRun.getSelectedIndex();
+            QueuedRun queuedTab = (QueuedRun) tabsRun.getComponentAt(index);
+            Run localRun = queuedTab.getSelectedRun();
+            Attributes localAttributes = queuedTab.getSelectedAttributes();
+            localRun.setRunId(txtRunName.getText());
             try {
-              run.saveConfigFile("RunConfig" + run.getRunId() + ".txt");
-              att.saveConfigFile("AttributeConfig" + run.getRunId() + ".txt");
+              localRun.saveConfigFile("RunConfig" + localRun.getRunId() + ".txt");
+              localAttributes.saveConfigFile("AttributeConfig" + localRun.getRunId() + ".txt");
             } catch (IOException error) {
               System.out.println("Problem saving run and attribute configuration files.");
             }
             txtCurrentUpdates.setEnabled(true);
-            updating("Now running script with arguments: " + String.valueOf(run.returnArgs()));
-            startGlseq = new ScriptTask();
+            updating("Now running script with arguments: " + String.valueOf(localRun.returnArgs()));
+            ScriptTask startGlseq = new ScriptTask(localRun, localAttributes);
             startGlseq.execute();
+            tabsRun.remove((queuedTab));
+            if (tabsRun.getComponentCount() <= 0) {
+              btnRun.setEnabled(false);
+            }
+
           } else {
             updating("Please either generate a new attribute file or enter a path "
                 + "to a previously generated file.");
@@ -451,6 +489,11 @@ public final class Application {
     txtchRunningUpdates.setBackground(Color.GRAY);
     txtchRunningUpdates.setBounds(10, 5, 341, 48);
     runContainer.add(txtchRunningUpdates);
+    tabsRun.setForeground(Color.LIGHT_GRAY);
+    tabsRun.setBounds(10, 234, 341, 246);
+
+    runContainer.add(tabsRun);
+
     runOptionsTitleContainer.setBounds(367, 0, 379, 213);
     frame.getContentPane().add(runOptionsTitleContainer);
     runOptionsTitleContainer.setBackground(Color.GRAY);

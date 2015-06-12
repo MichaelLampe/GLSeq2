@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Attributes {
@@ -75,6 +76,7 @@ public class Attributes {
   private String cushawPath = "";
   private String cushawGpuPath = "";
   private String cushawIndexPath = "";
+  private String topHatPath = "";
 
   // RunId
   public String runId = "";
@@ -161,13 +163,14 @@ public class Attributes {
   }
 
   /**
-   * Future use case for possible SSH construction of AttributeFiles in a //
-   * programatic manner.
+   * Future use case for possible SSH construction of AttributeFiles in a
+   * programmatic manner. Otherwise also let's the user not use the UI when
+   * accessing it from a server.
    * 
    * @param inputArgs
    *          An array of strings passed in from another source
    */
-  public void setAttributse(String[] inputArgs) {
+  public void setAttributes(String[] inputArgs) {
     Field field;
     for (String param : inputArgs) {
       String[] parts = param.split("=");
@@ -345,6 +348,10 @@ public class Attributes {
 
   public void setCushawGpuPath(String cushawGpuPath) {
     this.cushawGpuPath = cushawGpuPath;
+  }
+
+  public void setTopHatPath(String topHatPath) {
+    this.topHatPath = topHatPath;
   }
 
   //
@@ -557,6 +564,10 @@ public class Attributes {
     return cushawGpuPath;
   }
 
+  public String getTopHatPath() {
+    return topHatPath;
+  }
+
   /**
    * 
    * @return AttributeFileLocation - The new attribute file's path
@@ -572,7 +583,8 @@ public class Attributes {
     }
     Date current = new Date();
     SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd");
-    File attributeFile = new File("Attribute_" + ft.format(current) + ".R");
+    File attributeFile = new File("Attribute_" + ft.format(current) + "_"
+        + String.valueOf(uniqueAttributeFile()) + ".R");
     attributeFile.createNewFile();
     final String attFileLocation = attributeFile.getAbsolutePath();
     FileWriter writer = new FileWriter(attributeFile);
@@ -618,9 +630,8 @@ public class Attributes {
     writer.write("#\n");
     writer.write("presplit <- " + presplit.toUpperCase() + "\n");
     writer.write("#\n");
-    writer
-        .write("# sequencing platform (used by CUSHAW, supported "
-            + "values: capillary, ls454, illumina, solid, helicos, iontorrent, pacbio)\n");
+    writer.write("# sequencing platform (used by CUSHAW, supported "
+        + "values: capillary, ls454, illumina, solid, helicos, iontorrent, pacbio)\n");
     writer.write("seqPlatform <- \"" + seqPlatform + "\"\n");
     writer.write("#\n");
     writer.write("# quality scores format\n");
@@ -629,53 +640,44 @@ public class Attributes {
     writer.write("# Strandness of the library (NULL, F, R) \n");
     writer.write("libstrand <- \"" + libstrands + "\"\n");
     writer.write("#\n");
-    writer
-        .write("# Number of unique characters in the beginning"
-            + " of the each file (library ID length):\n");
+    writer.write("# Number of unique characters in the beginning"
+        + " of the each file (library ID length):\n");
     writer.write("libNchar <- " + libNchar + "\n");
     writer.write("#\n");
-    writer
-        .write("# Subset of the libraries to process "
-            + "(optional; normally the list wil be generated from the actual directory content)\n");
+    writer.write("# Subset of the libraries to process "
+        + "(optional; normally the list wil be generated from the actual directory content)\n");
     writer.write("libList <- " + libList + "\n");
     writer.write("#\n");
-    writer
-        .write("# Takes a directory of files with the end title"
-            + " \"countable.sam\" and collects them for counting\n");
+    writer.write("# Takes a directory of files with the end title"
+        + " \"countable.sam\" and collects them for counting\n");
     writer.write("countable.sams.dir <- \"" + countableSamDir + "\"\n");
     writer.write("#\n");
     writer.write("###############################\n");
     writer.write("# REFERENCE OPTIONS\n");
     writer.write("###############################\n");
     writer.write("#\n");
-    writer
-        .write("# reference genome - the index directory"
-            + " for the respective method (RSEM or BWA)\n");
+    writer.write("# reference genome - the index directory"
+        + " for the respective method (RSEM or BWA)\n");
     writer.write("# (must match the name of the  subfolder under base.dir):\n");
     writer.write("rGenome <- \"" + rereferenceGenome + "\"\n");
     writer.write("#\n");
-    writer
-        .write("# name of the reference fasta"
-            + " file (may differ from the base name of the reference -\n");
+    writer.write("# name of the reference fasta"
+        + " file (may differ from the base name of the reference -\n");
     writer.write("# still, it should be located in the folder for the selected feference):\n");
     writer.write("refFASTAname <- \"" + referenceFasta + "\"\n");
     writer.write("#\n");
-    writer
-        .write("# name of the reference genomic features"
-            + " file (may differ from the base name of the reference -\n");
-    writer
-        .write("# this will be eventually taken from"
-            + " the database); it should be located in the folder for the selected feference)\n");
-    writer
-        .write("# gtf files may be used instead of"
-            + " gff where applicable; the same object is used for both cases:\n");
+    writer.write("# name of the reference genomic features"
+        + " file (may differ from the base name of the reference -\n");
+    writer.write("# this will be eventually taken from"
+        + " the database); it should be located in the folder for the selected feference)\n");
+    writer.write("# gtf files may be used instead of"
+        + " gff where applicable; the same object is used for both cases:\n");
     writer.write("refGFFname <- \"" + referenceGff + "\"\n");
     writer.write("# refGFFname <- \"Novosphingobium_3replicons.Clean.gff\"\n");
     writer.write("#\n");
-    writer
-        .write("# number of the column in GTF file with"
-            + " the gene / other IDs charachter string "
-            + "(9, unless the file is non-standard for some reason):\n");
+    writer.write("# number of the column in GTF file with"
+        + " the gene / other IDs charachter string "
+        + "(9, unless the file is non-standard for some reason):\n");
     writer.write("gtfFeatureColumn <- " + gtfFeatureColumn + "\n");
     writer.write("#\n");
     writer.write("# GFF attribute to be used as feature ID (HTSeq):\n");
@@ -691,9 +693,8 @@ public class Attributes {
     writer.write("#\n");
     writer.write("# Base of the destination directory (added May 9, 2013)\n");
     writer.write("# This should be located on a FAST volume (SCSI is recommended)\n");
-    writer
-        .write("# a particular subfolder names after "
-            + "the run ID will be created by GLSeq below this folder\n");
+    writer.write("# a particular subfolder names after "
+        + "the run ID will be created by GLSeq below this folder\n");
     writer.write("dest.dir.base <- \"" + destinationDirectory + "\"\n");
     writer.write("#\n");
     writer.write("# number of cores to use\n");
@@ -703,9 +704,8 @@ public class Attributes {
     writer.write("nStreams <-" + numberStreams + "\n");
     writer.write("#\n");
     writer.write("# number of parallel computation streams for data preparation\n");
-    writer
-        .write("# (may differ from the number of streams"
-            + " for expression computation because of particular software demands) \n");
+    writer.write("# (may differ from the number of streams"
+        + " for expression computation because of particular software demands) \n");
     writer.write("nStreamsDataPrep <- " + numberStreamsDataPrep + "\n");
     writer.write("#\n");
     writer.write("# the actual unique run ID - \n");
@@ -731,9 +731,8 @@ public class Attributes {
     writer.write("# PRE-PROCESSING OPTIONS\n");
     writer.write("###############################\n");
     writer.write("#\n");
-    writer
-        .write("# trim the reads and generate QC "
-            + "reports for before- and after-trimming FASTQ files? \n");
+    writer.write("# trim the reads and generate QC "
+        + "reports for before- and after-trimming FASTQ files? \n");
     writer.write("readTrim <- " + readTrim.toUpperCase() + "\n");
     writer.write("#\n");
     writer.write("# minimum length of a trimmed read\n");
@@ -742,9 +741,8 @@ public class Attributes {
     writer.write("# trimmomatic parameter values for HEADCROP  \n");
     writer.write("trimhead <- " + trimHead + "\n");
     writer.write("#\n");
-    writer
-        .write("# name of the FASTA file with artificial"
-            + " sequences (adapters, primers etc) - must be located in the base.dir\n");
+    writer.write("# name of the FASTA file with artificial"
+        + " sequences (adapters, primers etc) - must be located in the base.dir\n");
     writer.write("artificial.fq <- \"" + artificialFasta + "\"\n");
     writer.write("#\n");
     writer.write("###############################\n");
@@ -764,9 +762,8 @@ public class Attributes {
     writer.write("# Maximal length of fragment (for paired-end libraries)\n");
     writer.write("fragMaxLength <- " + fragMaxLength + "\n");
     writer.write("#\n");
-    writer
-        .write("# Maximum size (MB) of the auxiliary buffer used "
-            + "for computing credibility intervals (CI) - for RSEM (+extra 2Gb per stream)\n");
+    writer.write("# Maximum size (MB) of the auxiliary buffer used "
+        + "for computing credibility intervals (CI) - for RSEM (+extra 2Gb per stream)\n");
     writer.write("ciMem <- " + ciMem + "\n");
     writer.write("#\n");
     writer.write("# Output genome bam\n");
@@ -799,15 +796,20 @@ public class Attributes {
     writer.write("# path to CUSHAW-GPU\n");
     writer.write("CUSHAW.GPU.path <- \"" + cushawGpuPath + "\"\n");
     writer.write("#\n");
+    writer.write("# Path to the TopHat aligner\n");
+    writer.write("TopHat.path <- \"" + topHatPath + "\"\n");
+    writer.write("#\n");
     writer.write("# End of Attribute File\n");
     writer.close();
     return attFileLocation;
   }
-/**
- * 
- * @param fileName The name of the file the user wishes to create.
- * @throws IOException . 
- */
+
+  /**
+   * 
+   * @param fileName
+   *          The name of the file the user wishes to create.
+   * @throws IOException .
+   */
   public void saveConfigFile(String fileName) throws IOException {
     // An array of all the fields
     final Field[] field = this.getClass().getDeclaredFields();
@@ -821,12 +823,10 @@ public class Attributes {
     attributeFile.createNewFile();
     FileWriter writer = new FileWriter(attributeFile);
     // Short formatting warning
-    writer
-        .write("READ: Program requires that each config "
-            + "option has one space, and only one space,\n");
-    writer
-        .write("after the equal sign.  If you are editing "
-            + "the options from here, please remember this.\n");
+    writer.write("READ: Program requires that each config "
+        + "option has one space, and only one space,\n");
+    writer.write("after the equal sign.  If you are editing "
+        + "the options from here, please remember this.\n");
     // Writes all the fields to the text file in the most minimal manner
     // possible.
     for (int i = 0; i < field.length; i++) {
@@ -837,5 +837,16 @@ public class Attributes {
       }
     }
     writer.close();
+  }
+
+  /**
+   * Makes a random number so that attribute files are unique.
+   * 
+   * @return A more unique number
+   */
+  private int uniqueAttributeFile() {
+    Random rand = new Random();
+    int value = rand.nextInt(10000);
+    return value;
   }
 }
