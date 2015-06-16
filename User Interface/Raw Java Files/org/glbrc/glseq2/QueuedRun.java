@@ -4,8 +4,9 @@ import java.awt.Color;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 
 public class QueuedRun extends JPanel {
   public static int count = 0;
@@ -28,7 +29,7 @@ public class QueuedRun extends JPanel {
   private final Attributes panelAttributes;
   private final Run panelRun;
   private final JScrollPane scrollPane = new JScrollPane();
-  private final JScrollPane scrollPane_1 = new JScrollPane();
+  private final JScrollPane scrollPane1 = new JScrollPane();
 
   /**
    * Create the panel.
@@ -132,10 +133,11 @@ public class QueuedRun extends JPanel {
     txtAttributePath.setEditable(false);
     scrollPane.setViewportView(txtAttributePath);
     txtAttributePath.setText(panelRun.getAttributeFilePath());
-    scrollPane_1.setBounds(10, 69, 150, 50);
+    scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane1.setBounds(10, 69, 150, 50);
     
-    add(scrollPane_1);
-    scrollPane_1.setViewportView(txtCounting);
+    add(scrollPane1);
+    scrollPane1.setViewportView(txtCounting);
     txtCounting.setEditable(false);
     txtCounting.setText(countingString());
   }
@@ -157,7 +159,7 @@ public class QueuedRun extends JPanel {
       }
       countString += panelAttributes.getFeatureCounts();
     }
-    if (panelAttributes.getFeatureCounts().equals("HTSeq")) {
+    if (panelAttributes.getHtseq().equals("HTSeq")) {
       if (!countString.equals("")) {
         countString += "\n";
       }
