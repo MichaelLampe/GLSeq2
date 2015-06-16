@@ -20,6 +20,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.ScrollPaneConstants;
 
 public final class Application {
   /*
@@ -32,7 +33,7 @@ public final class Application {
   public static final Font HEADER_FONT = new Font("Courier", Font.PLAIN, 26);
   public static final Font TEXT_FONT = new Font("Courier", Font.PLAIN, 11);
   // Used to write updates to the panel in the UI
-  public static final JTextPane txtCurrentUpdates = new JTextPane();
+  public static final UpdateFeed txtCurrentUpdates = new UpdateFeed();
   private final JScrollPane scrollPane = new JScrollPane();
 
   // Holds the page
@@ -437,6 +438,7 @@ public final class Application {
      */
     runContainer.add(panel);
     panel.setLayout(null);
+    scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane.setBounds(10, 11, 321, 160);
 
     panel.add(scrollPane);
@@ -466,10 +468,11 @@ public final class Application {
             ScriptTask startGlseq = new ScriptTask(localRun, localAttributes);
             startGlseq.execute();
             tabsRun.remove((queuedTab));
+            // Remove a button count so more runs can be run.
+            QueuedRun.count--;
             if (tabsRun.getComponentCount() <= 0) {
               btnRun.setEnabled(false);
             }
-
           } else {
             updating("Please either generate a new attribute file or enter a path "
                 + "to a previously generated file.");
@@ -521,10 +524,6 @@ public final class Application {
    * 
    */
   public static final void updating(String update) {
-    String current = txtCurrentUpdates.getText();
-    txtCurrentUpdates.setText(current + "\n" + update
-        + "\n#########################################");
-    // Keep the scrollbar at the bottom
-    txtCurrentUpdates.setCaretPosition(txtCurrentUpdates.getDocument().getLength());
+    txtCurrentUpdates.update(update);
   }
 }
