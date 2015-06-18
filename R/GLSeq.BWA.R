@@ -135,6 +135,6 @@ for (zz in 1:nStreams) {
       if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
     }
   } # for i 
-  if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")
-  comm.stack.pool <- paste(comm.stack.pool,  " && echo  >  ", fileCompletenessID, ".", zz, " & ", sep="")
-} # for zz
+  comm.stack.pool <- paste(comm.stack.pool,"&")
+} 
+comm.stack.pool <- paste(comm.stack.pool,"wait")
