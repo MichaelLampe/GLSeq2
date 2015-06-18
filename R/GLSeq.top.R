@@ -102,10 +102,6 @@ if (updateFromDb == "noupdate") {
 #
 picardToolsPath <- trailDirCheck(picardToolsPath)
 ##############
-# Getting input values:
-# updating from database
-# if needed
-##############
 # a record of the current run is always saved in the database,
 # even if the update from DB is suppressed
 if (updateFromDb == "update") {
@@ -240,31 +236,50 @@ destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="")
 # Directory name checkEnd
 #@@@@@@@@@@@@
 #
-destDir.create <- paste("mkdir ", dest.dir, sep="")
-destDirBam.create <- paste("mkdir ", destDirBam, sep="")
-destDirLog.create <- paste("mkdir ", destDirLog, sep="")
-try(system(destDir.create))
-try(system(destDirBam.create))
-try(system(destDirLog.create))
-#
-if ("HTSeq" %in% cAlgor){
-  destDirHTSeqCount <-  paste(dest.dir, text.add, ".HTSeq.counting/", sep="")
-  destDirHTSeqCount.create <- paste("mkdir ", destDirHTSeqCount, sep="")
-  try(system(destDirHTSeqCount.create))
+if (alignment == "alignment" || counting == "counting"){
+  destDir.create <- paste("mkdir ", dest.dir, sep="")
+  destDirBam.create <- paste("mkdir ", destDirBam, sep="")
+  destDirLog.create <- paste("mkdir ", destDirLog, sep="")
+  try(system(destDir.create))
+  try(system(destDirBam.create))
+  try(system(destDirLog.create))
+  #
+  if ("HTSeq" %in% cAlgor){
+    destDirHTSeqCount <-  paste(dest.dir, text.add, ".HTSeq.counting/", sep="")
+    destDirHTSeqCount.create <- paste("mkdir ", destDirHTSeqCount, sep="")
+    try(system(destDirHTSeqCount.create))
+  }
+  #
+  if ("FeatureCounts" %in% cAlgor){
+    destDirFeatureCountsCount <-  paste(dest.dir, text.add, ".FeatureCounts.counting/", sep="")
+    destDirFeatureCountsCount.create <- paste("mkdir ", destDirFeatureCountsCount, sep="")
+    try(system(destDirFeatureCountsCount.create))
+  }
+  #
+  if ("RSEM" %in% cAlgor){
+    destDirRSEMCount <-  paste(dest.dir, text.add, ".RSEM.counting/", sep="")
+    destDirRSEMCount.create <- paste("mkdir ", destDirRSEMCount, sep="")
+    try(system(destDirRSEMCount.create))
+  }
+}
+if (resCollect == "collect"){
+  if (alignment == "alignment" || counting == "counting"){
+    # Collecting on a new run
+    collectDir <- paste(dest.dir,text.add,".collect/",sep="")
+    collectDir.create <- paste("mkdir",collectDir)
+  } else{
+    ### Running an old run again
+    previous.dir <- trailDirCheck(previous.dir)
+    collectDir <- paste(previous.dir,text.add,".collect/",sep="")
+    collectDir.create <- paste("mkdir",collectDir)
+  }
+  try(system(collectDir.create))
 }
 #
-if ("FeatureCounts" %in% cAlgor){
-  destDirFeatureCountsCount <-  paste(dest.dir, text.add, ".FeatureCounts.counting/", sep="")
-  destDirFeatureCountsCount.create <- paste("mkdir ", destDirFeatureCountsCount, sep="")
-  try(system(destDirFeatureCountsCount.create))
-}
+# Copies the attribute file into the folder.
 #
-if ("RSEM" %in% cAlgor){
-  destDirRSEMCount <-  paste(dest.dir, text.add, ".RSEM.counting/", sep="")
-  destDirRSEMCount.create <- paste("mkdir ", destDirRSEMCount, sep="")
-  try(system(destDirRSEMCount.create))
-}
-#
+copyAttributeFile <- paste("cp",attrPath,dest.dir)
+try(system(copyAttributeFile))
 #
 ###############
 # Log-tail command addition
@@ -305,25 +320,25 @@ if(dataPrepare == "nodataprep") {
     readyDataCopy <- paste("cp ", readyData.dir, "*.fq ", dest.dir, sep="")
     system(readyDataCopy)
     Sys.sleep(10)
-  }
-  if (paired.end) {
-    fqfiles <- dir(dest.dir) 
-    fqfiles <- fqfiles[grep(".fq", fqfiles)]
-    fqfiles.base <- substr(fqfiles, 1,nchar(fqfiles) - 5)
-    fqfiles.base <- unique(fqfiles.base)
-    # table of pairs of FASTQ file names (1 pair per row):
-    # we assemble left and right file names explicitly here because 
-    # we don't want to rely on file sequence in the directory and get wrong results if there are occasional unpaired files etc. 
+    if (paired.end) {
+      fqfiles <- dir(dest.dir) 
+      fqfiles <- fqfiles[grep(".fq", fqfiles)]
+      fqfiles.base <- substr(fqfiles, 1,nchar(fqfiles) - 5)
+      fqfiles.base <- unique(fqfiles.base)
+      # table of pairs of FASTQ file names (1 pair per row):
+      # we assemble left and right file names explicitly here because 
+      # we don't want to rely on file sequence in the directory and get wrong results if there are occasional unpaired files etc. 
+      #
+      # assemble function for paired-end libraries:
+      fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
+    } # if paired-end
     #
-    # assemble function for paired-end libraries:
-    fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
-  } # if paired-end
-  #
-  # for single-ended libraries: 
-  if (!(paired.end)) {
-    fqfiles <- dir(dest.dir) 
-    fqfiles <- fqfiles[grep(".fq", fqfiles)]
-    fqfiles.table <- cbind(NULL, fqfiles) 
+    # for single-ended libraries: 
+    if (!(paired.end)) {
+      fqfiles <- dir(dest.dir) 
+      fqfiles <- fqfiles[grep(".fq", fqfiles)]
+      fqfiles.table <- cbind(NULL, fqfiles) 
+    }
   }
 } # if nodataprep
 #
@@ -403,11 +418,13 @@ if(dataPrepare == "dataprep") {
 ########################## RANGES OF DATA ################################
 ##########################################################################
 #
-chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
-if (nStreams > nrow(fqfiles.table)) nStreams <- nrow(fqfiles.table) # quiet and nice solution but there will de descrepancy between nStreams in the attribute file and the actual nStreams (recorded in the .rda file - good news)
-rangelist <- chunk(1:nrow(fqfiles.table), nStreams)
-# ranges are in rangelist[1:nSreams]
-for (ii in 1:nStreams) assign(paste("range",ii,sep=""),rangelist[[ii]])
+if (alignment == "alignment"){
+  chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
+  if (nStreams > nrow(fqfiles.table)) nStreams <- nrow(fqfiles.table) # quiet and nice solution but there will de descrepancy between nStreams in the attribute file and the actual nStreams (recorded in the .rda file - good news)
+  rangelist <- chunk(1:nrow(fqfiles.table), nStreams)
+  # ranges are in rangelist[1:nSreams]
+  for (ii in 1:nStreams) assign(paste("range",ii,sep=""),rangelist[[ii]])
+}
 #
 ##########################################################################
 ###################### EXPRESSION QUANTIFICATION #########################
@@ -436,28 +453,16 @@ if (alignment == "alignment"){
       setwd(base.dir)
       source("GLSeq.Counting.R")
     }
-    comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm)
+    comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm,"&")
   }
 }
 #
-if ("RSEM" %in% cAlgor){
-  comm.stack.pool <- paste(comm.stack.pool,"wait")
-  comm.stack.pool <- paste(comm.stack.pool,"&&","mv",paste("*.RSEM.counts.*"),destDirRSEMCount)
-  comm.stack.pool <- paste(comm.stack.pool,"&&","mv","*.index.*",destDirRSEMCount)
-}
-#
-###########################################################################
-###################### COLLECT ############################################
-###########################################################################
-#
-if (resCollect == "collect" && alignment == "noalignment" && counting == "nocounting"){
-  collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
-  collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
-  # Gets converted to a logical (0 = FALSE, 1 = TRUE)
-  forceStart = 0
-  collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add," ",base.dir," ",dest.dir," ",alignment," ",counting," ",attrPath," ",forceStart," 1>> ", collLog, " 2>> ", collerr, " &", sep="")
-  if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
-  if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
+if (counting == "counting"){
+  if ("RSEM" %in% cAlgor){
+    comm.stack.pool <- paste(comm.stack.pool,"wait")
+    comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir,"&&","mv",paste("*.RSEM.counts.*"),destDirRSEMCount)
+    comm.stack.pool <- paste(comm.stack.pool,"&&","mv","*.index.*",destDirRSEMCount)
+  }
 }
 #
 ###########################################################################
@@ -509,9 +514,11 @@ if (dataPrepare  == "dataprep") {
 # Watch for readiness of the data files 
 # before starting the expression calculations
 ################
-setwd(dest.dir)
-DataIsWaiting <- FALSE 
-if (dataPrepare  == "nodataprep") DataIsWaiting <- TRUE
+DataIsWaiting <- TRUE
+if (dataPrepare == "dataprep"){
+  setwd(dest.dir)
+  DataIsWaiting <- FALSE 
+}
 dataReady.ind <- paste(text.add, ".DataReady", sep="") 
 # 
 # Waiting
@@ -520,7 +527,9 @@ while(!(DataIsWaiting)) {
   Sys.sleep(21)
   DataIsWaiting <- dataReady.ind %in% dir(dest.dir)
 }
-print("Data Preparation Complete")
+if (dataPrepare == "dataprep"){
+  if (DataIsWaiting) print("Data Preparation Complete")
+}
 #
 ##########################################################################
 #################### EXPRESSION CALCULATION ##############################
@@ -537,9 +546,31 @@ if (DataIsWaiting) {
       warning("The alignment step has now completed.")
     }
   }
-  warning("Now initiating the full command stack.")
-  warning("A message will appear when it has completed.")
-  warning("Here is the command that is being run:")
-  warning(comm.stack.pool)
-  try(system(comm.stack.pool,intern = TRUE))
+  print("Starting command")
+  t <- try(system(comm.stack.pool))
+  if (t == 0){
+    print("Successfully executed command")
+  }
 }
+#
+###########################################################################
+###################### COLLECT ############################################
+###########################################################################
+#
+if (resCollect == "collect" && alignment == "noalignment" && counting == "nocounting"){
+  dest.dir <- previous.dir
+  dest.dir <- trailDirCheck(dest.dir)
+  destDirFeatureCountsCount <-  paste(dest.dir,previous.run.name,".FeatureCounts.counting/", sep="")
+  destDirHTSeqCount <-  paste(dest.dir,previous.run.name,".HTSeq.counting/", sep="")
+  destDirRSEMCount <-  paste(dest.dir,previous.run.name,".RSEM.counting/", sep="")
+}
+if (resCollect == "collect" && counting == "counting"){
+  setwd(base.dir)
+  print("STARTED COLLECTION")
+  source("GLSeq.ResultsCollect.R")
+}
+# Summarize it all.
+#print("STARTED SUMMARY")
+#setwd(base.dir)
+#source("GLSeq.runSummary.R")
+stop("Program complete.")
