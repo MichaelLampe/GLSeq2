@@ -34,11 +34,16 @@ if ("FeatureCounts" %in% cAlgor){
 #
 # RSEM only works with NON-GAPPED aligners
 # 
+# Decided to hardcode in the Gapped-Alignment only.
 ################################################
-if ("RSEM" %in% cAlgor){
-  occured <- TRUE
-  setwd(base.dir)
-  source ("GLSeq.RsemCount.R")
+if (alignment == "alignment"){
+  if (aAlgor == "Bowtie" || aAlgor == "Bowtie2"){
+    if ("RSEM" %in% cAlgor){
+      occured <- TRUE
+      setwd(base.dir)
+      source ("GLSeq.RsemCount.R")
+    }
+  }
 }
 if (!occured){
   warning("No counting protocol was initiated.  Please make sure you have supplied a supported counting setting")

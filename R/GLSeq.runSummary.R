@@ -75,10 +75,10 @@ sampleID.key[,3] <- as.numeric(as.character(sampleID.key[,3]))
 # with older (actually used and recorded in the rda file of the run) raw file names: 
 # (if this procedure is not applicable, the 8-th argument of the script should be set to NULL)
 if (!(is.null(rawFnames))) {
-rawnames <- as.character(read.table(rawFnames)$V9)
-for (i in 1:length(rawnames)) {
-sampleID.key[grep(substr(rawnames[i], 6, nchar(rawnames[i])), sampleID.key[,1]),1] <- rawnames[i]
-}
+  rawnames <- as.character(read.table(rawFnames)$V9)
+  for (i in 1:length(rawnames)) {
+    sampleID.key[grep(substr(rawnames[i], 6, nchar(rawnames[i])), sampleID.key[,1]),1] <- rawnames[i]
+  }
 } # if rawFnames
 #
 completionStatus <- "Complete"
@@ -87,8 +87,8 @@ completionStatus <- "Complete"
 #taking exp/samp IDs from GLOW:
 #####################
 if (goGLOW) {
-# dummy assignment (for now):
-	a <- 2
+  # dummy assignment (for now):
+  a <- 2
 }
 #
 #####################
@@ -108,9 +108,9 @@ attrTable <- matrix(NA, length(attrlist), 2)
 rownames(attrTable) <- attrlist
 attrTable <- attrTable[,-2,drop=FALSE]
 for (ii in 1:length(attrlist)) { 
-	if(is.null(get(attrlist[ii]))) attrTable[ii,1] <- "NULL" # straightforward assignment of the get() output doesn't work in this case
-#	if(!(is.null(get(attrlist[ii]))) & class(get(attrlist[ii])) != "try-error") attrTable[ii,1] <- get(attrlist[ii]) 
-	if(!(is.null(get(attrlist[ii])))) attrTable[ii,1] <- get(attrlist[ii]) }
+  if(is.null(get(attrlist[ii]))) attrTable[ii,1] <- "NULL" # straightforward assignment of the get() output doesn't work in this case
+  #	if(!(is.null(get(attrlist[ii]))) & class(get(attrlist[ii])) != "try-error") attrTable[ii,1] <- get(attrlist[ii]) 
+  if(!(is.null(get(attrlist[ii])))) attrTable[ii,1] <- get(attrlist[ii]) }
 #
 attrTable.fName <- paste(destDirLog, text.add, ".runParam.txt", sep="")
 write.table(attrTable, file=attrTable.fName, row.names=TRUE, col.names=FALSE, quote=FALSE, sep="\t")
@@ -145,9 +145,9 @@ fCollect <- list()
 # Extracting experiment ID from correspondence table
 ##############
 if (experimentID == 0) {
-expIDs <- sampleID.key[substr(sampleID.key[,1],1,libNchar) %in% libMatch,3]
-if (length(unique(expIDs)) > 1) stop('simultaneous reporting of samples that belong to multiple experiment sets are not supported at this time \n')
-experimentID <- expIDs[1]
+  expIDs <- sampleID.key[substr(sampleID.key[,1],1,libNchar) %in% libMatch,3]
+  if (length(unique(expIDs)) > 1) stop('simultaneous reporting of samples that belong to multiple experiment sets are not supported at this time \n')
+  experimentID <- expIDs[1]
 }
 # 
 ####################
@@ -162,61 +162,61 @@ if (wfID ==0) workflowXML <- xmlNode("workflow", xmlNode("name", workflow.name),
 if (wfID !=0) workflowXML <- xmlNode("workflow", attrs=c(workflow_id=wfID), xmlNode("name", workflow.name), xmlNode("workflow_template_id", workflowTemplateID), xmlNode("completion_status", completionStatus), xmlNode("parameter_list", attrTable.fName), xmlNode("experiment_id", experimentID), xmlNode("reference_genome_id", refGenID))
 #
 for (libs in 1:nrow(fqfiles.table)) {
-lib.fNames <- fileNamesCollect(libMatch.wild[libs], newDestDir)
-fCollect[[libs]] <- lib.fNames
-# XML generation:
-	fastq.key.IND <- grep(fqfiles.base[libs], sampleID.key[,1])
-	samp.id <- sampleID.key[fastq.key.IND,2][1] # the latter is added for the time being
-	sampleXML <- xmlNode("sample", attrs=c(sample_id=samp.id))
-	for (thisfile in 1:length(lib.fNames)) {
-		fType <- NULL
-		fDescr <- "no description provided"
-		fName <- path2file(lib.fNames[thisfile])
-		if (sum(grep(".bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "BAM" 
-		if (sum(grep(".bam.bai",lib.fNames[thisfile])) > 0) fType <- "BAMI" 
-		if (sum(grep(".genes.results",lib.fNames[thisfile])) > 0) fType <- "Counts"
-		if (sum(grep(".counts.txt",lib.fNames[thisfile])) > 0) fType <- "Counts"
-			if (sum(grep(".counts",lib.fNames[thisfile])) > 0) fType <- "Counts" # BWA-HTSeq version
-		if (sum(grep(".wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "WIG"	
-		if (sum(grep(".bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "BigWig"
-		if (sum(grep(".F.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "ForwardBigWig"
-		if (sum(grep(".R.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "ReverseBigWig"
-		# file descriptions:
-		if (sum(grep(".sorted.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Binary alignment map sorted by coordinate"
-		if (sum(grep(".sorted.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the binary alignment map that was sorted by coordinate"
-		if (sum(grep(".sorted.F.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Binary alignment map restricted to the Forward strand of the genome, sorted by coordinate"
-		if (sum(grep(".sorted.F.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the binary alignment map restricted to the Forward strand of the genome, sorted by coordinate"
-		if (sum(grep(".sorted.R.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Binary alignment map restricted to the Reverse strand of the genome, sorted by coordinate"
-		if (sum(grep(".sorted.R.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the binary alignment map restricted to the Reverse strand of the genome, sorted by coordinate"
-		if (sum(grep(".sorted.wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "wiggle file of genome coverage on both strands"	
-		if (sum(grep(".sorted.F.wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "wiggle file of genome coverage restricted to the Forward strand of the genome"
-		if (sum(grep(".sorted.R.wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "wiggle file of genome coverage restricted to the Reverse strand of the genome"	
-		if (sum(grep(".sorted.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of genome coverage on both strands"
-		if (sum(grep(".sorted.F.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of genome coverage restricted to the Forward strand of the genome"
-		if (sum(grep(".sorted.R.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of genome coverage restricted to the Reverse strand of the genome"
-		if (sum(grep(".genome.sorted.F.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map sorted by coordinate and restricted to the forward strand of the genome"
-		if (sum(grep(".genome.sorted.F.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map sorted by coordinate and restricted to the forward strand of the genome"
-		if (sum(grep(".genome.sorted.R.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map sorted by coordinate and restricted to the reverse strand of the genome"	
-		if (sum(grep(".genome.sorted.R.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map sorted by coordinate and restricted to the reverse strand of the genome"	
-		if (sum(grep(".genome.sorted.bam",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map sorted by coordinate"
-		if (sum(grep(".genome.sorted.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map sorted by coordinate"
-		if (sum(grep(".transcript.sorted.bam",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map based on the transcripts inferred by RSEM and sorted by coordinate"
-		if (sum(grep(".transcript.sorted.bam.bai",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map based on the transcripts inferred by RSEM and sorted by coordinate"
-		if (sum(grep(".genome.sorted.F.wig",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Wiggle file of the annotated transcriptome coverage restricted to the Forward strand of the genome"
-		if (sum(grep(".genome.sorted.R.wig",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Wiggle file of the annotated transcriptome coverage restricted to the Reverse strand of the genome"
-		if (sum(grep(".genes.results",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Library centric expression matrix with different measures in separate columns"
-		if (sum(grep(".genome.sorted.R.bw",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of the annotated transcriptome coverage restricted to the Reverse strand of the genome"
-		if (sum(grep(".genome.sorted.F.bw",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of the annotated transcriptome coverage restricted to the Forward strand of the genome"
-		# assembling XML
-		if (!(is.null(fType))) {
-		outfileXML <- xmlNode("datafile", xmlNode("name", fName),  xmlNode("description", fDescr), xmlNode("file_path", lib.fNames[thisfile]), xmlNode("file_type", fType), xmlNode("owner", "omoskvin"), xmlNode("input_output", "output"))
-		# adding sample >> files tree to XML for all the samples (sampleXML):
-		sampleXML <- addChildren(sampleXML, outfileXML)
-		# adding datafiles part to the workflow XML: 
-		workflowXML <- addChildren(workflowXML, outfileXML)	
-		} # avoiding records for the file types outside of the controlled vocabulary
-	} # for thisfile    
-experimentSamplesXML <- addChildren(experimentSamplesXML, sampleXML)	
+  lib.fNames <- fileNamesCollect(libMatch.wild[libs], newDestDir)
+  fCollect[[libs]] <- lib.fNames
+  # XML generation:
+  fastq.key.IND <- grep(fqfiles.base[libs], sampleID.key[,1])
+  samp.id <- sampleID.key[fastq.key.IND,2][1] # the latter is added for the time being
+  sampleXML <- xmlNode("sample", attrs=c(sample_id=samp.id))
+  for (thisfile in 1:length(lib.fNames)) {
+    fType <- NULL
+    fDescr <- "no description provided"
+    fName <- path2file(lib.fNames[thisfile])
+    if (sum(grep(".bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "BAM" 
+    if (sum(grep(".bam.bai",lib.fNames[thisfile])) > 0) fType <- "BAMI" 
+    if (sum(grep(".genes.results",lib.fNames[thisfile])) > 0) fType <- "Counts"
+    if (sum(grep(".counts.txt",lib.fNames[thisfile])) > 0) fType <- "Counts"
+    if (sum(grep(".counts",lib.fNames[thisfile])) > 0) fType <- "Counts" # BWA-HTSeq version
+    if (sum(grep(".wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "WIG"	
+    if (sum(grep(".bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "BigWig"
+    if (sum(grep(".F.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "ForwardBigWig"
+    if (sum(grep(".R.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fType <- "ReverseBigWig"
+    # file descriptions:
+    if (sum(grep(".sorted.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Binary alignment map sorted by coordinate"
+    if (sum(grep(".sorted.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the binary alignment map that was sorted by coordinate"
+    if (sum(grep(".sorted.F.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Binary alignment map restricted to the Forward strand of the genome, sorted by coordinate"
+    if (sum(grep(".sorted.F.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the binary alignment map restricted to the Forward strand of the genome, sorted by coordinate"
+    if (sum(grep(".sorted.R.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Binary alignment map restricted to the Reverse strand of the genome, sorted by coordinate"
+    if (sum(grep(".sorted.R.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the binary alignment map restricted to the Reverse strand of the genome, sorted by coordinate"
+    if (sum(grep(".sorted.wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "wiggle file of genome coverage on both strands"	
+    if (sum(grep(".sorted.F.wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "wiggle file of genome coverage restricted to the Forward strand of the genome"
+    if (sum(grep(".sorted.R.wig$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "wiggle file of genome coverage restricted to the Reverse strand of the genome"	
+    if (sum(grep(".sorted.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of genome coverage on both strands"
+    if (sum(grep(".sorted.F.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of genome coverage restricted to the Forward strand of the genome"
+    if (sum(grep(".sorted.R.bw$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of genome coverage restricted to the Reverse strand of the genome"
+    if (sum(grep(".genome.sorted.F.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map sorted by coordinate and restricted to the forward strand of the genome"
+    if (sum(grep(".genome.sorted.F.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map sorted by coordinate and restricted to the forward strand of the genome"
+    if (sum(grep(".genome.sorted.R.bam$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map sorted by coordinate and restricted to the reverse strand of the genome"	
+    if (sum(grep(".genome.sorted.R.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map sorted by coordinate and restricted to the reverse strand of the genome"	
+    if (sum(grep(".genome.sorted.bam",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map sorted by coordinate"
+    if (sum(grep(".genome.sorted.bam.bai$",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map sorted by coordinate"
+    if (sum(grep(".transcript.sorted.bam",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Annotated transcriptome based binary alignment map based on the transcripts inferred by RSEM and sorted by coordinate"
+    if (sum(grep(".transcript.sorted.bam.bai",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Index of the annotated transcriptome based binary alignment map based on the transcripts inferred by RSEM and sorted by coordinate"
+    if (sum(grep(".genome.sorted.F.wig",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Wiggle file of the annotated transcriptome coverage restricted to the Forward strand of the genome"
+    if (sum(grep(".genome.sorted.R.wig",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Wiggle file of the annotated transcriptome coverage restricted to the Reverse strand of the genome"
+    if (sum(grep(".genes.results",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "Library centric expression matrix with different measures in separate columns"
+    if (sum(grep(".genome.sorted.R.bw",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of the annotated transcriptome coverage restricted to the Reverse strand of the genome"
+    if (sum(grep(".genome.sorted.F.bw",lib.fNames[thisfile], perl=TRUE)) > 0) fDescr <- "BigWig file of the annotated transcriptome coverage restricted to the Forward strand of the genome"
+    # assembling XML
+    if (!(is.null(fType))) {
+      outfileXML <- xmlNode("datafile", xmlNode("name", fName),  xmlNode("description", fDescr), xmlNode("file_path", lib.fNames[thisfile]), xmlNode("file_type", fType), xmlNode("owner", "omoskvin"), xmlNode("input_output", "output"))
+      # adding sample >> files tree to XML for all the samples (sampleXML):
+      sampleXML <- addChildren(sampleXML, outfileXML)
+      # adding datafiles part to the workflow XML: 
+      workflowXML <- addChildren(workflowXML, outfileXML)	
+    } # avoiding records for the file types outside of the controlled vocabulary
+  } # for thisfile    
+  experimentSamplesXML <- addChildren(experimentSamplesXML, sampleXML)	
 } # for libs
 #
 #####################
@@ -228,92 +228,39 @@ wf.fNames <- fileNamesCollect(wfMatch.wild, newDestDir)
 all.fNames <-  fileNamesCollect("*", newDestDir) # revison 78
 wf.fNames <- all.fNames # just like that, for the time being
 for (wfFile in 1:length(wf.fNames)) {
-fType <- NULL
-fDescr <- "no description provided"
-fName <- path2file(wf.fNames[wfFile])
-if (sum(grep(".csv$",wf.fNames[wfFile], perl=TRUE)) > 0 & qAlgor == "RSEM" ) fType <- "Merged Counts" # catch-all
-	# fro RSEM:
-if (sum(grep(".FPKM.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
-	fDescr <- "Normalized counts FPKM" }
-if (sum(grep(".FPKM_lower.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
-	fDescr <- "Lower estimate of FPKM at 95 percent confidence level" }
-if (sum(grep(".FPKM_upper.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
-	fDescr <- "Upper estimate of FPKM at 95 percent confidence level" }
-if (sum(grep(".FPKM_pme.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
-	fDescr <- "Posterior Mean Estimate of FPKM" }
-if (sum(grep(".counts.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
-	fDescr <- "Counts" }
-if (sum(grep(".counts_pme.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
-	fDescr <- "Posterior Mean Estimate of counts" }
-if (sum(grep(".TPM.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
-	fDescr <- "Transcripts Per Million" }
-if (sum(grep(".TPM_pme.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
-	fDescr <- "Posterior Mean Estimate of Transcripts Per Million" }
-if (sum(grep(".TPM_upper.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
-	fDescr <- "Upper estimate of Transcripts Per Million at 95 percent confidence level" }
-if (sum(grep(".TPM_lower.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
-	fDescr <- "Lower estimate of Transcripts Per Million at 95 percent confidence level" }
-	# for BWA-HTSeq:
-if (sum(grep(".RPKM.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
-	fDescr <- "Normalized counts RPKM" }
-if (sum(grep(".exceptionReport.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "QC" 
-	fDescr <- "Read alignment statistics for every library in the workflow" }
-if (sum(grep("^m.",wf.fNames[wfFile], perl=TRUE)) > 0) fDescr <- paste(fDescr, "remapped to meaningful sample identifiers") # doesn't work when called via Rscript!
-if (!(is.null(fType))) {
-	wfFileXML <- xmlNode("datafile", xmlNode("name", fName), xmlNode("description", fDescr), xmlNode("file_path", wf.fNames[wfFile]), xmlNode("file_type", fType), xmlNode("owner", "omoskvin"), xmlNode("input_output", "output"))
-	workflowXML <- addChildren(workflowXML, wfFileXML)	
-	}
+  fType <- NULL
+  fDescr <- "no description provided"
+  fName <- path2file(wf.fNames[wfFile])
+  if (sum(grep(".csv$",wf.fNames[wfFile], perl=TRUE)) > 0 & qAlgor == "RSEM" ) fType <- "Merged Counts" # catch-all
+  # fro RSEM:
+  if (sum(grep(".FPKM.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
+                                                                  fDescr <- "Normalized counts FPKM" }
+  if (sum(grep(".FPKM_lower.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
+                                                                        fDescr <- "Lower estimate of FPKM at 95 percent confidence level" }
+  if (sum(grep(".FPKM_upper.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
+                                                                        fDescr <- "Upper estimate of FPKM at 95 percent confidence level" }
+  if (sum(grep(".FPKM_pme.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
+                                                                      fDescr <- "Posterior Mean Estimate of FPKM" }
+  if (sum(grep(".counts.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
+                                                                    fDescr <- "Counts" }
+  if (sum(grep(".counts_pme.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
+                                                                        fDescr <- "Posterior Mean Estimate of counts" }
+  if (sum(grep(".TPM.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
+                                                                 fDescr <- "Transcripts Per Million" }
+  if (sum(grep(".TPM_pme.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts"
+                                                                     fDescr <- "Posterior Mean Estimate of Transcripts Per Million" }
+  if (sum(grep(".TPM_upper.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
+                                                                       fDescr <- "Upper estimate of Transcripts Per Million at 95 percent confidence level" }
+  if (sum(grep(".TPM_lower.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
+                                                                       fDescr <- "Lower estimate of Transcripts Per Million at 95 percent confidence level" }
+  # for BWA-HTSeq:
+  if (sum(grep(".RPKM.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "Merged Counts" 
+                                                                  fDescr <- "Normalized counts RPKM" }
+  if (sum(grep(".exceptionReport.csv$",wf.fNames[wfFile], perl=TRUE)) > 0) { fType <- "QC" 
+                                                                             fDescr <- "Read alignment statistics for every library in the workflow" }
+  if (sum(grep("^m.",wf.fNames[wfFile], perl=TRUE)) > 0) fDescr <- paste(fDescr, "remapped to meaningful sample identifiers") # doesn't work when called via Rscript!
+  if (!(is.null(fType))) {
+    wfFileXML <- xmlNode("datafile", xmlNode("name", fName), xmlNode("description", fDescr), xmlNode("file_path", wf.fNames[wfFile]), xmlNode("file_type", fType), xmlNode("owner", "omoskvin"), xmlNode("input_output", "output"))
+    workflowXML <- addChildren(workflowXML, wfFileXML)	
+  }
 }
-#
-#####################
-# adding to final XML files: 
-#####################
-experimentWorkflowXML <- addChildren(experimentWorkflowXML, workflowXML)
-#
-####################
-# exporting XML's to files:
-####################
-setwd(base.dir)
-expSamples.xmlName <- paste("xml/", workflow.name, ".expSamples.xml", sep="")
-expWorkflow.xmlName <- paste("xml/", workflow.name, ".expWorkflow.xml", sep="")
-saveXML(experimentSamplesXML, file=expSamples.xmlName, prefix=NULL)
-saveXML(experimentWorkflowXML, file=expWorkflow.xmlName, prefix=NULL)
-#
-#####################
-# updating the GLOW:
-#####################
-expSamples.upsertName <- paste("xml/", workflow.name, ".expSamples.upsert", sep="")
-expWorkflow.upsertName <- paste("xml/", workflow.name, ".expWorkflow.upsert", sep="")
-#
-# generating upsert command files:
-system(paste("cat xml/expxml.start", expSamples.xmlName, " >  xml/expSamples.upsertTMP2"))	
-system(paste("perl -pe 's/>\n/>/g'  xml/expSamples.upsertTMP2 >  xml/expSamples.upsertTMP"))
-system(paste("perl -pe 's/>\\s+/>/g' xml/expSamples.upsertTMP >", expSamples.upsertName)) 
-system(paste("rm  xml/expSamples.upsertTMP && mv", expSamples.upsertName, "xml/expSamples.upsertTMP"))
-system(paste("perl -pe 's/\n//g' xml/expSamples.upsertTMP >", expSamples.upsertName))
-system("rm xml/expSamples.upsertTMP")
-system("rm xml/expSamples.upsertTMP2")
-#
-system(paste("cat xml/expxml.start", expWorkflow.xmlName, " >  xml/expWorkflow.upsertTMP2"))	
-system(paste("perl -pe 's/>\n/>/g'  xml/expWorkflow.upsertTMP2 >  xml/expWorkflow.upsertTMP"))
-system(paste("perl -pe 's/>\\s+/>/g' xml/expWorkflow.upsertTMP >", expWorkflow.upsertName)) 
-system(paste("rm  xml/expWorkflow.upsertTMP && mv", expWorkflow.upsertName, "xml/expWorkflow.upsertTMP"))
-system(paste("perl -pe 's/\n//g' xml/expWorkflow.upsertTMP >", expWorkflow.upsertName))
-system("rm xml/expWorkflow.upsertTMP")
-system("rm xml/expWorkflow.upsertTMP2")
-#
-if (goGLOW) {
-sa.comm <- paste("curl --cookie ~/GLOWtest/cjar --data @", expSamples.upsertName, " https://glow-ng-test.glbrc.org/upsert_experiment", sep="")
-wf.comm <- paste("curl --cookie ~/GLOWtest/cjar --data @", expWorkflow.upsertName, " https://glow-ng-test.glbrc.org/upsert_experiment", sep="")
-system(paste(sa.comm, "&&", wf.comm)) 
-}
-#####################################
-
-
-
-
-
-
-
-
-

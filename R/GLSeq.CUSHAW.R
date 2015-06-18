@@ -10,13 +10,12 @@
 source("GLSeq.Util.R")
 setwd(dest.dir)
 ####################################
-# Copy genome indices to the destimation dir: 
+# Copy genome indices to the destination dir: 
 ####################################
 ref.dir <- paste(base.dir, rGenome, sep="")
 indCopy <- paste("cd ", ref.dir, " && cp ",refFASTAname," ",dest.dir, sep="")
 system(indCopy)
 #
-comm.stack.pool <- NULL # 
 # This will index the CUSHAW with your FASTA file, necessary.  
 # Previously the user needed to do this, but it should be easier if we just take care of
 # This stuff on our end during each run (It is fast && cheap anyway)
@@ -99,6 +98,7 @@ if (GPUspecialCase) {
     warning("The alignment step has now completed.")
   }
 }
+comm.stack.pool <- NULL # 
 #################
 # Rest of the cleanup to get to counting, or CPU only CUSHAW
 #################
@@ -119,22 +119,17 @@ for (zz in 1:nStreams) {
     # If no GPU, we can run all of the above files in parallel
     ###################
     if (!GPU.accel){
-      if (paired.end) sam.create<- paste(CUSHAW.path, "-r", refFASTAname, "-q", fq.left, fq.right, "-o", unsorted.sam , "-t", nCores,"-t", nCores) 
+      if (paired.end) sam.create<- paste(CUSHAW.path, "-r", refFASTAname, "-q", fq.left, fq.right, "-o", unsorted.sam , "-t", nCores) 
       if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", refFASTAname, "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
     }
     ###################
     # Convert BAM to sorted BAM file
     ################### 
-    sorted.arg <- paste(this.resName, "unsorted", sep=".")
+    sorted <- paste(this.resName,"sorted",sep=".")
     ref.index <- paste(refFASTAname, "fai", sep=".") 
     unsorted.bam <- paste(this.resName, "unsorted.bam", sep=".") 
-    bam.create <- paste("samtools view -uS -t ", ref.index, unsorted.sam, " | samtools sort - ", sorted.arg) # System command #6
+    bam.create <- paste("samtools view -uS -t ", ref.index, unsorted.sam, " | samtools sort -n -",sorted) # System command #6
     bam.index <- paste("samtools index", unsorted.bam) # System command #7
-    ###################
-    # Sort bam file by name
-    ################### 
-    sorted <- paste(this.resName,"sorted",sep=".")
-    sort.bam <- paste("samtools sort -n",unsorted.bam,sorted)
     ###################
     # Convert back to SAM file
     ################### 
@@ -156,29 +151,17 @@ for (zz in 1:nStreams) {
     ###################
     # Current command:
     ###################
-    if (!GPU.accel) comm.i <- paste(sam.create, "&&",bam.create,"&&",bam.index,"&&",sort.bam,"&&",convert.to.sam)
-    if (GPU.accel) comm.i <- paste(bam.create,"&&",bam.index,"&&",sort.bam,"&&",convert.to.sam)
+    if (!GPU.accel) comm.i <- paste(sam.create, "&&",bam.create,"&&",bam.index,"&&",convert.to.sam)
+    if (GPU.accel) comm.i <- paste(bam.create,"&&",bam.index,"&&",convert.to.sam)
     if (count.comm != "") comm.i <- paste(comm.i, "&&", count.comm)
     #
     # For the very first assembly in the stack (i = 1)
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " date && ", comm.i)
+    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "cd",dest.dir,"&&", comm.i)
     #
     # For subsequent assemblies of every stack (i > 1)
-    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
-    #
-    ###########################################################################
-    ###################### COLLECT ###########################################
-    ###########################################################################
-    #
-    if (resCollect == "collect"){
-      collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
-      collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
-      collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, sep="")
-      if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
-      if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
-    }
+    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "&&","cd",dest.dir,"&&", comm.i)
     # system(comm.i)
   } # for i 
-  if (zz ==1) fileCompletenessID <- paste(text.add, ".completeExpression", sep="")
-  comm.stack.pool <- paste(comm.stack.pool,  " && echo  >  ", fileCompletenessID, ".", zz, " & ", sep="")
-} # for zz
+  comm.stack.pool <- paste(comm.stack.pool,"&")
+} 
+comm.stack.pool <- paste(comm.stack.pool,"wait")
