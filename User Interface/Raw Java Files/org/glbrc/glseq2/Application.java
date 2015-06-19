@@ -14,13 +14,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import javax.swing.ScrollPaneConstants;
 
 public final class Application {
   /*
@@ -35,7 +35,6 @@ public final class Application {
   // Used to write updates to the panel in the UI
   public static final UpdateFeed txtCurrentUpdates = new UpdateFeed();
   private final JScrollPane scrollPane = new JScrollPane();
-
   // Holds the page
   private final JFrame frame = new JFrame();
   // Data storage classes with functions to generate attribute files
@@ -79,7 +78,6 @@ public final class Application {
   private final SimpleAttributeSet center = new SimpleAttributeSet();
   private final JTabbedPane tabsRun = new JTabbedPane(JTabbedPane.RIGHT);
   private final JButton btnQueue = new JButton("Add to Queue");
-
   /**
    * Launch the application.
    */
@@ -170,37 +168,36 @@ public final class Application {
     } else {
       btnDatabase.setText(ButtonEnums.AttributeButton.NO_UPDATE.value);
     }
-    //
+
     if (run.getProcessedData().equals(ButtonEnums.Attribute.PREPROCESSING.value)) {
       btnPreProcessing.setText(ButtonEnums.AttributeButton.PREPROCESSING.value);
     } else {
       btnPreProcessing.setText(ButtonEnums.AttributeButton.NO_PREPROCESSING.value);
     }
-    //
+
     if (run.getAlignment().equals(ButtonEnums.Attribute.ALIGNMENT.value)) {
       btnAlignment.setText(ButtonEnums.AttributeButton.ALIGNMENT.value);
     } else {
       btnAlignment.setText(ButtonEnums.AttributeButton.NO_ALIGNMENT.value);
     }
-    //
+
     if (run.getCounting().equals(ButtonEnums.Attribute.COUNT.value)) {
       btnCounting.setText(ButtonEnums.AttributeButton.COUNT.value);
     } else {
       btnCounting.setText(ButtonEnums.AttributeButton.NO_COUNT.value);
     }
-    //
+
     if (run.getCollectResults().equals(ButtonEnums.Attribute.COLLECT.value)) {
       btnCollecting.setText(ButtonEnums.AttributeButton.COLLECT.value);
     } else {
       btnCollecting.setText(ButtonEnums.AttributeButton.NO_COLLECT.value);
     }
-    //
+
     if (run.getAmpersand().equals(ButtonEnums.Attribute.BACKGROUND.value)) {
       btnBackground.setText(ButtonEnums.AttributeButton.BACKGROUND.value);
     } else {
       btnBackground.setText(ButtonEnums.AttributeButton.NO_BACKGROUND.value);
     }
-    //
   }
 
   /**
@@ -227,7 +224,9 @@ public final class Application {
     attributeFileContainer.setBounds(0, 0, 367, 572);
     frame.getContentPane().add(attributeFileContainer);
     attributeFileContainer.setLayout(null);
-
+    
+    // Data and Library Button
+    //
     btnDataAndLibrary.setBounds(33, 43, 300, 70);
     attributeFileContainer.add(btnDataAndLibrary);
     btnDataAndLibrary.addActionListener(new ActionListener() {
@@ -236,6 +235,9 @@ public final class Application {
         library.setVisible(true);
       }
     });
+    
+    // Pipeline Button
+    //
     btnPipeline.setBounds(33, 124, 300, 70);
     attributeFileContainer.add(btnPipeline);
     btnPipeline.addActionListener(new ActionListener() {
@@ -244,6 +246,9 @@ public final class Application {
         running.setVisible(true);
       }
     });
+    
+    // Processing Button
+    //
     btnProcessing.setBounds(33, 205, 300, 70);
     attributeFileContainer.add(btnProcessing);
     btnProcessing.addActionListener(new ActionListener() {
@@ -252,6 +257,9 @@ public final class Application {
         processing.setVisible(true);
       }
     });
+    
+    // Environment Button
+    //
     btnEnvironment.setBounds(33, 285, 300, 70);
     attributeFileContainer.add(btnEnvironment);
     btnEnvironment.addActionListener(new ActionListener() {
@@ -260,15 +268,16 @@ public final class Application {
         environment.setVisible(true);
       }
     });
+    
+    // Attribute File
+    //
     JPanel attributeFileTitleContainer = new JPanel();
     attributeFileTitleContainer.setBackground(Color.GRAY);
     attributeFileTitleContainer.setBounds(0, 0, 367, 70);
     attributeFileContainer.add(attributeFileTitleContainer);
     attributeFileTitleContainer.setLayout(null);
-
     StyledDocument doc = txtchAttributeFileTitle.getStyledDocument();
     doc.setParagraphAttributes(0, doc.getLength(), center, false);
-
     txtchAttributeFileTitle.setFont(HEADER_FONT);
     txtchAttributeFileTitle.setForeground(Color.WHITE);
     txtchAttributeFileTitle.setBackground(Color.GRAY);
@@ -290,13 +299,12 @@ public final class Application {
         }
       }
     });
-
     txtAttributeFile.setBounds(33, 396, 298, 56);
     attributeFileContainer.add(txtAttributeFile);
     txtAttributeFile.setWrapStyleWord(true);
     txtAttributeFile.setLineWrap(true);
     txtAttributeFile.setFont(TEXT_FONT);
-
+    
     txtcAttributeFilePath.setBounds(135, 366, 91, 19);
     attributeFileContainer.add(txtcAttributeFilePath);
     txtcAttributeFilePath.setText("Attribute File Path");
@@ -305,9 +313,8 @@ public final class Application {
     txtcAttributeFilePath.setEditable(false);
     txtcAttributeFilePath.setBackground(Color.GRAY);
 
-    /*
-     * This is where the run option buttons and text boxes are held
-     */
+    // Run Options and Text Boxes
+    //
     runOptionsContainer.setBackground(Color.GRAY);
     runOptionsContainer.setBounds(367, 40, 367, 532);
     frame.getContentPane().add(runOptionsContainer);
@@ -390,11 +397,9 @@ public final class Application {
       }
     });
     runOptionsContainer.add(btnBackground);
-
     txtRunName.setBounds(111, 418, 246, 19);
     runOptionsContainer.add(txtRunName);
     txtRunName.setFont(TEXT_FONT);
-
     txtcRunName.setBounds(10, 418, 91, 19);
     runOptionsContainer.add(txtcRunName);
     txtcRunName.setForeground(Color.WHITE);
@@ -518,7 +523,6 @@ public final class Application {
    * This method will return immediately, adding any information that it knows
    * to the update screen.
    * 
-   * @author Michael Lampe
    * @param update
    *          - The value to add to the display
    * 

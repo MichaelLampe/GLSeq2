@@ -8,10 +8,6 @@ import javax.swing.JTextArea;
 
 public class UpdateFeed extends JTextArea {
   private static final long serialVersionUID = 1L;
-
-  /**
-   * Create the panel.
-   */
   private static Date currentTime;
   private static Date lastUpdate;
   private static String currentText;
@@ -46,6 +42,7 @@ public class UpdateFeed extends JTextArea {
       updateText("\n" + update + "\n");
       setText(currentText);
     } else {
+      //
       // Solution to the update problems. Found on stack overflow.
       // http://stackoverflow.com/a/11166024
       //
@@ -57,13 +54,13 @@ public class UpdateFeed extends JTextArea {
         }
       }, 100);
     }
-    // Keep the scrollbar at the bottom
+    // Keep the scroll bar at the bottom
     setCaretPosition(this.getDocument().getLength());
     return true;
   }
 
   /**
-   * Makes the text field wait 2 seconds to update.
+   * Makes the text field wait 0.1 seconds to update.
    * 
    * @return True if waiting is no longer needed
    */
@@ -77,6 +74,12 @@ public class UpdateFeed extends JTextArea {
     }
   }
 
+  /**
+   * Updates the text field and removes extra characters. If there are too many.
+   * 
+   * @param the
+   *          String to add
+   */
   private static void updateText(String update) {
     currentText += update;
     while (currentText.length() > 5000) {

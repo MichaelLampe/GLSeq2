@@ -1,8 +1,10 @@
 #########################################################
 # Great Lakes Seq package for low-level processing of RNA-Seq data
 # Trimmomatic-BWA-HTSeq quantification of the expression values
-# TopHat
-# June 2015
+# TopHat Alignment Method
+#
+# Date: June 2015
+# Author: Michael Lampe
 #########################################################
 #
 #
@@ -13,7 +15,9 @@ file.name.change <- "date"
 if (paired.end){
   for (zz in 1:nStreams) {
     for (i in rangelist[[zz]]){
+      #
       # Tophat uses different file name conventions, so we need to switch them here.
+      #
       file.name.change <- paste(file.name.change,"&&","mv",fqfiles.table[i,1])
       fqfiles.table[i,1] <- sub(".1.fq","_1.fq",fqfiles.table[i,1])
       file.name.change <- paste(file.name.change,fqfiles.table[i,1])
@@ -43,7 +47,6 @@ IndexOptions <- paste("-f")
 index <- paste("bowtie2-build",IndexOptions,refFASTAname,rGenome)
 system(index)
 #
-comm.stack.pool <- "date" 
 #
 for (zz in 1:nStreams) {
   for (i in rangelist[[zz]]) {
@@ -61,13 +64,14 @@ for (zz in 1:nStreams) {
     # This makes sure we don't overwrite any results and can pull them individually from their folder to
     # the main folder for further processing/display, but retain some of TopHat's excellent post-run notes
     #
-    alignmentOptions <- paste("-o",paste(this.resName,".TopHat.Alignment",sep=""))
+    tophat.output.dir <- paste(this.resName,"TopHat.Alignment",sep=".")
+    alignmentOptions <- paste("-o",tophat.output.dir)
     align <- paste(TopHat.path,alignmentOptions,rGenome,fq.left)
     if (paired.end){
       align <- paste(align,fq.right)
     }
     acceptedHitsName <- paste("Accepted_Hits.",this.resName,".bam",sep="")
-    file.rename.and.move <- paste("cd",this.resName,"&&","mv","accepted_hits.bam",acceptedHitsName,"&&","mv",acceptedHitsName,dest.dir,"&&","cd",dest.dir)
+    file.rename.and.move <- paste("cd",tophat.output.dir,"&&","mv","accepted_hits.bam",acceptedHitsName,"&&","mv",acceptedHitsName,dest.dir,"&&","cd",dest.dir)
     
     bam.index <- paste("samtools index", acceptedHitsName)
     #
@@ -93,6 +97,8 @@ for (zz in 1:nStreams) {
     #
     # Add any counting
     # Need to move the files that are made back into the normal folder
+    if (i == 1) comm.stack.pool <- paste("cd",dest.dir) 
+    if (i != 1) comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir)
     comm.stack.pool <- paste(comm.stack.pool,'&&',align)
     comm.stack.pool <- paste(comm.stack.pool,"&&",file.rename.and.move)
     comm.stack.pool <- paste(comm.stack.pool,"&&",bam.index)

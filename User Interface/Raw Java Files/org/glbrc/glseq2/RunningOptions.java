@@ -336,8 +336,7 @@ public class RunningOptions extends JDialog {
           panelAlignment.add(txtcAlignmentAlgorithm);
         }
         comboAlignmentAlgo.setFont(Application.TEXT_FONT);
-        comboAlignmentAlgo.setModel(new DefaultComboBoxModel<String>(new String[] { "BWA",
-            "Bowtie", "Bowtie2", "Cushaw", "Cushaw-GPU" }));
+        comboAlignmentAlgo.setModel(new DefaultComboBoxModel<String>(new String[] {"BWA", "Bowtie", "Bowtie2", "Cushaw", "Cushaw-GPU", "TopHat"}));
         comboAlignmentAlgo.setBounds(10, 28, 334, 42);
         comboAlignmentAlgo.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent comboAction) {
