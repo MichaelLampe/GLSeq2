@@ -33,6 +33,8 @@ public class Attributes {
   private String libList = "NULL";
   private String countableSamDir = "";
   private String presplit = "FALSE";
+  private String prevRunDirectory = "";
+  private String prevRunName = "";
   // Reference Attributes
   private String rereferenceGenome = "";
   private String referenceFasta = "";
@@ -376,9 +378,25 @@ public class Attributes {
     this.alignmentAlgor = alignmentAlgor;
   }
 
+  public String getPrevRunDirectory() {
+    return prevRunDirectory;
+  }
+
+  public void setPrevRunDirectory(String prevRunDirectory) {
+    this.prevRunDirectory = prevRunDirectory;
+  }
+
   //
   public String getCushawIndexPath() {
     return cushawIndexPath;
+  }
+
+  public String getPrevRunName() {
+    return prevRunName;
+  }
+
+  public void setPrevRunName(String prevRunName) {
+    this.prevRunName = prevRunName;
   }
 
   public String getHtseq() {
@@ -651,6 +669,13 @@ public class Attributes {
     writer.write("# Takes a directory of files with the end title"
         + " \"countable.sam\" and collects them for counting\n");
     writer.write("countable.sams.dir <- \"" + countableSamDir + "\"\n");
+    writer.write("#\n");
+    writer.write("# This is a previous run directory that was used.\n");
+    writer.write("# It is the actual folder that was created when the run started\n");
+    writer.write("previous.dir <- \"" + prevRunDirectory + "\"\n");
+    writer.write("#\n");
+    writer.write("# The name of the previous run");
+    writer.write("previous.run.name <- \"" + prevRunName + "\"\n");
     writer.write("#\n");
     writer.write("###############################\n");
     writer.write("# REFERENCE OPTIONS\n");
