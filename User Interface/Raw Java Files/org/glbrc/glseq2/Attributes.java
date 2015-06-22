@@ -79,6 +79,7 @@ public class Attributes {
   private String cushawGpuPath = "";
   private String cushawIndexPath = "";
   private String topHatPath = "";
+  private String destDirTest;
 
   // RunId
   public String runId = "";
@@ -356,6 +357,10 @@ public class Attributes {
     this.topHatPath = topHatPath;
   }
 
+  public void setDestDirTest(String destDirTest) {
+    this.destDirTest = destDirTest;
+  }
+
   //
   //
   public void setCushawIndexPath(String cushawIndexPath) {
@@ -584,6 +589,10 @@ public class Attributes {
 
   public String getTopHatPath() {
     return topHatPath;
+  }
+
+  public String getDestDirTest() {
+    return destDirTest;
   }
 
   /**
@@ -823,6 +832,11 @@ public class Attributes {
     writer.write("#\n");
     writer.write("# Path to the TopHat aligner\n");
     writer.write("TopHat.path <- \"" + topHatPath + "\"\n");
+    writer.write("#\n");
+    writer
+        .write("# Logging system.  Will create general logs of"
+            + " all the runs and put them in this other directory.\n");
+    writer.write("destDirTest <- \"" + destDirTest + "\"\n");
     writer.write("#\n");
     writer.write("# End of Attribute File\n");
     writer.close();

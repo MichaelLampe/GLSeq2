@@ -12,6 +12,9 @@
 #
 #########################################################
 #
+# Starts counting the time
+start.time <- proc.time()
+#
 args <- commandArgs(trailingOnly = TRUE)
 #
 # update attributes from DB? (otherwise, use values from GLSeg.R as is)
@@ -49,7 +52,15 @@ protID <- as.character(args[7])
 # this replaces the original reading of the attribute file from the GLSeq folder (may cause conflicts if more than 1 user want to use GLSeq at the same time)
 attrPath <- as.character(args[8])
 #
+#
+# Naturally set to null, if the user would like they can activate
+# this log type in the cattribute file by assigning it.
+destDirTest <- NULL
+#
+#
 source("GLSeq.Util.R")
+#
+#
 #
 # the default run attempt
 runAttempt <- formatC(1, width=2, flag="0")
@@ -75,11 +86,6 @@ runDate <- gsub(":", "_", runDate)
 # 
 source(attrPath)
 #
-#    REWRITE the following line when incorporating GLOW-NG communication! 
-# 
-if (updateFromDb != "update" & updateFromDb != "noupdate") source(updateFromDb)
-#
-# generating text.add from local attribute file:
 if (updateFromDb == "noupdate") {
   earlierResults <- dir(base.dir)
   earlierResults <- earlierResults[grep(".rda", earlierResults)]
@@ -90,6 +96,70 @@ if (updateFromDb == "noupdate") {
   # the real text.add that will be used as a common ID for all the GLSeq scripts is generated right here:
   text.add <- paste(expID, runAttempt, sep=".") 
 }
+dest.dir.base <- trailDirCheck(dest.dir.base) # may be redundant; still, fixed an error
+# base directory name with guaranteed trailing slash: 
+base.dir <- trailDirCheck(base.dir)
+#
+# Destination directory for the processed files (if no connection to DB performed):
+dest.dir <- paste(dest.dir.base, text.add, "/", sep="")
+# destination directory name with guaranteed trailing slash: 
+dest.dir <- trailDirCheck(dest.dir)
+#
+# raw directory name with guaranteed trailing slash: 
+raw.dir <- trailDirCheck(raw.dir)
+# readyData.dir checking
+if (!is.null(readyData.dir)) readyData.dir <- trailDirCheck(readyData.dir)
+#
+###
+# the following directories are ALWAYS relative to the base directory!!!
+#
+# Destination directory for log /stat files:
+destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="")
+#
+#
+# Creates a log file
+log.file <- NULL
+if (!is.null(destDirTest)){
+  log.file <- paste(destDirTest,text.add,".RunLog.txt",sep="")
+  # Overwrites previous file in case run had problems.
+  create.log.file <- paste("echo \"LOG FILE OF COMMANDS RUN\"",">",log.file)
+  try(system(create.log.file))
+  add.to.logs(paste("Arguments for this run"),log.file)
+}
+#
+# Handle each case individually in case we end up reworking these more
+#
+add.to.logs(paste("UPDATE FROM DATABASE:",updateFromDb),log.file)
+add.to.logs(paste("PREPARING DATA:",dataPrepare),log.file)
+add.to.logs(paste("ALIGNING READS:",alignment),log.file)
+add.to.logs(paste("COUNTING ALIGNED READS:",counting),log.file)
+add.to.logs(paste("COLLECTING RESULTS:",resCollect),log.file)
+add.to.logs(paste("PROTOCOL ID:",protID),log.file)
+add.to.logs(paste("ATTRIBUTE FILE LOCATION:",attrPath),log.file)
+add.to.logs("################## END OF RUN OPTIONS ##################",log.file)
+add.to.logs("################## Selected Attribute File Values ##################",log.file)
+add.to.logs(paste("Raw Data Directory:",raw.dir),log.file)
+add.to.logs(paste("Ready Data Directory:",readyData.dir),log.file)
+add.to.logs(paste("Reference FASTA name:",refFASTAname),log.file)
+add.to.logs(paste("Reference GFF name:",refGFFname),log.file)
+add.to.logs(paste("Script Directory:",base.dir),log.file)
+add.to.logs(paste("Destination Directory:",dest.dir),log.file)
+if (aAlgor == "Cushaw") {
+  if (GPU.accel){
+    add.to.logs("Alignment Algorithm: Cushaw-GPU",log.file)
+  }else{
+    add.to.logs(paste("Alignment Algorithm:",aAlgor),log.file)
+  }
+} else{
+  add.to.logs(paste("Alignment Algorithm:",aAlgor),log.file)
+}
+add.to.logs(paste("Counting Algorithm(s):",HTSeq,FeatureCounts,RSEM),log.file)
+add.to.logs("################## END OF ATTRIBUTE OPTIONS ##################",log.file)
+#
+#
+if (updateFromDb != "update" & updateFromDb != "noupdate") source(updateFromDb)
+#
+# generating text.add from local attribute file:
 #
 # generating text.add for the case of a custom updateFromDb record (including GLOWNG)
 # (will not happen anytime soon)
@@ -209,76 +279,69 @@ if (updateFromDb == "update") {
 #@@@@@@@@@@
 #
 # 
-dest.dir.base <- trailDirCheck(dest.dir.base) # may be redundant; still, fixed an error
-# base directory name with guaranteed trailing slash: 
-base.dir <- trailDirCheck(base.dir)
 #
-# Destination directory for the processed files (if no connection to DB performed):
-dest.dir <- paste(dest.dir.base, text.add, "/", sep="")
-# destination directory name with guaranteed trailing slash: 
-dest.dir <- trailDirCheck(dest.dir)
 #
-# raw directory name with guaranteed trailing slash: 
-raw.dir <- trailDirCheck(raw.dir)
-# readyData.dir checking
-if (!is.null(readyData.dir)) readyData.dir <- trailDirCheck(readyData.dir)
 #
-###
-# the following directories are ALWAYS relative to the base directory!!!
 #
-# Destination directory for bam / wig files
-destDirBam <- paste(dest.dir, text.add, ".viz/", sep="")
 #
-# Destination directory for log /stat files:
-destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="") 
-#
-#@@@@@@@@@@@@
+#############
 # Directory name checkEnd
-#@@@@@@@@@@@@
+#############
 #
+add.to.logs("################## Creating directories for the run ##################",log.file)
 if (alignment == "alignment" || counting == "counting"){
   destDir.create <- paste("mkdir ", dest.dir, sep="")
-  destDirBam.create <- paste("mkdir ", destDirBam, sep="")
   destDirLog.create <- paste("mkdir ", destDirLog, sep="")
+  add.to.logs(destDir.create,log.file)
   try(system(destDir.create))
-  try(system(destDirBam.create))
+  #
+  add.to.logs(destDirLog.create,log.file)
   try(system(destDirLog.create))
   #
   if ("HTSeq" %in% cAlgor){
-    destDirHTSeqCount <-  paste(dest.dir, text.add, ".HTSeq.counting/", sep="")
+    destDirHTSeqCount <-  paste(dest.dir, text.add, ".HTSeq.Counting/", sep="")
     destDirHTSeqCount.create <- paste("mkdir ", destDirHTSeqCount, sep="")
+    #
+    add.to.logs(destDirHTSeqCount.create,log.file)
     try(system(destDirHTSeqCount.create))
   }
   #
   if ("FeatureCounts" %in% cAlgor){
-    destDirFeatureCountsCount <-  paste(dest.dir, text.add, ".FeatureCounts.counting/", sep="")
+    destDirFeatureCountsCount <-  paste(dest.dir, text.add, ".FeatureCounts.Counting/", sep="")
     destDirFeatureCountsCount.create <- paste("mkdir ", destDirFeatureCountsCount, sep="")
+    #
+    add.to.logs(destDirFeatureCountsCount.create,log.file)
     try(system(destDirFeatureCountsCount.create))
   }
   #
   if ("RSEM" %in% cAlgor){
-    destDirRSEMCount <-  paste(dest.dir, text.add, ".RSEM.counting/", sep="")
+    destDirRSEMCount <-  paste(dest.dir, text.add, ".RSEM.Counting/", sep="")
     destDirRSEMCount.create <- paste("mkdir ", destDirRSEMCount, sep="")
+    #
+    add.to.logs(destDirRSEMCount.create,log.file)
     try(system(destDirRSEMCount.create))
   }
 }
 if (resCollect == "collect"){
   if (alignment == "alignment" || counting == "counting"){
     # Collecting on a new run
-    collectDir <- paste(dest.dir,text.add,".collect/",sep="")
+    collectDir <- paste(dest.dir,text.add,".Collect/",sep="")
     collectDir.create <- paste("mkdir",collectDir)
   } else{
     ### Running an old run again
     previous.dir <- trailDirCheck(previous.dir)
-    collectDir <- paste(previous.dir,text.add,".collect/",sep="")
+    collectDir <- paste(previous.dir,text.add,".Collect/",sep="")
     collectDir.create <- paste("mkdir",collectDir)
   }
+  add.to.logs(collectDir.create,log.file)
   try(system(collectDir.create))
 }
 #
 # Copies the attribute file into the folder.
 #
+add.to.logs("################## Copying attribute file for this run into destination folder ##################",log.file)
 copyAttributeFile <- paste("cp",attrPath,dest.dir)
+add.to.logs(copyAttributeFile,log.file)
 try(system(copyAttributeFile))
 #
 ###############
@@ -318,7 +381,10 @@ if(dataPrepare == "nodataprep") {
   # copying the ready-to-process fastq files to the destination directory:
   if (alignment == "alignment"){
     readyDataCopy <- paste("cp ", readyData.dir, "*.fq ", dest.dir, sep="")
+    add.to.logs("################## Copying preprocessed .fq files into destination directory  ##################",log.file)
+    add.to.logs(readyDataCopy,log.file)
     system(readyDataCopy)
+    #
     Sys.sleep(10)
     if (paired.end) {
       fqfiles <- dir(dest.dir) 
@@ -363,7 +429,11 @@ if(dataPrepare == "dataprep") {
     # Explicit list of files supplied
     #
     if(updateFromDb == "update") {
-      if (is.null(libList)) stop("Apparently, no raw file names were retrieved from the database - nothing to work with \n")
+      if (is.null(libList)){ 
+        error.message.stopping <- "Apparently, no raw file names were retrieved from the database - nothing to work with \n"
+        add.to.logs(error.message.stopping,log.file)
+        stop(error.message.stopping)
+      }
       if(!presplit) fqfiles.base <- substr(libList, 1, nchar(libList)-3)
       if (presplit) fqfiles.base <- substr(libList, 1, nchar(libList)-8)
       fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
@@ -378,6 +448,7 @@ if(dataPrepare == "dataprep") {
       gzfiles <- dir(raw.dir)
       fqfiles <- dir(raw.dir)
       if (!unzipped) {
+        add.to.logs("################## Finding zipped files to prepare ##################",log.file)
         gzfiles <- gzfiles[grep(".gz", gzfiles)]
         if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
         if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 8)
@@ -385,6 +456,7 @@ if(dataPrepare == "dataprep") {
       }
       #
       if (unzipped) {
+        add.to.logs("################## Finding unzipped files to prepare ##################",log.file)
         fqfiles <- fqfiles[grep(".fq",fqfiles)]
         if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 0)
         if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 5)
@@ -399,17 +471,20 @@ if(dataPrepare == "dataprep") {
   if (!(paired.end))  {
     gzfiles <- dir(raw.dir)
     fqfiles <- dir(raw.dir)
-    if (unzipped){
-      fqfiles <- dir(raw.dir) 
-      fqfiles <- fqfiles[grep(".fq", fqfiles)] # just in case raw.dir has somethig else besides .fq files
-      fqfiles <- substr(gzfiles, 1, nchar(fqfiles)-0)
-      fqfiles.table <- cbind(NULL, fqfiles) 
-    }
     if (!unzipped){
+      add.to.logs("################## Finding zipped files to prepare ##################",log.file)
       gzfiles <- dir(raw.dir) 
       gzfiles <- gzfiles[grep(".gz", gzfiles)] # just in case raw.dir has somethig else besides .gz files
       fqfiles <- substr(gzfiles, 1, nchar(gzfiles)-3)
       fqfiles.table <- cbind(NULL, fqfiles)
+    }
+    if (unzipped){
+      add.to.logs("################## Finding unzipped files to prepare ##################",log.file)
+      fqfiles <- dir(raw.dir) 
+      fqfiles <- fqfiles[grep(".fq", fqfiles)] # just in case raw.dir has somethig else besides .fq files
+      fqfiles <- substr(gzfiles, 1, nchar(fqfiles)-0)
+      fqfiles.table <- cbind(NULL, fqfiles)
+      for
     }
   }
 }
@@ -440,15 +515,25 @@ GPUspecialCase <- FALSE
 this.resName <- NULL
 #
 if (alignment == "alignment"){
+  #
+  add.to.logs("################## Creating alignment script ##################",log.file)
   source("GLSeq.Alignment.R")
+  #
 } else{
   if(counting == "counting"){
+    add.to.logs(paste("Starting counting:", fqfiles.table),log.file)
+    #
     comm.stack.pool <- "date"
     #
     countable.sams <- dir(countable.sams.dir)[grep("countable.sam", dir(countable.sams.dir))]
+    #
     for (i in 1:length(countable.sams)){
       countable.sam <- countable.sams[i]
       copy.comm <- paste("cp",paste(countable.sams.dir,countable.sam,sep="/"),dest.dir)
+      #
+      add.to.logs("################## Copying premade SAM files into directory ##################",log.file)
+      add.to.logs(copy.comm,log.file)
+      #
       system(copy.comm)
       setwd(base.dir)
       source("GLSeq.Counting.R")
@@ -542,14 +627,29 @@ if (DataIsWaiting) {
   {
     if (dataPrepare == "dataprep")
     {
+      add.to.logs("################## Alignment with CUSHAW-GPU starting ##################",log.file)
+      add.to.logs(Cushawgpu.special.case,log.file)
+      cushaw.start.time <- proc.time()
       system(Cushawgpu.special.case)
+      #
+      add.to.logs(paste("Cushaw alignment took", proc.time()[3] - cushaw.start.time[3],"to complete"),log.file)
+      #
       warning("The alignment step has now completed.")
     }
   }
   print("Starting command")
+  add.to.logs("################## Executing communication script ##################",log.file)
+  add.to.logs(comm.stack.pool,log.file)
+  stack.start.time <- proc.time()
   t <- try(system(comm.stack.pool))
+  #
+  add.to.logs(paste("Alignment and/or counting stack took",proc.time()[3] - stack.start.time[3],"to complete"),log.file)
+  #
   if (t == 0){
+    add.to.logs("Communication script executed successfully.",log.file)
     print("Successfully executed command")
+  } else{
+    add.to.logs("Communication script exited with a failure message.",log.file)
   }
 }
 #
@@ -566,6 +666,7 @@ if (resCollect == "collect" && alignment == "noalignment" && counting == "nocoun
 }
 if (resCollect == "collect" && counting == "counting"){
   setwd(base.dir)
+  add.to.logs("################## Starting Results Collection ##################",log.file)
   print("STARTED COLLECTION")
   source("GLSeq.ResultsCollect.R")
 }
@@ -573,4 +674,5 @@ if (resCollect == "collect" && counting == "counting"){
 #print("STARTED SUMMARY")
 #setwd(base.dir)
 #source("GLSeq.runSummary.R")
+add.to.logs(paste("The process took:",(proc.time()[3]-start.time[3]),"to complete."),log.file)
 stop("Program complete.")
