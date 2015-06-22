@@ -108,6 +108,11 @@ public class Environment extends JDialog {
   private final JButton btnTopHat = new JButton("");
   private final JScrollPane scrollPane9 = new JScrollPane();
   private final JTextArea txtTopHat = new JTextArea();
+  private final JPanel verboseLogPanel = new JPanel();
+  private final JTextPane txtcVerboseLog = new JTextPane();
+  private final JButton btnVerboseLog = new JButton("");
+  private final JScrollPane verboseScroll = new JScrollPane();
+  private final JTextArea txtVerboseLog = new JTextArea();
 
   /**
    * Launch the application.
@@ -385,6 +390,41 @@ public class Environment extends JDialog {
     txtTopHat.setText(Application.att.getTopHatPath());
 
     scrollPane9.setViewportView(txtTopHat);
+    verboseLogPanel.setLayout(null);
+    verboseLogPanel.setForeground(Color.DARK_GRAY);
+    verboseLogPanel.setBackground(Color.LIGHT_GRAY);
+    verboseLogPanel.setBounds(413, 526, 400, 59);
+    
+    contentPanel.add(verboseLogPanel);
+    txtcVerboseLog.setText("Verbose Test Log");
+    txtcVerboseLog.setForeground(Color.DARK_GRAY);
+    txtcVerboseLog.setFont(new Font("Monospaced", Font.PLAIN, 11));
+    txtcVerboseLog.setEditable(false);
+    txtcVerboseLog.setBounds(10, 11, 171, 37);
+    
+    verboseLogPanel.add(txtcVerboseLog);
+    btnVerboseLog.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+    btnVerboseLog.setBounds(191, 11, 38, 37);
+    btnVerboseLog.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent arg0) {
+        final JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.showOpenDialog(txtTrimmomatic);
+        try {
+          File file = chooser.getSelectedFile();
+          txtVerboseLog.setText(file.getAbsolutePath());
+        } catch (NullPointerException e) {
+          // This is meant to be here.
+        }
+      }
+    });
+    verboseLogPanel.add(btnVerboseLog);
+    verboseScroll.setBounds(239, 11, 151, 37);
+    
+    verboseLogPanel.add(verboseScroll);
+    nimbusFix(Color.LIGHT_GRAY, txtcVerboseLog);
+    txtVerboseLog.setText(Application.att.getDestDirTest());
+    verboseScroll.setViewportView(txtVerboseLog);
 
   }
 
@@ -551,6 +591,7 @@ public class Environment extends JDialog {
             Application.att.setCushawGpuPath(txtCushawGpu.getText());
             Application.att.setScriptDirectory(txtGlSeqDirectory.getText());
             Application.att.setTopHatPath(txtTopHat.getText());
+            Application.att.setDestDirTest(txtVerboseLog.getText());
             dispose();
           }
         });
