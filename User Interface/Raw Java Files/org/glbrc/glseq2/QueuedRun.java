@@ -103,7 +103,16 @@ public class QueuedRun extends JPanel {
 
     add(txtRunName);
     txtAlignment.setEditable(false);
-    txtAlignment.setText(panelAttributes.getaAlgor());
+    if (panelAttributes.getaAlgor().equals("Cushaw")) {
+      if (panelAttributes.getGpuAccel().equals("TRUE")) {
+        txtAlignment.setText("Cushaw-GPU");
+      } else {
+        txtAlignment.setText(panelAttributes.getaAlgor());
+      }
+    } else {
+      txtAlignment.setText(panelAttributes.getaAlgor());
+    }
+
     txtAlignment.setBounds(10, 40, 150, 20);
 
     add(txtAlignment);
@@ -128,14 +137,14 @@ public class QueuedRun extends JPanel {
 
     add(txtZipped);
     scrollPane.setBounds(10, 191, 302, 44);
-    
+
     add(scrollPane);
     txtAttributePath.setEditable(false);
     scrollPane.setViewportView(txtAttributePath);
     txtAttributePath.setText(panelRun.getAttributeFilePath());
     scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     scrollPane1.setBounds(10, 69, 150, 50);
-    
+
     add(scrollPane1);
     scrollPane1.setViewportView(txtCounting);
     txtCounting.setEditable(false);

@@ -135,7 +135,7 @@ public class RunningOptions extends JDialog {
       checkRsem.setEnabled(true);
     }
     //
-    if (String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("CUSHAW")) {
+    if (String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("Cushaw")) {
       if (Application.att.getGpuAccel().equals("TRUE")) {
         comboAlignmentAlgo.setSelectedItem("Cushaw-GPU");
       }

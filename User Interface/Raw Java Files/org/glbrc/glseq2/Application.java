@@ -461,7 +461,6 @@ public final class Application {
             QueuedRun queuedTab = (QueuedRun) tabsRun.getComponentAt(index);
             Run localRun = queuedTab.getSelectedRun();
             Attributes localAttributes = queuedTab.getSelectedAttributes();
-            localRun.setRunId(txtRunName.getText());
             try {
               localRun.saveConfigFile("RunConfig" + localRun.getRunId() + ".txt");
               localAttributes.saveConfigFile("AttributeConfig" + localRun.getRunId() + ".txt");

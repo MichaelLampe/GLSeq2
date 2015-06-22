@@ -604,9 +604,11 @@ public class Attributes {
     // Writes a new attribute file based on the current format that we have
     // outlined.
     // Saves it as an R file, with the current date.
+    boolean changed = false;
     if (alignmentAlgor.equals("Cushaw-GPU")) {
       alignmentAlgor = "Cushaw";
       gpuAcceleration = "TRUE";
+      changed = true;
     }
     Date current = new Date();
     SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd");
@@ -840,6 +842,9 @@ public class Attributes {
     writer.write("#\n");
     writer.write("# End of Attribute File\n");
     writer.close();
+    if (changed) {
+      alignmentAlgor = "Cushaw-GPU";
+    }
     return attFileLocation;
   }
 
