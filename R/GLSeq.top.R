@@ -122,7 +122,8 @@ log.file <- NULL
 if (!is.null(destDirTest)){
   log.file <- paste(destDirTest,text.add,".RunLog.txt",sep="")
   # Overwrites previous file in case run had problems.
-  create.log.file <- paste("echo \"LOG FILE OF COMMANDS RUN\"",">",log.file)
+  create.log.file <- paste("echo \"RUN LOG FILE\"",">",log.file)
+  add.to.logs("############################################################",log.file)
   try(system(create.log.file))
   add.to.logs(paste("Arguments for this run"),log.file)
 }
@@ -321,6 +322,13 @@ if (alignment == "alignment" || counting == "counting"){
     add.to.logs(destDirRSEMCount.create,log.file)
     try(system(destDirRSEMCount.create))
   }
+  if ("Cufflinks" %in% cAlgor){
+    destDirCufflinksCount <-  paste(dest.dir, text.add, ".Cufflinks.Counting/", sep="")
+    destDirCufflinksCount.create <- paste("mkdir ", destDirCufflinksCount, sep="")
+    #
+    add.to.logs(destDirCufflinksCount.create,log.file)
+    try(system(destDirCufflinksCount.create))
+  }
 }
 if (resCollect == "collect"){
   if (alignment == "alignment" || counting == "counting"){
@@ -484,7 +492,6 @@ if(dataPrepare == "dataprep") {
       fqfiles <- fqfiles[grep(".fq", fqfiles)] # just in case raw.dir has somethig else besides .fq files
       fqfiles <- substr(gzfiles, 1, nchar(fqfiles)-0)
       fqfiles.table <- cbind(NULL, fqfiles)
-      for
     }
   }
 }
@@ -495,7 +502,7 @@ if(dataPrepare == "dataprep") {
 #
 if (alignment == "alignment"){
   chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
-  if (nStreams > nrow(fqfiles.table)) nStreams <- nrow(fqfiles.table) # quiet and nice solution but there will de descrepancy between nStreams in the attribute file and the actual nStreams (recorded in the .rda file - good news)
+  if (nStreams > nrow(fqfiles.table)) nStreams <- nrow(fqfiles.table) # quiet and nice solution but there will de descrepancy between nStreams in the attribute file and the actual nStreams
   rangelist <- chunk(1:nrow(fqfiles.table), nStreams)
   # ranges are in rangelist[1:nSreams]
   for (ii in 1:nStreams) assign(paste("range",ii,sep=""),rangelist[[ii]])
@@ -632,7 +639,7 @@ if (DataIsWaiting) {
       cushaw.start.time <- proc.time()
       system(Cushawgpu.special.case)
       #
-      add.to.logs(paste("Cushaw alignment took", proc.time()[3] - cushaw.start.time[3],"to complete"),log.file)
+      add.to.logs(paste("Cushaw alignment took", proc.time()[3] - cushaw.start.time[3],"seconds to complete"),log.file)
       #
       warning("The alignment step has now completed.")
     }
@@ -643,7 +650,7 @@ if (DataIsWaiting) {
   stack.start.time <- proc.time()
   t <- try(system(comm.stack.pool))
   #
-  add.to.logs(paste("Alignment and/or counting stack took",proc.time()[3] - stack.start.time[3],"to complete"),log.file)
+  add.to.logs(paste("Alignment and/or counting stack took",proc.time()[3] - stack.start.time[3],"seconds to complete"),log.file)
   #
   if (t == 0){
     add.to.logs("Communication script executed successfully.",log.file)
@@ -674,5 +681,5 @@ if (resCollect == "collect" && counting == "counting"){
 #print("STARTED SUMMARY")
 #setwd(base.dir)
 #source("GLSeq.runSummary.R")
-add.to.logs(paste("The process took:",(proc.time()[3]-start.time[3]),"to complete."),log.file)
+add.to.logs(paste("The process took:",(proc.time()[3]-start.time[3]),"seconds to complete."),log.file)
 stop("Program complete.")
