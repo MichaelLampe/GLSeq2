@@ -10,6 +10,14 @@ if ("HTSeq" %in% cAlgor){
   source ("GLSeq.HTSeq.R")
 }
 ################################################
+#Cufflinks Counting Protocol
+################################################
+if ("Cufflinks" %in% cAlgor){
+  occured <- TRUE
+  setwd(base.dir)
+  source ("GLSeq.Cufflinks.R")
+}
+################################################
 #FeatureCounts Counting Protocol
 ################################################
 if ("FeatureCounts" %in% cAlgor){
@@ -35,14 +43,22 @@ if ("FeatureCounts" %in% cAlgor){
 # RSEM only works with NON-GAPPED aligners
 # 
 # Decided to hardcode in the Gapped-Alignment only.
+#
 ################################################
-if (alignment == "alignment"){
-  if (aAlgor == "Bowtie" || aAlgor == "Bowtie2"){
-    if ("RSEM" %in% cAlgor){
+if ("RSEM" %in% cAlgor){
+  if (alignment == "alignment"){
+    if (aAlgor == "Bowtie" || aAlgor == "Bowtie2"){
       occured <- TRUE
       setwd(base.dir)
       source ("GLSeq.RsemCount.R")
+    } else{
+      add.to.logs("RSEM was indicated as a counting option, but a supported alignment protocol was not used.  Not counting using RSEM.",log.file)
     }
+  } else{
+    # In case the user is just counting
+    occured <- TRUE
+    setwd(base.dir)
+    source ("GLSeq.RsemCount.R")
   }
 }
 if (!occured){
