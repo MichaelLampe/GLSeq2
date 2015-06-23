@@ -14,18 +14,38 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.SwingWorker;
 
 // SwingWorker allows for parallel execution
-public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
+public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
   private Run localRun;
   private Attributes localAttributes;
+  private boolean batch;
 
+ /**  This constructor is called when one run is done.  It has the added
+ *  bonus of also reporting a few more statistics that would get cumbersome (currently)
+ *  with ~12 runs going on.
+ *  
+ *  @param localRun - The run given to it that it will use to generate the args 
+ *  @param localAttributes - The attributes it will use to save a copy.
+ */
   public ScriptTask(Run localRun, Attributes localAttributes) {
     this.localRun = localRun;
     this.localAttributes = localAttributes;
+    batch = false;
+  }
+
+  /** This constructor utilizes all the tabbed runs to generate a queue of runs.
+   * They will run sequentially and non-dependently via the ';' in the Linux command line.
+ *  
+ */
+  public ScriptTask() {
+    batch = true;
+    // No declaration. This means we'll be doing a batch run here.
+
   }
 
   @Override
@@ -39,16 +59,39 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
      * Saves both the attribute and run config file. This is just pulling data
      * from the correct sources to get a good file path for the saved files.
      */
-    try {
-      localAttributes.saveConfigFile(localRun.getDestinationDirectory(localAttributes
-          .getDestinationDirectory()) + "/AttributesConfigFile_" + localAttributes.runId + ".txt");
-      localRun.saveConfigFile(localRun.getDestinationDirectory(localAttributes
-          .getDestinationDirectory()) + "/RunConfigFile_" + localAttributes.runId + ".txt");
-    } catch (IOException e) {
-      // This is meant to be here
+    if (!batch) {
+      try {
+        localAttributes
+            .saveConfigFile(localRun.getDestinationDirectory(localAttributes
+                .getDestinationDirectory())
+                + "/AttributesConfigFile_"
+                + localAttributes.runId
+                + ".txt");
+        localRun.saveConfigFile(localRun.getDestinationDirectory(localAttributes
+            .getDestinationDirectory()) + "/RunConfigFile_" + localAttributes.runId + ".txt");
+      } catch (IOException e) {
+        // This is meant to be here
+      }
+      // Indicate to user that the script has started
     }
-    // Indicate to user that the script has started
-    List<String> args = localRun.returnArgs();
+    List<String> args;
+    if (batch) {
+      args = new ArrayList<String>();
+      int totalTabs = QueuedRun.count;
+      for (int i = totalTabs - 1; i >= 0; i--) {
+        QueuedRun thisTab = (QueuedRun) Application.tabsRun.getComponentAt(i);
+        args.addAll(thisTab.getSelectedRun().returnArgs());
+        args.add(";");
+        args.add("echo \"A run has completed\"");
+        if (i > 0) {
+          args.add(";");
+        }
+        Application.tabsRun.remove(thisTab);
+        QueuedRun.count--;
+      }
+    } else {
+      args = localRun.returnArgs();
+    }
     // Script generated based on arguments from the RunOptions class.
     // It calls the R script with the correct user parameters
     ProcessBuilder script = new ProcessBuilder(args);
@@ -92,7 +135,7 @@ public final class ScriptTask extends SwingWorker<List<Integer>, Integer> {
       // Script is done when it says done
       process.waitFor();
       Application.updating("The Top Script has now completely executed. "
-          + "Processing will continue in your destination folder until complete.");
+          + "Processing will continue in your destination folder(s) until complete.");
     } catch (InterruptedException e) {
       Application.updating("Error running the script. Script interrupted.");
     }

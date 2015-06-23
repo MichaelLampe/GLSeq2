@@ -1,6 +1,5 @@
 package org.glbrc.glseq2;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -8,10 +7,7 @@ import javax.swing.JTextArea;
 
 public class UpdateFeed extends JTextArea {
   private static final long serialVersionUID = 1L;
-  private static Date currentTime;
-  private static Date lastUpdate;
-  private static String currentText;
-  private static boolean futureRun = false;
+  private static String currentText = "";
   private Timer time;
 
   /**
@@ -22,7 +18,6 @@ public class UpdateFeed extends JTextArea {
     setWrapStyleWord(true);
     setLineWrap(true);
     time = new Timer();
-    lastUpdate = new Date();
     currentText = getText();
   }
 
@@ -32,46 +27,28 @@ public class UpdateFeed extends JTextArea {
    * @return true
    */
   public boolean update(String update) {
-    if (futureRun) {
-      // Yes I did mean to add to new lines, this creates a nice white space
-      // around individual messages.
-      updateText("\n" + update + "\n");
-      futureRun = false;
-    }
-    if (checkTime()) {
-      updateText("\n" + update + "\n");
-      setText(currentText);
-    } else {
-      //
-      // Solution to the update problems. Found on stack overflow.
-      // http://stackoverflow.com/a/11166024
-      //
-      futureRun = true;
-      time.schedule(new TimerTask() {
-        @Override
-        public void run() {
-          setText(currentText);
-        }
-      }, 100);
-    }
+    // New lines create white space and improves readability
+    updateText("\n" + update + "\n");
+    //
+    // Solution to the update problems. Found on stack overflow.
+    // http://stackoverflow.com/a/11166024
+    //
+    time.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        setText(currentText);
+        moveView();
+      }
+    }, 100);
     // Keep the scroll bar at the bottom
-    setCaretPosition(this.getDocument().getLength());
     return true;
   }
 
-  /**
-   * Makes the text field wait 0.1 seconds to update.
-   * 
-   * @return True if waiting is no longer needed
+  /*
+   * Moves the view to the bottom of the viewport
    */
-  private static boolean checkTime() {
-    currentTime = new Date();
-    if ((currentTime.getTime() - lastUpdate.getTime()) > 100) {
-      lastUpdate = new Date();
-      return true;
-    } else {
-      return false;
-    }
+  private void moveView() {
+    setCaretPosition(this.getDocument().getLength());
   }
 
   /**

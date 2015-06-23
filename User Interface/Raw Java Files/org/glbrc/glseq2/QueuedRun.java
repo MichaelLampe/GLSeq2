@@ -1,6 +1,9 @@
 package org.glbrc.glseq2;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -30,6 +33,7 @@ public class QueuedRun extends JPanel {
   private final Run panelRun;
   private final JScrollPane scrollPane = new JScrollPane();
   private final JScrollPane scrollPane1 = new JScrollPane();
+  private final JButton deleteRun = new JButton("X");
 
   /**
    * Create the panel.
@@ -99,7 +103,7 @@ public class QueuedRun extends JPanel {
     add(btnCollecting);
     txtRunName.setEditable(false);
     txtRunName.setText(panelRun.getRunId());
-    txtRunName.setBounds(10, 10, 302, 20);
+    txtRunName.setBounds(10, 10, 250, 20);
 
     add(txtRunName);
     txtAlignment.setEditable(false);
@@ -149,6 +153,16 @@ public class QueuedRun extends JPanel {
     scrollPane1.setViewportView(txtCounting);
     txtCounting.setEditable(false);
     txtCounting.setText(countingString());
+    deleteRun.setForeground(Color.RED);
+    deleteRun.setFont(new Font("Arial Black", Font.BOLD, 11));
+    deleteRun.setBounds(269, 10, 43, 20);
+    deleteRun.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent btn) {
+        removeThis();
+      }
+    });
+    add(deleteRun);
   }
 
   /**
@@ -176,6 +190,10 @@ public class QueuedRun extends JPanel {
     }
 
     return countString;
+  }
+
+  private void removeThis() {
+    Application.tabsRun.remove(this);
   }
 
   public Run getSelectedRun() {

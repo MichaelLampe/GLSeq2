@@ -14,9 +14,11 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIDefaults;
 
@@ -75,6 +77,13 @@ public class Data extends JDialog {
   private final JButton btnPrevRunName = new JButton("");
   private final JTextArea txtPreviousRunName = new JTextArea(Application.att.getPrevRunName());
   private final JTextPane txtcPreviousRunName = new JTextPane();
+  private final JScrollPane scrollPane = new JScrollPane();
+  private final JScrollPane scrollPane1 = new JScrollPane();
+  private final JScrollPane scrollPane2 = new JScrollPane();
+  private final JScrollPane scrollPane3 = new JScrollPane();
+  private final JScrollPane scrollPane4 = new JScrollPane();
+  private final JScrollPane scrollPane5 = new JScrollPane();
+  private final JScrollPane scrollPane6 = new JScrollPane();
 
   /**
    * Launch the application.
@@ -245,9 +254,6 @@ public class Data extends JDialog {
           });
           panelRawDirectory.add(btnRawDir);
         }
-        txtrawDirectory.setBounds(319, 0, 334, 37);
-
-        panelRawDirectory.add(txtrawDirectory);
         txtcDirectoryContainingRaw.setForeground(Color.DARK_GRAY);
         nimbusFix(Color.LIGHT_GRAY, txtcDirectoryContainingRaw);
         txtcDirectoryContainingRaw.setEditable(false);
@@ -256,7 +262,12 @@ public class Data extends JDialog {
         txtcDirectoryContainingRaw.setBounds(0, 0, 261, 37);
 
         panelRawDirectory.add(txtcDirectoryContainingRaw);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setBounds(319, 0, 334, 42);
+        
+        panelRawDirectory.add(scrollPane);
       }
+      scrollPane.setViewportView(txtrawDirectory);
       panelPreProcessedFiles.setForeground(Color.DARK_GRAY);
       panelPreProcessedFiles.setBackground(Color.LIGHT_GRAY);
       panelPreProcessedFiles.setLayout(null);
@@ -424,9 +435,6 @@ public class Data extends JDialog {
     });
 
     panel1.add(btnPrevRunName);
-    txtPreviousRunName.setBounds(319, 0, 334, 37);
-
-    panel1.add(txtPreviousRunName);
     txtcPreviousRunName.setText("Previous Run Name");
     txtcPreviousRunName.setForeground(Color.DARK_GRAY);
     txtcPreviousRunName.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -434,6 +442,11 @@ public class Data extends JDialog {
     txtcPreviousRunName.setBounds(0, 0, 261, 37);
     nimbusFix(Color.LIGHT_GRAY, txtcPreviousRunName);
     panel1.add(txtcPreviousRunName);
+    scrollPane6.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    scrollPane6.setBounds(319, 0, 334, 42);
+    
+    panel1.add(scrollPane6);
+    scrollPane6.setViewportView(txtPreviousRunName);
     btnPrevRunDirectory.setIcon(new ImageIcon(Data.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnPrevRunDirectory.setBounds(271, 0, 38, 37);
@@ -452,9 +465,6 @@ public class Data extends JDialog {
     });
 
     panel.add(btnPrevRunDirectory);
-    txtPreviousRunDirectory.setBounds(319, 0, 334, 37);
-
-    panel.add(txtPreviousRunDirectory);
     txtcPreviousRunDirectory.setText("Previous Run Directory");
     txtcPreviousRunDirectory.setForeground(Color.DARK_GRAY);
     txtcPreviousRunDirectory.setFont(new Font("Monospaced", Font.PLAIN, 11));
@@ -462,6 +472,11 @@ public class Data extends JDialog {
     txtcPreviousRunDirectory.setBounds(0, 0, 261, 37);
     nimbusFix(Color.LIGHT_GRAY, txtcPreviousRunDirectory);
     panel.add(txtcPreviousRunDirectory);
+    scrollPane5.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    scrollPane5.setBounds(319, 0, 334, 42);
+    
+    panel.add(scrollPane5);
+    scrollPane5.setViewportView(txtPreviousRunDirectory);
     btnCountableSam.setIcon(new ImageIcon(Data.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnCountableSam.addActionListener(new ActionListener() {
@@ -480,9 +495,6 @@ public class Data extends JDialog {
     btnCountableSam.setBounds(271, 0, 38, 37);
 
     panelCountableSam.add(btnCountableSam);
-    txtCountableSamDirectory.setBounds(319, 0, 334, 37);
-
-    panelCountableSam.add(txtCountableSamDirectory);
     txtcCountableSamFile.setText("Countable SAM File Directory");
     txtcCountableSamFile.setForeground(Color.DARK_GRAY);
     nimbusFix(Color.LIGHT_GRAY, txtcCountableSamFile);
@@ -491,6 +503,11 @@ public class Data extends JDialog {
     txtcCountableSamFile.setBounds(0, 0, 261, 37);
 
     panelCountableSam.add(txtcCountableSamFile);
+    scrollPane4.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    scrollPane4.setBounds(319, 0, 334, 42);
+    
+    panelCountableSam.add(scrollPane4);
+    scrollPane4.setViewportView(txtCountableSamDirectory);
     panelLibraryIdLength.setLayout(null);
     txtcLibraryIdLength.setForeground(Color.DARK_GRAY);
     nimbusFix(Color.LIGHT_GRAY, txtcLibraryIdLength);
@@ -545,8 +562,6 @@ public class Data extends JDialog {
     });
 
     panelRawFiles.add(btnRawFiles);
-    txtRawFileNames.setBounds(319, 0, 334, 37);
-    panelRawFiles.add(txtRawFileNames);
     txtcRawFileNames.setForeground(Color.DARK_GRAY);
     nimbusFix(Color.LIGHT_GRAY, txtcRawFileNames);
     txtcRawFileNames.setEditable(false);
@@ -555,6 +570,11 @@ public class Data extends JDialog {
     txtcRawFileNames.setBounds(0, 0, 261, 37);
 
     panelRawFiles.add(txtcRawFileNames);
+    scrollPane3.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    scrollPane3.setBounds(319, 0, 334, 42);
+    
+    panelRawFiles.add(scrollPane3);
+    scrollPane3.setViewportView(txtRawFileNames);
     btnBaseDir.setIcon(new ImageIcon(Data.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnBaseDir.setBounds(271, 0, 38, 37);
@@ -573,9 +593,6 @@ public class Data extends JDialog {
     });
 
     panelDestinationDir.add(btnBaseDir);
-    txtDestinationDirectory.setBounds(319, 0, 334, 37);
-
-    panelDestinationDir.add(txtDestinationDirectory);
     txtcBaseOfDestination.setForeground(Color.DARK_GRAY);
     nimbusFix(Color.LIGHT_GRAY, txtcBaseOfDestination);
     txtcBaseOfDestination.setEditable(false);
@@ -584,6 +601,11 @@ public class Data extends JDialog {
     txtcBaseOfDestination.setBounds(0, 0, 261, 37);
 
     panelDestinationDir.add(txtcBaseOfDestination);
+    scrollPane2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    scrollPane2.setBounds(319, 0, 334, 42);
+    
+    panelDestinationDir.add(scrollPane2);
+    scrollPane2.setViewportView(txtDestinationDirectory);
     btnPreProcFiles.setIcon(new ImageIcon(Data.class
         .getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
     btnPreProcFiles.setBounds(271, 0, 38, 37);
@@ -602,9 +624,6 @@ public class Data extends JDialog {
     });
 
     panelPreProcessedFiles.add(btnPreProcFiles);
-    txtPreProcessedFiles.setBounds(319, 0, 334, 37);
-
-    panelPreProcessedFiles.add(txtPreProcessedFiles);
     txtcDirectoryContainingPreprocessed.setForeground(Color.DARK_GRAY);
     nimbusFix(Color.LIGHT_GRAY, txtcDirectoryContainingPreprocessed);
     txtcDirectoryContainingPreprocessed.setEditable(false);
@@ -613,6 +632,10 @@ public class Data extends JDialog {
     txtcDirectoryContainingPreprocessed.setBounds(0, 0, 261, 37);
 
     panelPreProcessedFiles.add(txtcDirectoryContainingPreprocessed);
+    scrollPane1.setBounds(319, 0, 334, 42);
+    
+    panelPreProcessedFiles.add(scrollPane1);
+    scrollPane1.setViewportView(txtPreProcessedFiles);
   }
 
   // Fixes a bug in Nimbus where it overrides the desired JTextPane

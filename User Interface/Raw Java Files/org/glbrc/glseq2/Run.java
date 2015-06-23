@@ -27,7 +27,6 @@ public class Run {
   private String runId;
   private String protocolId;
   private String attributeFilePath;
-  private String ampersand;
 
   /**
    * Instantiates with everything off.
@@ -41,7 +40,6 @@ public class Run {
     runId = "";
     protocolId = "0";
     attributeFilePath = "";
-    ampersand = "&";
   }
 
   /**
@@ -121,7 +119,6 @@ public class Run {
     args.add(runId);
     args.add(protocolId);
     args.add(attributeFilePath);
-    args.add(ampersand);
     return args;
 
   }
@@ -240,10 +237,6 @@ public class Run {
     return updateFromDatabase;
   }
 
-  public String getAmpersand() {
-    return ampersand;
-  }
-
   // #######################################################
   // ################# Setters #############################
   // #######################################################
@@ -278,9 +271,5 @@ public class Run {
 
   public void setUpdateFromDatabase(String updateFromDatabase) {
     this.updateFromDatabase = updateFromDatabase;
-  }
-
-  public void setAmpersand(String ampersand) {
-    this.ampersand = ampersand;
   }
 }

@@ -63,7 +63,7 @@ public final class ButtonEnums {
     //
     COLLECT("collect"), NO_COLLECT("nocollect"),
     //
-    BACKGROUND("&"), NO_BACKGROUND("");
+    BATCH("Running all queued runs"), NO_BATCH("Run only selected queued run");
 
     public final String value;
 
