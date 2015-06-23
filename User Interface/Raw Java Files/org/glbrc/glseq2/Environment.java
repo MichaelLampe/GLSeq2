@@ -403,7 +403,8 @@ public class Environment extends JDialog {
     txtcVerboseLog.setBounds(10, 11, 171, 37);
     
     verboseLogPanel.add(txtcVerboseLog);
-    btnVerboseLog.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing/plaf/windows/icons/TreeOpen.gif")));
+    btnVerboseLog.setIcon(new ImageIcon(Environment.class.getResource("/com/sun/java/swing"
+        + "/plaf/windows/icons/TreeOpen.gif")));
     btnVerboseLog.setBounds(191, 11, 38, 37);
     btnVerboseLog.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {

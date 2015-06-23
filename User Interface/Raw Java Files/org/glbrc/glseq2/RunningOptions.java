@@ -50,7 +50,6 @@ public class RunningOptions extends JDialog {
   private final JTextPane txtcMaximumAuxiliaryBuffer = new JTextPane();
   //
   private final JButton btnExtractCoverage = new JButton();
-  private final JButton btnComputeConfIntervals = new JButton();
   private final JButton btnOutputGenomeBam = new JButton();
   //
   private final JPanel panelAlignment = new JPanel();
@@ -135,7 +134,7 @@ public class RunningOptions extends JDialog {
       checkRsem.setEnabled(true);
     }
     //
-    if (String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("CUSHAW")) {
+    if (String.valueOf(comboAlignmentAlgo.getSelectedItem()).contains("Cushaw")) {
       if (Application.att.getGpuAccel().equals("TRUE")) {
         comboAlignmentAlgo.setSelectedItem("Cushaw-GPU");
       }
@@ -265,12 +264,6 @@ public class RunningOptions extends JDialog {
       btnExtractCoverage.setText(ButtonEnums.OptionButton.NO_EXTRACT.value);
     }
     //
-    if (Application.att.getCompConf().equals("TRUE")) {
-      btnComputeConfIntervals.setText(ButtonEnums.OptionButton.COMPUTE.value);
-    } else {
-      btnComputeConfIntervals.setText(ButtonEnums.OptionButton.NO_COMPUTE.value);
-    }
-    //
     if (Application.att.getGenoBam().equals("TRUE")) {
       btnOutputGenomeBam.setText(ButtonEnums.OptionButton.OUTPUT.value);
     } else {
@@ -336,7 +329,8 @@ public class RunningOptions extends JDialog {
           panelAlignment.add(txtcAlignmentAlgorithm);
         }
         comboAlignmentAlgo.setFont(Application.TEXT_FONT);
-        comboAlignmentAlgo.setModel(new DefaultComboBoxModel<String>(new String[] {"BWA", "Bowtie", "Bowtie2", "Cushaw", "Cushaw-GPU", "TopHat"}));
+        comboAlignmentAlgo.setModel(new DefaultComboBoxModel<String>(new String[] { "BWA",
+            "Bowtie", "Bowtie2", "Cushaw", "Cushaw-GPU", "TopHat" }));
         comboAlignmentAlgo.setBounds(10, 28, 334, 42);
         comboAlignmentAlgo.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent comboAction) {
@@ -401,7 +395,6 @@ public class RunningOptions extends JDialog {
         spinNumberOfCores.setModel(new SpinnerNumberModel(new Integer(4), new Integer(0), null,
             new Integer(1)));
         spinNumberOfCores.setBounds(380, 0, 77, 40);
-
         panelNumberOfCores.add(spinNumberOfCores);
         {
           txtcNumberOfCores.setForeground(Color.DARK_GRAY);
@@ -513,22 +506,8 @@ public class RunningOptions extends JDialog {
         panelManualHolder.add(btnExtractCoverage);
       }
       {
-        btnComputeConfIntervals.setFont(Application.TEXT_FONT);
-        btnComputeConfIntervals.setBounds(10, 177, 443, 40);
-        btnComputeConfIntervals.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent buttonAction) {
-            if (btnComputeConfIntervals.getText().equals(ButtonEnums.OptionButton.COMPUTE.value)) {
-              btnComputeConfIntervals.setText(ButtonEnums.OptionButton.NO_COMPUTE.value);
-            } else {
-              btnComputeConfIntervals.setText(ButtonEnums.OptionButton.COMPUTE.value);
-            }
-          }
-        });
-        panelManualHolder.add(btnComputeConfIntervals);
-      }
-      {
         btnOutputGenomeBam.setFont(Application.TEXT_FONT);
-        btnOutputGenomeBam.setBounds(550, 178, 443, 40);
+        btnOutputGenomeBam.setBounds(10, 178, 983, 40);
         btnOutputGenomeBam.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent buttonAction) {
             if (btnOutputGenomeBam.getText().equals(ButtonEnums.OptionButton.OUTPUT.value)) {
@@ -593,12 +572,6 @@ public class RunningOptions extends JDialog {
               Application.att.setStrandExtract("FALSE");
             }
             //
-            if (btnComputeConfIntervals.getText().equals(ButtonEnums.OptionButton.COMPUTE.value)) {
-              Application.att.setCompConf("TRUE");
-            } else {
-              Application.att.setCompConf("FALSE");
-            }
-            //
             if (btnOutputGenomeBam.getText().equals(ButtonEnums.OptionButton.OUTPUT.value)) {
               Application.att.setGenoBam("TRUE");
             } else {
@@ -622,9 +595,10 @@ public class RunningOptions extends JDialog {
       }
     }
   }
-
+  //
   // Fixes a bug in Nimbus where it overrides the desired JTextPane
   // Background colors
+  //
   void nimbusFix(Color background, JTextPane pane) {
     UIDefaults defaults = new UIDefaults();
     defaults.put("TextPane[Enabled].backgroundPainter", background);
