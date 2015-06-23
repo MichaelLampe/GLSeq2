@@ -143,7 +143,7 @@ show1Vec <- function(maxNchar=40) {
   out }
 #@@@@@@@@@@@@@
 #
-add.to.logs <- function(text,file=NULL){
+add.to.logs <- function(text="No Message Found",file=NULL){
   if (!is.null(file)){
     message <- paste("echo ","\"",text,"\""," >> ",file,sep="")
     system(message)

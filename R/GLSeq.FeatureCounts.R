@@ -7,7 +7,6 @@ this.resName <- as.character(args[5])
 paired.end <- as.logical(args[6])
 
 library(Rsubread)
-
 #############
 # Makes sure in the correct dir
 #############
