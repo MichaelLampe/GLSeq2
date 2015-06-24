@@ -21,6 +21,6 @@ if (!is.na(countable.sam)){
   cufflinks.options <- paste("--output-dir",destDirCufflinksCount)
   cufflinks.run <- paste("cufflinks",cufflinks.options,cufflinks.ready.countable)
   #
-  if (count.comm != "") count.comm <- paste(count.comm,"&&",cufflinks.ready.countable,"&&",cufflinks.run)
-  if (count.comm == "") count.comm <- paste(cufflinks.ready.countable,"&&",cufflinks.run)
+  if (count.comm != "") count.comm <- paste(count.comm,"&&",cufflinks.ready.create,"&&",cufflinks.run)
+  if (count.comm == "") count.comm <- paste(cufflinks.ready.create,"&&",cufflinks.run)
 }
