@@ -20,70 +20,89 @@ import java.util.Scanner;
 public class Attributes {
 
   // Data and Library Attributes
-  private String directory = "";
-  private String unzipped = "FALSE";
-  private String directoryFq = "";
-  private String rawFileNames = "";
-  private String strain = "";
-  private String pairedEnd = "TRUE";
-  private String seqPlatform = "";
-  private String qualityScores = "";
-  private String libstrands = "";
-  private String libNchar = "0";
-  private String libList = "NULL";
-  private String countableSamDir = "";
-  private String presplit = "FALSE";
-  private String prevRunDirectory = "";
-  private String prevRunName = "";
+  public String directory = "";
+  public String unzipped = "FALSE";
+  public String directoryFq = "";
+  public String rawFileNames = "";
+  public String strain = "";
+  public String pairedEnd = "TRUE";
+  public String seqPlatform = "";
+  public String qualityScores = "";
+  public String libstrands = "";
+  public String libNchar = "0";
+  public String libList = "NULL";
+  public String countableSamDir = "";
+  public String presplit = "FALSE";
+  public String prevRunDirectory = "";
+  public String prevRunName = "";
   // Reference Attributes
-  private String rereferenceGenome = "";
-  private String referenceFasta = "";
-  private String referenceGff = "";
-  private String gtfFeatureColumn = "0";
-  private String idAttr = "";
+  public String rereferenceGenome = "";
+  public String referenceFasta = "";
+  public String referenceGff = "";
+  public String gtfFeatureColumn = "0";
+  public String idAttr = "";
 
   // Run Attributes
-  private String destinationDirectory = "";
-  private String featureCounts = "";
-  private String rsem = "";
-  private String htseq = "";
-  private String cufflinks = "";
-  private String alignmentAlgor = "";
-  private String numberCores = "0";
-  private String numberStreams = "0";
-  private String numberStreamsDataPrep = "0";
-  private String gpuAcceleration = "FALSE";
+  public String destinationDirectory = "";
+  public String featureCounts = "";
+  public String rsem = "";
+  public String htseq = "";
+  public String cufflinks = "";
+  public String alignmentAlgor = "";
+  public String numberCores = "0";
+  public String numberStreams = "0";
+  public String numberStreamsDataPrep = "0";
+  public String gpuAcceleration = "FALSE";
 
   // Pre-Processing Attributes
-  private String readTrim = "0";
-  private String trimHead = "0";
-  private String minTrim = "0";
-  private String artificialFasta = "";
+  public String readTrim = "0";
+  public String trimHead = "0";
+  public String minTrim = "0";
+  public String artificialFasta = "";
 
   // Common Processing Attributes
-  private String strandExtract = "FALSE";
+  public String strandExtract = "FALSE";
 
   // RSEM Attributes
-  private String compConf = "FALSE";
-  private String fragMaxLength = "0";
-  private String ciMem = "0";
-  private String genobam = "FALSE";
+  public String compConf = "FALSE";
+  public String fragMaxLength = "0";
+  public String ciMem = "0";
+  public String genobam = "FALSE";
 
   // Environment Attributes
-  private String scriptDirectory = "";
-  private String trimPath = "";
-  private String picardToolsPath = "";
-  private String fastqcPath = "";
-  private String bwaPath = "";
-  private String bam2wigPath = "";
-  private String cushawPath = "";
-  private String cushawGpuPath = "";
-  private String cushawIndexPath = "";
-  private String topHatPath = "";
-  private String destDirTest;
+  public String scriptDirectory = "";
+  public String trimPath = "";
+  public String picardToolsPath = "";
+  public String fastqcPath = "";
+  public String bwaPath = "";
+  public String bam2wigPath = "";
+  public String cushawPath = "";
+  public String cushawGpuPath = "";
+  public String cushawIndexPath = "";
+  public String topHatPath = "";
+  public String destDirTest;
 
   // RunId
   public String runId = "";
+
+  public Attributes() {
+
+  }
+
+  public Attributes(Attributes anotherAttributes) {
+    Field[] fields = anotherAttributes.getClass().getDeclaredFields();
+    for (Field field : fields) {
+      try {
+        Field currentField = this.getClass().getField(field.getName());
+        currentField.set(this, field.get(anotherAttributes));
+      } catch (IllegalArgumentException | IllegalAccessException e) {
+
+      } catch (NoSuchFieldException e) {
+      } catch (SecurityException e) {
+
+      }
+    }
+  }
 
   /**
    * Creates a new or replaces the current attribute file and adds all the field
