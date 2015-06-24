@@ -1,6 +1,7 @@
 source ("GLSeq.Util.R")
 setwd(base.dir)
 occured <- FALSE
+comm.stack.pool <- ""
 
 ################################################
 #BWA Alignment Protocol

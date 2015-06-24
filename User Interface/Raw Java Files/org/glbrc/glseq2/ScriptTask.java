@@ -50,7 +50,6 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
   public ScriptTask() {
     batch = true;
     // No declaration. This means we'll be doing a batch run here.
-
   }
 
   @Override
@@ -79,33 +78,42 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
       }
       // Indicate to user that the script has started
     }
-    List<Run> allRun = new ArrayList<Run>();
-    List<Attributes> attributes = new ArrayList<Attributes>();
+    List<Run> allRuns = new ArrayList<Run>();
+    List<Attributes> allAttributes = new ArrayList<Attributes>();
+    List<QueuedRun> queue = Application.tabsRun.getQueues();
+    //
     if (batch) {
-      List<QueuedRun> allRuns = Application.tabsRun.getQueues();
-      //
-      for (QueuedRun run : allRuns) {
-        allRun.add(run.getSelectedRun());
-        attributes.add(run.getSelectedAttributes());
+      // Gathers all the runs and attribute objects
+      for (QueuedRun q : queue) {
+        allRuns.add(q.getSelectedRun());
+        allAttributes.add(q.getSelectedAttributes());
       }
-      //
-      for (QueuedRun run : allRuns) {
-        Application.tabsRun.removeQueue(run);
+      // Removes all the used tabs.
+      int remove = allRuns.size() - 1;
+      for (int i = remove; i >= 0; i--) {
+        Application.tabsRun.removeQueue(queue.get(i));
         QueuedRun.count--;
       }
-    } else {
-      allRun.add(localRun);
       //
-      attributes.add(localAttributes);
+    } else {
+      // Just add the single local one
+      allRuns.add(localRun);
+      allAttributes.add(localAttributes);
     }
-    // Script generated based on arguments from the RunOptions class.
-    // It calls the R script with the correct user parameters
-    for (int i = 0; i < allRun.size(); i++) {
-      ProcessBuilder script = new ProcessBuilder(allRun.get(i).returnArgs());
-      script.directory(new File(allRun.get(i).getScriptDirectory(
-          attributes.get(i).getScriptDirectory())));
-      Process process = null;
+    for (int i = 0; i < allRuns.size(); i++) {
+      // Script generated based on arguments from the RunOptions class.
+      // It calls the R script with the correct user parameters
       try {
+
+        // Build process w/ args again
+        System.out.println(allRuns.get(i).returnArgs());
+        ProcessBuilder script = new ProcessBuilder(allRuns.get(i).returnArgs());
+
+        // Need to do this script stuff
+        script.directory(new File(allRuns.get(i).getScriptDirectory(
+            allAttributes.get(i).getScriptDirectory())));
+
+        Process process = null;
         process = script.start();
         System.out.println("Started script");
         final InputStream is = process.getInputStream();
@@ -135,19 +143,21 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
         }).start();
         // Error message if the script is incorrectly run. Did not select
         // directory or options are easy reasons for this error.
+        try {
+          // Script is done when it says done
+          process.waitFor();
+          Application.updating("The Top Script has now completely executed. " + (i+1) + " out of "
+              + allRuns.size() + " jobs are complete.");
+        } catch (InterruptedException e) {
+          Application.updating("Error running the script. Script interrupted.");
+        }
       } catch (IOException e) {
         Application.updating("Sorry, there was a problem running the script. "
             + " Please check that all the options have been correctly selected.");
         Application.updating(String.valueOf(e));
-      }
-      try {
-        // Script is done when it says done
-        process.waitFor();
-        Application.updating("The Top Script has now completely executed. "
-            + "Processing will continue in your destination folder(s) until complete.");
-      } catch (InterruptedException e) {
-        Application.updating("Error running the script. Script interrupted.");
+
       }
     }
+
   }
 }

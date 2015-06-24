@@ -43,6 +43,25 @@ public class Run {
   }
 
   /**
+   * Creates a new, unique Run with the same fields as another. Useful for
+   * interfacing with the static Run in Application and passing a non-static
+   * argument to the Script Task when running batch scripts.
+   * 
+   * @param anotherRun
+   *          - Another instance of run that will be copied.
+   */
+  public Run(Run anotherRun) {
+    updateFromDatabase = anotherRun.getUpdateFromDatabase();
+    processedData = anotherRun.getProcessedData();
+    alignment = anotherRun.getAlignment();
+    counting = anotherRun.getCounting();
+    collectResults = anotherRun.getCollectResults();
+    runId = anotherRun.getRunId();
+    protocolId = anotherRun.getProtocolId();
+    attributeFilePath = anotherRun.getAttributeFilePath();
+  }
+
+  /**
    * Converts script into script directory for uses.
    * 
    * @param scriptDirectory
@@ -167,9 +186,11 @@ public class Run {
   // #######################################################
   // ################# Saves Current Configs ###############
   // #######################################################
-  /** Saves the current fields as a configuration file
+  /**
+   * Saves the current fields as a configuration file
    * 
-   * @param fileName - What to name it
+   * @param fileName
+   *          - What to name it
    * @throws IOException .
    */
   public void saveConfigFile(String fileName) throws IOException {
@@ -182,12 +203,10 @@ public class Run {
     }
     runFile.createNewFile();
     FileWriter writer = new FileWriter(runFile);
-    writer
-        .write("READ: Program requires that each config "
-            + "option has one space, and only one space,\n");
-    writer
-        .write("after the equal sign.  If you are editing"
-            + " the options from here, please remember this.\n\n");
+    writer.write("READ: Program requires that each config "
+        + "option has one space, and only one space,\n");
+    writer.write("after the equal sign.  If you are editing"
+        + " the options from here, please remember this.\n\n");
     for (int i = 0; i < field.length; i++) {
       try {
         writer.write(field[i].getName() + " = " + field[i].get(this) + "\n");
