@@ -76,7 +76,7 @@ public final class Application {
   private final JButton btnRun = new JButton("Run Current Selection");
   // Allows for text styling, mainly centering
   private final SimpleAttributeSet center = new SimpleAttributeSet();
-  public static final JTabbedPane tabsRun = new JTabbedPane(JTabbedPane.RIGHT);
+  public static final BatchTab tabsRun = new BatchTab(BatchTab.RIGHT);
   private final JButton btnQueue = new JButton("Add to Queue");
 
   /**
@@ -409,7 +409,7 @@ public final class Application {
             if (txtRunName.getText().length() > 0) {
               run.setRunId(txtRunName.getText());
               run.setAttributeFilePath(txtAttributeFile.getText());
-              tabsRun.add(new QueuedRun(run, att));
+              tabsRun.addQueue(new QueuedRun(run, att));
               btnRun.setEnabled(true);
             } else {
               updating("Please give your run a unique name");
@@ -467,7 +467,7 @@ public final class Application {
                   + String.valueOf(localRun.returnArgs()));
               ScriptTask startGlseq = new ScriptTask(localRun, localAttributes);
               startGlseq.execute();
-              tabsRun.remove((queuedTab));
+              tabsRun.removeQueue((queuedTab));
               // Remove a button count so more runs can be run.
               QueuedRun.count--;
               if (tabsRun.getComponentCount() <= 0) {
