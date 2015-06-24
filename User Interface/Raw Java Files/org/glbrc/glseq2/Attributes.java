@@ -47,6 +47,7 @@ public class Attributes {
   private String featureCounts = "";
   private String rsem = "";
   private String htseq = "";
+  private String cufflinks = "";
   private String alignmentAlgor = "";
   private String numberCores = "0";
   private String numberStreams = "0";
@@ -371,6 +372,10 @@ public class Attributes {
     this.htseq = htseq;
   }
 
+  public void setCufflinks(String cufflinks) {
+    this.cufflinks = cufflinks;
+  }
+
   public void setFeatureCounts(String featureCounts) {
     this.featureCounts = featureCounts;
   }
@@ -406,6 +411,10 @@ public class Attributes {
 
   public String getHtseq() {
     return htseq;
+  }
+
+  public String getCufflinks() {
+    return cufflinks;
   }
 
   public String getFeatureCounts() {
@@ -758,7 +767,8 @@ public class Attributes {
     writer.write("HTSeq <- \"" + htseq + "\"\n");
     writer.write("FeatureCounts <- \"" + featureCounts + "\"\n");
     writer.write("RSEM <- \"" + rsem + "\"\n");
-    writer.write("cAlgor <- c(HTSeq,RSEM,FeatureCounts)\n");
+    writer.write("Cufflinks <- \"" + cufflinks + "\"\n");
+    writer.write("cAlgor <- c(HTSeq,RSEM,FeatureCounts,Cufflinks)\n");
     writer.write("#\n");
     writer.write("#  GPU acceleration option for CUSHAW\n");
     writer.write("GPU.accel <- " + gpuAcceleration.toUpperCase() + "\n");
@@ -835,9 +845,8 @@ public class Attributes {
     writer.write("# Path to the TopHat aligner\n");
     writer.write("TopHat.path <- \"" + topHatPath + "\"\n");
     writer.write("#\n");
-    writer
-        .write("# Logging system.  Will create general logs of"
-            + " all the runs and put them in this other directory.\n");
+    writer.write("# Logging system.  Will create general logs of"
+        + " all the runs and put them in this other directory.\n");
     writer.write("destDirTest <- \"" + destDirTest + "\"\n");
     writer.write("#\n");
     writer.write("# End of Attribute File\n");

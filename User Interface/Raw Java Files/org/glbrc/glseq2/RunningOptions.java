@@ -96,6 +96,7 @@ public class RunningOptions extends JDialog {
   //
   private final JPanel panelGlow = new JPanel();
   private final JTextPane txtpnGlowLoginGoing = new JTextPane();
+  private final JCheckBox checkCufflinks = new JCheckBox("Cufflinks");
 
   /**
    * Launch the application.
@@ -151,6 +152,9 @@ public class RunningOptions extends JDialog {
     if (Application.att.getRsem().contains("RSEM")
         && Application.att.getaAlgor().contains("Bowtie")) {
       checkRsem.setSelected(true);
+    }
+    if (Application.att.getCufflinks().contains("Cufflinks")) {
+      checkCufflinks.setSelected(true);
     }
     //
     {
@@ -377,6 +381,12 @@ public class RunningOptions extends JDialog {
 
         panelCounting.add(checkRsem);
       }
+      checkCufflinks.setForeground(Color.DARK_GRAY);
+      checkCufflinks.setFont(new Font("Monospaced", Font.PLAIN, 11));
+      checkCufflinks.setBackground(Color.LIGHT_GRAY);
+      checkCufflinks.setBounds(150, 27, 138, 23);
+
+      panelCounting.add(checkCufflinks);
       {
         txtchPipelineOptions.setBounds(10, 11, 284, 42);
         panel1.add(txtchPipelineOptions);
@@ -559,6 +569,11 @@ public class RunningOptions extends JDialog {
             } else {
               Application.att.setHtseq("");
             }
+            if (checkCufflinks.isSelected()) {
+              Application.att.setCufflinks("Cufflinks");
+            } else {
+              Application.att.setCufflinks("");
+            }
             //
             Application.run.setProtocolId(txtProtocolId.getText());
             Application.att.setStreams(String.valueOf(spinParallelExpression.getValue()));
@@ -595,6 +610,7 @@ public class RunningOptions extends JDialog {
       }
     }
   }
+
   //
   // Fixes a bug in Nimbus where it overrides the desired JTextPane
   // Background colors

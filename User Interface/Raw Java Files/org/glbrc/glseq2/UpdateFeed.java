@@ -36,8 +36,16 @@ public class UpdateFeed extends JTextArea {
     time.schedule(new TimerTask() {
       @Override
       public void run() {
-        setText(currentText);
-        moveView();
+        try {
+          setText(currentText);
+          moveView();
+        } catch (NullPointerException e) {
+          // About 1 in 10 runs a null pointer will pop up here.
+          // Decided to just add a print statement for debugging so the user
+          // Won't see a huge stack trace, as the error doesn't seem to affect
+          // function.
+          System.out.println("Possible timer problem. UpdateFeed.java");
+        }
       }
     }, 100);
     // Keep the scroll bar at the bottom

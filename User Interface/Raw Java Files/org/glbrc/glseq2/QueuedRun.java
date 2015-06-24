@@ -188,12 +188,19 @@ public class QueuedRun extends JPanel {
       }
       countString += panelAttributes.getHtseq();
     }
+    if (panelAttributes.getCufflinks().equals("Cufflinks")) {
+      if (!countString.equals("")) {
+        countString += "\n";
+      }
+      countString += panelAttributes.getCufflinks();
+    }
 
     return countString;
   }
 
   private void removeThis() {
     Application.tabsRun.remove(this);
+    count--;
   }
 
   public Run getSelectedRun() {
