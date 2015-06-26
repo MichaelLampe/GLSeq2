@@ -101,6 +101,8 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
       allAttributes.add(localAttributes);
     }
     for (int i = 0; i < allRuns.size(); i++) {
+      
+        
       // Script generated based on arguments from the RunOptions class.
       // It calls the R script with the correct user parameters
       try {
@@ -124,11 +126,11 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
               BufferedReader reader = new BufferedReader(new InputStreamReader(is));
               String line;
               while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                Application.updating(line);
               }
               reader = new BufferedReader(new InputStreamReader(es));
               while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                Application.updating(line);
               }
             } catch (IOException e) {
               e.printStackTrace();
@@ -146,8 +148,8 @@ public class ScriptTask extends SwingWorker<List<Integer>, Integer> {
         try {
           // Script is done when it says done
           process.waitFor();
-          Application.updating("The Top Script has now completely executed. " + (i+1) + " out of "
-              + allRuns.size() + " jobs are complete.");
+          Application.updating("The Top Script has now completely executed. " + (i + 1)
+              + " out of " + allRuns.size() + " jobs are complete.");
         } catch (InterruptedException e) {
           Application.updating("Error running the script. Script interrupted.");
         }

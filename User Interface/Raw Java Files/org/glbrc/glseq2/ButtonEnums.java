@@ -29,17 +29,14 @@ public final class ButtonEnums {
     TRIMMING("Trimming Raw Reads"), NO_TRIMMING("Not Trimming Raw Reads"),
     //
     // Script Running Options
-    EXTRACT("Extracting Forward and Reverse Coverage from Original BAM File"), 
-    NO_EXTRACT("NOT Extracting Forward and Reverse Coverage from Original BAM File"), 
+    EXTRACT("Extracting Forward and Reverse Coverage from Original BAM File"), NO_EXTRACT(
+        "NOT Extracting Forward and Reverse Coverage from Original BAM File"),
     //
-    COMPUTE("Computing Confidence Intervals"), 
-    NO_COMPUTE("NOT Computing Confidence Intervals"), 
+    COMPUTE("Computing Confidence Intervals"), NO_COMPUTE("NOT Computing Confidence Intervals"),
     //
-    OUTPUT("Outputting Genome BAM"),
-    NO_OUTPUT("NOT Outputting Genome Bam"), 
+    OUTPUT("Outputting Genome BAM"), NO_OUTPUT("NOT Outputting Genome Bam"),
     //
-    PRESPLIT("Presplit"),
-    NO_PRESPLIT("NOT Presplit");
+    PRESPLIT("Presplit"), NO_PRESPLIT("NOT Presplit");
 
     public final String value;
 
@@ -63,7 +60,8 @@ public final class ButtonEnums {
     //
     COLLECT("collect"), NO_COLLECT("nocollect"),
     //
-    BATCH("Running all queued runs"), NO_BATCH("Run only selected queued run");
+    EXTERNAL("Job will be run on an external computer"), INTERNAL(
+        "Job will be run on this computer");
 
     public final String value;
 
