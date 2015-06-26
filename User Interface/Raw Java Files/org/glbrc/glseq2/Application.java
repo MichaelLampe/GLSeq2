@@ -71,17 +71,19 @@ public final class Application {
   private final JButton btnAlignment = new JButton("Aligning");
   private final JButton btnCounting = new JButton("Counting");
   private final JButton btnCollecting = new JButton("Collecting Results");
-  private final JButton btnRunAll = new JButton("Run All Queued Jobs");
   private final JButton btnRun = new JButton("Run Current Selection");
   // Allows for text styling, mainly centering
   private final SimpleAttributeSet center = new SimpleAttributeSet();
   public static final BatchTab tabsRun = new BatchTab(BatchTab.RIGHT);
   private final JButton btnQueue = new JButton("Add to Queue");
+  private final JButton btnRunLocation = new JButton(ButtonEnums.Attribute.EXTERNAL.value);
 
   /**
    * Launch the application.
    */
   public static final void main(String[] args) {
+    System.out.println("Starting");
+
     att = new Attributes();
     run = new Run();
 
@@ -177,7 +179,6 @@ public final class Application {
     } else {
       btnCollecting.setText(ButtonEnums.AttributeButton.NO_COLLECT.value);
     }
-    btnRunAll.setText(ButtonEnums.Attribute.BATCH.value);
   }
 
   /**
@@ -289,23 +290,21 @@ public final class Application {
     frame.getContentPane().add(runOptionsContainer);
     runOptionsContainer.setLayout(null);
     btnDatabase.setBounds(10, 0, 347, 70);
-    
+
     runOptionsContainer.add(btnDatabase);
     btnPreProcessing.setBounds(10, 81, 347, 70);
-    
+
     runOptionsContainer.add(btnPreProcessing);
     btnAlignment.setBounds(10, 162, 160, 70);
-    
+
     runOptionsContainer.add(btnAlignment);
     btnCounting.setBounds(197, 162, 160, 70);
-    
+
     runOptionsContainer.add(btnCounting);
     btnCollecting.setBounds(10, 243, 347, 70);
-    
-    runOptionsContainer.add(btnCollecting);
-    btnRunAll.setBounds(10, 324, 347, 70);
 
-    runOptionsContainer.add(btnRunAll);
+    runOptionsContainer.add(btnCollecting);
+
     txtRunName.setBounds(111, 418, 246, 19);
     runOptionsContainer.add(txtRunName);
     txtRunName.setFont(TEXT_FONT);
@@ -319,6 +318,9 @@ public final class Application {
     btnQueue.setBounds(10, 448, 347, 73);
 
     runOptionsContainer.add(btnQueue);
+    btnRunLocation.setBounds(10, 324, 347, 70);
+
+    runOptionsContainer.add(btnRunLocation);
 
     runContainer.setBackground(Color.GRAY);
     runContainer.setBounds(734, 0, 361, 572);
@@ -326,7 +328,7 @@ public final class Application {
     runContainer.setLayout(null);
     panel.setBackground(Color.LIGHT_GRAY);
     panel.setBounds(10, 40, 341, 183);
-    
+
     runContainer.add(panel);
     panel.setLayout(null);
     scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -339,7 +341,7 @@ public final class Application {
     scrollPane.setViewportView(txtCurrentUpdates);
     btnRun.setBounds(10, 491, 341, 70);
     btnRun.setEnabled(false);
-    
+
     runContainer.add(btnRun);
     txtchRunningUpdates.setText("Running Updates");
     StyledDocument docs = txtchRunningUpdates.getStyledDocument();
@@ -367,7 +369,7 @@ public final class Application {
     txtchRunOptions.setBackground(Color.GRAY);
     txtchRunOptions.setText("Run Options");
     txtchRunOptions.setEditable(false);
-    
+
     /*
      * All Action Listeners are below here.
      */
@@ -460,16 +462,6 @@ public final class Application {
       }
     });
 
-    btnRunAll.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent buttonAction) {
-        if (btnRunAll.getText().equals(ButtonEnums.Attribute.BATCH.value)) {
-          btnRunAll.setText(ButtonEnums.Attribute.NO_BATCH.value);
-        } else {
-          btnRunAll.setText(ButtonEnums.Attribute.BATCH.value);
-        }
-      }
-    });
-
     btnCollecting.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent buttonAction) {
         if (btnCollecting.getText().equals(ButtonEnums.AttributeButton.COLLECT.value)) {
@@ -482,6 +474,16 @@ public final class Application {
       }
     });
 
+    btnRunLocation.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent buttonAction) {
+        if (btnRunLocation.getText().equals(ButtonEnums.Attribute.EXTERNAL.value)) {
+          btnRunLocation.setText(ButtonEnums.Attribute.INTERNAL.value);
+        } else {
+          btnRunLocation.setText(ButtonEnums.Attribute.EXTERNAL.value);
+        }
+      }
+    });
+
     btnQueue.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent arg0) {
         if (QueuedRun.count < 12) {
@@ -489,7 +491,7 @@ public final class Application {
             if (txtRunName.getText().length() > 0) {
               run.setRunId(txtRunName.getText());
               run.setAttributeFilePath(txtAttributeFile.getText());
-              tabsRun.addQueue(new QueuedRun(new Run(run),new Attributes(att)));
+              tabsRun.addQueue(new QueuedRun(new Run(run), new Attributes(att)));
               btnRun.setEnabled(true);
             } else {
               updating("Please give your run a unique name");
@@ -507,33 +509,17 @@ public final class Application {
       public void actionPerformed(ActionEvent buttonAction) {
         if (txtRunName.getText().length() > 0) {
           if (txtAttributeFile.getText().length() > 0) {
-            if (btnRunAll.getText().equals(ButtonEnums.Attribute.NO_BATCH.value)) {
-              int index = tabsRun.getSelectedIndex();
-              QueuedRun queuedTab = (QueuedRun) tabsRun.getComponentAt(index);
-              Run localRun = queuedTab.getSelectedRun();
-              Attributes localAttributes = queuedTab.getSelectedAttributes();
-              try {
-                localRun.saveConfigFile("RunConfig" + localRun.getRunId() + ".txt");
-                localAttributes.saveConfigFile("AttributeConfig" + localRun.getRunId() + ".txt");
-              } catch (IOException error) {
-                System.out.println("Problem saving run and attribute configuration files.");
-              }
-              txtCurrentUpdates.setEnabled(true);
-              updating("Now running script with arguments: "
-                  + String.valueOf(localRun.returnArgs()));
-              ScriptTask startGlseq = new ScriptTask(localRun, localAttributes);
-              startGlseq.execute();
-              tabsRun.removeQueue((queuedTab));
-              // Remove a button count so more runs can be run.
-              QueuedRun.count--;
-              if (tabsRun.getComponentCount() <= 0) {
-                btnRun.setEnabled(false);
+            if (tabsRun.getQueues().size() > 0) {
+              if (btnRunLocation.getText().equals(ButtonEnums.Attribute.EXTERNAL.value)) {
+                // Launches a new dialog box that allows user login and running.
+                SshPanel ssh = new SshPanel();
+                ssh.setVisible(true);
+              } else {
+                ScriptTask startGlseq = new ScriptTask();
+                startGlseq.execute();
               }
             } else {
-              updating("Now running batch scripts.  "
-                  + "Jobs will automatically start after the one before it finishes.");
-              ScriptTask startGlseq = new ScriptTask();
-              startGlseq.execute();
+              updating("Please add a run to queue before attempting to run.");
             }
           } else {
             updating("Please either generate a new attribute file or enter a path "
