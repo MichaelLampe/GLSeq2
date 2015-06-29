@@ -510,6 +510,7 @@ public final class Application {
         if (txtRunName.getText().length() > 0) {
           if (txtAttributeFile.getText().length() > 0) {
             if (tabsRun.getQueues().size() > 0) {
+              btnRun.setEnabled(false);
               if (btnRunLocation.getText().equals(ButtonEnums.Attribute.EXTERNAL.value)) {
                 // Launches a new dialog box that allows user login and running.
                 SshPanel ssh = new SshPanel();
@@ -518,6 +519,7 @@ public final class Application {
                 ScriptTask startGlseq = new ScriptTask();
                 startGlseq.execute();
               }
+              btnRun.setEnabled(true);
             } else {
               updating("Please add a run to queue before attempting to run.");
             }

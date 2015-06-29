@@ -24,7 +24,7 @@ raw.dir <-""
 unzipped <- FALSE
 #
 # directory contining ready-to-go (split+QC-processed) fq files (Oct 17, 2013)
-readyData.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing/.Test_Cases/Test_Cushaw_526_HTSeq.02"
+readyData.dir <- "/home/GLBRCORG/mrlampe/GLBRC_UI/Testing/.Test_Cases/Test_CushawGPU_527_HTSeq_FeatureCounts.05"
 #
 # raw file names: 
 raw.fNames <- ""
@@ -45,7 +45,7 @@ qScores <- "phred33"
 libstrand <- "R"
 #
 # Number of unique characters in the beginning of the each file (library ID length):
-libNchar <- 4
+libNchar <- 30
 #
 # Subset of the libraries to process (optional; normally the list wil be generated from the actual directory content)
 libList <- "NULL"
@@ -105,7 +105,7 @@ nStreamsDataPrep <- 1
 # now is being generated inside GLSeq.top.R
 #
 # *** Alignment Algorithm ***
-aAlgor <- "Cushaw" 
+aAlgor <- "TopHat" 
 #
 #
 # *** Counting Algorithm(s) ***
@@ -183,4 +183,5 @@ CUSHAW.path <- "/opt/bifxapps/cushaw2-v2.1.11/cushaw2"
 # path to CUSHAW-GPU
 CUSHAW.GPU.path <- "/opt/bifxapps/cushaw2-gpu-2.1.8-r16/cushaw2-gpu"
 #
+TopHat.path <- "/opt/bifxapps/tophat-2.0.11.Linux_x86_64/tophat"
 # End of Attribute File

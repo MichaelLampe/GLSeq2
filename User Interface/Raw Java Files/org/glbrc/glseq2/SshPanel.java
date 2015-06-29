@@ -116,16 +116,25 @@ public class SshPanel extends JDialog {
         String username = txtUsername.getText();
         String password = String.valueOf(txtPassword.getPassword());
         SshTask ssh = new SshTask(server, port, username, password);
+        String tempOrig = btnRunScripts.getText();
+        btnRunScripts.setText("Checking the server with submitted username and password.");
         boolean auth = ssh.ping();
+        //
+        // If ping worked, continue
+        //
         if (auth) {
+          btnRunScripts.setText("Successfully completed.");
           ssh.execute();
           Application.updating("Username and password verified.  Submitting jobs to server(s)");
           setVisible(false);
+          
+        // Else, don't run the script as it will fail.
         } else {
           JOptionPane.showMessageDialog(contentPanel,
               "Error with login. Please check credentials and server address.");
           txtPassword.setText("");
         }
+        btnRunScripts.setText(tempOrig);
       }
     });
   }

@@ -24,3 +24,4 @@ if (!is.na(countable.sam)){
   if (count.comm != "") count.comm <- paste(count.comm,"&&",cufflinks.ready.create,"&&",cufflinks.run)
   if (count.comm == "") count.comm <- paste(cufflinks.ready.create,"&&",cufflinks.run)
 }
+
