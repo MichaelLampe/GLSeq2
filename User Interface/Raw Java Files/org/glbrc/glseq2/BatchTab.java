@@ -54,10 +54,15 @@ public class BatchTab extends JTabbedPane {
       return queues;
     }
   }
-
-  /*
-   * List<QueuedRun> queuedRuns = new ArrayList<QueuedRun>(); for (Component
-   * comp : getComponents()) { if (comp instanceof QueuedRun) { QueuedRun run =
-   * (QueuedRun) comp; queuedRuns.add(run); } } return queuedRuns; }
-   */
+/**
+ * Removes all the queues from this tab.
+ */
+  public void removeQueues() {
+    // Removes all the used tabs.
+    int remove = queues.size() - 1;
+    for (int i = remove; i >= 0; i--) {
+      Application.tabsRun.removeQueue(queues.get(i));
+      QueuedRun.count--;
+    }
+  }
 }

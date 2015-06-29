@@ -210,7 +210,8 @@ public class QueuedRun extends JPanel {
   public Attributes getSelectedAttributes() {
     return panelAttributes;
   }
-  public String attributeFileName(){
+
+  public String attributeFileName() {
     String filePath = panelRun.getAttributeFilePath();
     String[] fileParts = filePath.split("\\\\");
     String fileName = fileParts[fileParts.length - 1];

@@ -24,9 +24,9 @@ public class SshTask extends SwingWorker<List<Integer>, Integer> {
   private final String password;
   private String[] serverCommands;
 
-  /** Constructor for a single SSH task.
-   * 
-   * Creates a new login event and executes the task
+  /**
+   * Constructor for a single SSH task. Creates a new login event and executes
+   * the task
    * 
    * @param address
    *          - Server address
@@ -89,6 +89,7 @@ public class SshTask extends SwingWorker<List<Integer>, Integer> {
     }
     // Each index here represents a single server that will have a single line
     // of commands executed.
+    Application.updating("Constructing server commands");
     serverCommands = new String[servers.size()];
     int server = 0;
     for (QueuedRun q : Application.tabsRun.getQueues()) {
@@ -135,6 +136,9 @@ public class SshTask extends SwingWorker<List<Integer>, Integer> {
         server = 0;
       }
     }
+    Application.updating("Running commands via SSH.");
+    // Remove all the tabs and then run it
+    Application.tabsRun.removeQueues();
     runStack(serverCommands, servers);
   }
 

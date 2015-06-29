@@ -16,7 +16,9 @@
 #
 args <- commandArgs(trailingOnly = TRUE)
 text.add <- as.character(args[1])
+attrPath <- as.character(args[2])
 source("GLSeq.Util.R")
+source(attrPath)
 #
 ###########################
 # loading variables for the current run (from the current directory) 
@@ -114,14 +116,14 @@ if (unzipped){
   if (length(unique(raw.dir)) == 1){
     if (is.null(libList)){
       # Now takes either .fq or .fastq
-      fqFiles.unzip <- dir(raw.dir[1])[grep(".fq", dir(raw.dir[1]))]
+      fqFiles.unzip <- dir(raw.dir[1])[grep(".fq|fastq", dir(raw.dir[1]))]
     }
   }
 }
 #
 #
 if (!unzipped){
-  if (length(unique(raw.dir)) == 1 & is.null(libList))  fqFiles.zip <- dir(raw.dir[1])[grep(".gz", dir(raw.dir[1]))]
+  if (length(unique(raw.dir)) == 1 & is.null(libList))  fqFiles.zip <- dir(raw.dir[1])[grep("fq.gz|fastq.gz", dir(raw.dir[1]))]
 }
 #
 ############################
@@ -141,7 +143,7 @@ if (unzipped){
   # Thus, the file example.1.fq along with its pair of example.2.fq
   # would become example.1.fq and example.2.fq
   # and an unsplit file example.fq would become example.fq
-  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-3)
+  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-0)
 }
 #
 if (!unzipped){
@@ -149,7 +151,7 @@ if (!unzipped){
   # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
   # would become example.1.fq and example.2.fq
   # and an unsplit file example.fq.gz would become example.fq
-  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-6)
+  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-3)
 }
 
 #
@@ -162,6 +164,7 @@ if (!unzipped){
 #
 if (nStreamsDataPrep > length(fqFiles)) nStreamsDatapPep <- length(fqFiles)
 if (!paired.end) presplit <- FALSE
+chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
 if (presplit) rangelist.Dataprep <- chunk(2*(1:(length(fqFiles)/2)), nStreamsDataPrep)
 if (!presplit) rangelist.Dataprep <- chunk(1:length(fqFiles), nStreamsDataPrep)
 #
@@ -287,7 +290,7 @@ for (zz in 1:nStreamsDataPrep) {
         pairedTrimmed.1 <-  paste("p.", fqFile.base[j], ".1.fq", sep="")
         pairedTrimmed.2 <- paste("p.", fqFile.base[j], ".2.fq", sep="")
         #
-        trimCommand <- trimAssemble(first.read.filename, second.read.filename, trimPath, qScores, trimHead, artificial.fq)
+        trimCommand <- trimAssemble(first.read.filename, second.read.filename, trimPath, qScores, trimhead, artificial.fq)
         #
         fileShuffle <- paste("mv", first.read.filename, leftDirtyFname, " && ", "mv", second.read.filename, rightDirtyFname, " && ", "mv", pairedTrimmed.1, first.read.filename, " && ", "mv", pairedTrimmed.2, second.read.filename)
         #

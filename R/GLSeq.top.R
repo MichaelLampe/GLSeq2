@@ -96,6 +96,7 @@ if (updateFromDb == "noupdate") {
   # the real text.add that will be used as a common ID for all the GLSeq scripts is generated right here:
   text.add <- paste(expID, runAttempt, sep=".") 
 }
+
 dest.dir.base <- trailDirCheck(dest.dir.base) # may be redundant; still, fixed an error
 # base directory name with guaranteed trailing slash: 
 base.dir <- trailDirCheck(base.dir)
@@ -274,30 +275,21 @@ if (updateFromDb == "update") {
   ##################
 } # if update from db
 #
-#@@@@@@@@@@
-# Updating input values:
-# End
-#@@@@@@@@@@
-#
-# 
-#
-#
-#
-#
 #
 #############
 # Directory name checkEnd
 #############
 #
 add.to.logs("################## Creating directories for the run ##################",log.file)
+destDir.create <- paste("mkdir ", dest.dir, sep="")
+destDirLog.create <- paste("mkdir ", destDirLog, sep="")
+add.to.logs(destDir.create,log.file)
+try(system(destDir.create))
+#
+add.to.logs(destDirLog.create,log.file)
+try(system(destDirLog.create))
+
 if (alignment == "alignment" || counting == "counting"){
-  destDir.create <- paste("mkdir ", dest.dir, sep="")
-  destDirLog.create <- paste("mkdir ", destDirLog, sep="")
-  add.to.logs(destDir.create,log.file)
-  try(system(destDir.create))
-  #
-  add.to.logs(destDirLog.create,log.file)
-  try(system(destDirLog.create))
   #
   if ("HTSeq" %in% cAlgor){
     destDirHTSeqCount <-  paste(dest.dir, text.add, ".HTSeq.Counting/", sep="")
@@ -459,15 +451,15 @@ if(dataPrepare == "dataprep") {
         add.to.logs("################## Finding zipped files to prepare ##################",log.file)
         gzfiles <- gzfiles[grep(".gz", gzfiles)]
         if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
-        if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 8)
+        if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
         fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
       }
       #
       if (unzipped) {
         add.to.logs("################## Finding unzipped files to prepare ##################",log.file)
-        fqfiles <- fqfiles[grep(".fq",fqfiles)]
+        fqfiles <- fqfiles[grep(".fq|.fastq",fqfiles)]
         if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 0)
-        if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 5)
+        if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(fqfiles) - 0)
         fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
       }
     }
@@ -495,6 +487,7 @@ if(dataPrepare == "dataprep") {
     }
   }
 }
+add.to.logs("################## Completed finding files. ##################",log.file)
 #
 ##########################################################################
 ########################## RANGES OF DATA ################################
@@ -597,7 +590,7 @@ if (dataPrepare  == "dataprep") {
   Sys.sleep(10) 
   dataPrepLog <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")
   dataPrepErr <- paste(destDirLog, text.add, ".DataPrepErr.txt", sep="")
-  dataPrep <- paste("Rscript GLSeq.dataprep.R ", text.add, " 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="") 
+  dataPrep <- paste("Rscript GLSeq.dataprep.R ", text.add," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="") 
   print("Starting Data Preparation")
   system(dataPrep)
 }
