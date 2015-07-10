@@ -82,27 +82,48 @@ public final class Application {
    * Launch the application.
    */
   public static final void main(String[] args) {
-    System.out.println("Starting");
 
     att = new Attributes();
     run = new Run();
 
     // Checks if there are command line arguments
     if (args.length > 0) {
-      System.out.println("Generating attribute file from command line arguments.");
-      att.setAttributes(args);
-      try {
-        att.writeAttributesFile();
-      } catch (IOException e) {
-        System.out.println("Error constructing attribute file");
+      if (args[0].equals("JSON")) {
+        att.returnJson();
+      } else {
+        System.out.println("Generating attribute file from command line arguments.");
+        att.setAttributes(args);
+        try {
+          String file_name = null;
+          String file_location = null;
+          try {
+            if (args[0].contains("FILE_NAME")) {
+              file_name = args[0].split("=")[1];
+              if (args[1].contains("FILE_LOCATION")) {
+                file_location = args[1].split("=")[1];
+              }
+            } else {
+              if (args[0].contains("FILE_LOCATION")) {
+                file_location = args[0].split("=")[1];
+              }
+            }
+          } catch (IndexOutOfBoundsException e) {
+            // Do nothing here.
+          }
+          System.out.println("ATTIRUBTE_FILE_PATH="
+              + att.writeAttributesFile(file_name, file_location));
+        } catch (IOException e) {
+          System.out
+              .println("Error constructing attribute file. Likely unable to create attribute file where the JAR file exists.");
+        }
+        // Exit program
+        System.out.println("Program is now exiting.");
+        //
+        //
+        // Will need to add logic to tell the Glow_Database where this went.
+        //
+        //
       }
-      // Exit program
-      System.out.println("Program is now exiting.");
-      //
-      //
-      // Will need to add logic to tell the Glow_Database where this went.
-      //
-      //
       return;
     }
     EventQueue.invokeLater(new Runnable() {
@@ -405,7 +426,7 @@ public final class Application {
       public void actionPerformed(ActionEvent buttonAction) {
         try {
           att.saveConfigFile(null);
-          String path = att.writeAttributesFile();
+          String path = att.writeAttributesFile(null, null);
           run.setAttributeFilePath(path);
           txtAttributeFile.setText(path);
         } catch (IOException e1) {

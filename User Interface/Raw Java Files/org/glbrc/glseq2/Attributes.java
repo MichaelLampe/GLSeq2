@@ -36,7 +36,7 @@ public class Attributes {
   public String prevRunDirectory = "";
   public String prevRunName = "";
   // Reference Attributes
-  public String rereferenceGenome = "";
+  public String referenceGenome = "";
   public String referenceFasta = "";
   public String referenceGff = "";
   public String gtfFeatureColumn = "0";
@@ -55,7 +55,7 @@ public class Attributes {
   public String gpuAcceleration = "FALSE";
 
   // Pre-Processing Attributes
-  public String readTrim = "0";
+  public String readTrim = "FALSE";
   public String trimHead = "0";
   public String minTrim = "0";
   public String artificialFasta = "";
@@ -80,7 +80,7 @@ public class Attributes {
   public String cushawGpuPath = "";
   public String cushawIndexPath = "";
   public String topHatPath = "";
-  public String destDirTest;
+  public String destDirTest = "";
 
   // RunId
   public String runId = "";
@@ -261,7 +261,7 @@ public class Attributes {
 
   // Reference Attribute Setters
   public void setRGenome(String rerefenceGenome) {
-    this.rereferenceGenome = rerefenceGenome;
+    this.referenceGenome = rerefenceGenome;
   }
 
   public void setFasta(String referenceFasta) {
@@ -503,7 +503,7 @@ public class Attributes {
 
   // Reference Attribute Getters
   public String getRGenome() {
-    return rereferenceGenome;
+    return referenceGenome;
   }
 
   public String getFasta() {
@@ -628,7 +628,7 @@ public class Attributes {
    * @return AttributeFileLocation - The new attribute file's path
    * @throws IOException .
    */
-  public String writeAttributesFile() throws IOException {
+  public String writeAttributesFile(String file_name, String file_location) throws IOException {
     // Writes a new attribute file based on the current format that we have
     // outlined.
     // Saves it as an R file, with the current date.
@@ -638,13 +638,36 @@ public class Attributes {
       gpuAcceleration = "TRUE";
       changed = true;
     }
+
+    // The file to be created
+    File attributeFile = null;
+    // Adds the date to the file
     Date current = new Date();
     SimpleDateFormat ft = new SimpleDateFormat("yyyy.MM.dd");
-    File attributeFile = new File("Attribute_" + ft.format(current) + "_"
-        + String.valueOf(uniqueAttributeFile()) + ".R");
+
+    // If null, names file for user
+    if (file_name == null) {
+      if (file_location == null) {
+        attributeFile = new File("Attribute_" + ft.format(current) + "_"
+            + String.valueOf(uniqueAttributeFile()) + ".R");
+      } else {
+        file_location = checkSlash(file_location);
+        attributeFile = new File(file_location + "Attribute_" + ft.format(current) + "_"
+            + String.valueOf(uniqueAttributeFile()) + ".R");
+      }
+    } else {
+      // Custom file name set by the user.
+      if (file_location == null) {
+        attributeFile = new File(file_name + ".R");
+      } else {
+        file_location = checkSlash(file_location);
+        attributeFile = new File(file_location + file_name + ".R");
+      }
+    }
     attributeFile.createNewFile();
     final String attFileLocation = attributeFile.getAbsolutePath();
     FileWriter writer = new FileWriter(attributeFile);
+    // The entire attribute file in this format
     writer.write("#########################################################\n");
     writer.write("# Great Lakes Seq package for low-level processing of RNA-Seq data\n");
     writer.write("#########################################################\n");
@@ -713,7 +736,7 @@ public class Attributes {
     writer.write("# It is the actual folder that was created when the run started\n");
     writer.write("previous.dir <- \"" + prevRunDirectory + "\"\n");
     writer.write("#\n");
-    writer.write("# The name of the previous run");
+    writer.write("# The name of the previous run\n");
     writer.write("previous.run.name <- \"" + prevRunName + "\"\n");
     writer.write("#\n");
     writer.write("###############################\n");
@@ -723,11 +746,11 @@ public class Attributes {
     writer.write("# reference genome - the index directory"
         + " for the respective method (RSEM or BWA)\n");
     writer.write("# (must match the name of the  subfolder under base.dir):\n");
-    writer.write("rGenome <- \"" + rereferenceGenome + "\"\n");
+    writer.write("rGenome <- \"" + referenceGenome + "\"\n");
     writer.write("#\n");
     writer.write("# name of the reference fasta"
         + " file (may differ from the base name of the reference -\n");
-    writer.write("# still, it should be located in the folder for the selected feference):\n");
+    writer.write("# still, it should be located in the folder for the selected reference):\n");
     writer.write("refFASTAname <- \"" + referenceFasta + "\"\n");
     writer.write("#\n");
     writer.write("# name of the reference genomic features"
@@ -739,8 +762,8 @@ public class Attributes {
     writer.write("refGFFname <- \"" + referenceGff + "\"\n");
     writer.write("# refGFFname <- \"Novosphingobium_3replicons.Clean.gff\"\n");
     writer.write("#\n");
-    writer.write("# number of the column in GTF file with"
-        + " the gene / other IDs charachter string "
+    writer.write("# number of columns in the GTF file with"
+        + " the gene / other IDs character string "
         + "(9, unless the file is non-standard for some reason):\n");
     writer.write("gtfFeatureColumn <- " + gtfFeatureColumn + "\n");
     writer.write("#\n");
@@ -920,5 +943,49 @@ public class Attributes {
     Random rand = new Random();
     int value = rand.nextInt(10000);
     return value;
+  }
+
+  private String checkSlash(String file_name) {
+    if (file_name.substring(file_name.length() - 1).equals("/")) {
+      return file_name;
+    } else {
+      file_name = file_name + "/";
+      return file_name;
+    }
+  }
+
+  public void returnJson() {
+    System.out.println("{\"attributes\":[");
+    Field[] fields = this.getClass().getDeclaredFields();
+    for (Field field : fields) {
+      try {
+        System.out.println(formatJson(field.getName()));
+      } catch (IllegalArgumentException e) {
+        // Ignore
+      } catch (SecurityException e) {
+        // Ignore
+      }
+    }
+    System.out.println("]}");
+  }
+
+  private String formatJson(String field_name) {
+    String jsonKey = "{\"key\":";
+    AttributesJSON current = Enum.valueOf(AttributesJSON.class, field_name);
+    jsonKey += "\"" + current.name() + "\"";
+    if (current.category != null){
+      jsonKey += ", \"category\":\"" + current.category + "\"";
+    }
+    if (current.options != null){
+      jsonKey += ", \"options\":[" + current.options + "]";
+    }
+    if (current.defaultVal != null){
+      jsonKey += ", \"default\":\"" + current.defaultVal + "\"";
+    }
+    if (current.description != null){
+      jsonKey += ", \"description\":\"" + current.description + "\"";
+    }
+    jsonKey += "}";
+    return jsonKey;
   }
 }

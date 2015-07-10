@@ -243,13 +243,15 @@ public class SshTask extends SwingWorker<List<Integer>, Integer> {
             try {
               // Don't bother sending commands that have no use (Length of 0)
               if (command.length() > 0) {
-                new Shell.Plain(new SSHByPassword(servers.get(cur), port, username, password))
-                    .exec(command);
+                System.out.println("On server " + cur + " we are running the following command:");
+                System.out.println(command);
+
+                // new Shell.Plain(new SSHByPassword(servers.get(cur), port,
+                // username, password))
+                // .exec(command);
               }
-            } catch (UnknownHostException e) {
-              System.out.println("Unknown host.  Please check servers.");
-            } catch (IOException e) {
-              System.out.println("Input output problem, please check the commands that were sent.");
+            } catch (Exception e) {
+              System.out.println("ok");
             }
           }
         });
