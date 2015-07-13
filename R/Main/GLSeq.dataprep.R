@@ -99,7 +99,6 @@ fqFiles.unzip <- NULL
 if (unzipped){
   if (!(is.null(libList))) {
     fqFiles.unzip <- libList
-    print(libList)
   }
 }
 #
@@ -114,10 +113,8 @@ if (!unzipped){
 #
 if (unzipped){  
   if (length(unique(raw.dir)) == 1){
-    if (is.null(libList)){
-      # Now takes either .fq or .fastq
-      fqFiles.unzip <- dir(raw.dir[1])[grep(".fq|fastq", dir(raw.dir[1]))]
-    }
+    # Now takes either .fq or .fastq
+    fqFiles.unzip <- dir(raw.dir[1])[grep(".fq|fastq", dir(raw.dir[1]))]
   }
 }
 #
@@ -361,7 +358,7 @@ for (zz in 1:nStreamsDataPrep) {
         preQC <- paste(fastqcPath, SE.dirtyFname)
         #
         postQC <- paste(fastqcPath, unpaired.fq)
-       # moba
+        # moba
         comm.pool <- paste(comm.pool,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC)
       }
       #
