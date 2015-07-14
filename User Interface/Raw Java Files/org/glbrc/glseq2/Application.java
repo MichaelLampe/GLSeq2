@@ -1,4 +1,4 @@
-package org.glbrc.glseq2;
+package org.glbrc.glseq2.Project_Files;
 
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -90,6 +90,7 @@ public final class Application {
     if (args.length > 0) {
       if (args[0].equals("JSON")) {
         att.returnJson();
+        System.exit(0);
       } else {
         System.out.println("Generating attribute file from command line arguments.");
         att.setAttributes(args);
@@ -118,13 +119,8 @@ public final class Application {
         }
         // Exit program
         System.out.println("Program is now exiting.");
-        //
-        //
-        // Will need to add logic to tell the Glow_Database where this went.
-        //
-        //
+        System.exit(0);
       }
-      return;
     }
     EventQueue.invokeLater(new Runnable() {
       public void run() {
