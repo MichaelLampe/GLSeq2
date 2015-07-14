@@ -1,4 +1,4 @@
-package org.glbrc.glseq2;
+package org.glbrc.glseq2.Project_Files;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                   
@@ -957,9 +957,13 @@ public class Attributes {
   public void returnJson() {
     System.out.println("{\"attributes\":[");
     Field[] fields = this.getClass().getDeclaredFields();
-    for (Field field : fields) {
+    for (int i = 0; i < fields.length; i++) {
       try {
-        System.out.println(formatJson(field.getName()));
+        System.out.print(formatJson(fields[i].getName()));
+        if (i < fields.length - 2){
+          System.out.print(",");
+        }
+        System.out.println("");
       } catch (IllegalArgumentException e) {
         // Ignore
       } catch (SecurityException e) {
@@ -987,5 +991,9 @@ public class Attributes {
     }
     jsonKey += "}";
     return jsonKey;
+  }
+  
+  public int getFieldNumber(){
+    return this.getClass().getDeclaredFields().length;
   }
 }

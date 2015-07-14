@@ -1,4 +1,4 @@
-package org.glbrc.glseq2;
+package org.glbrc.glseq2.Project_Files;
 
 public final class ButtonEnums {
   public enum AttributeButton {

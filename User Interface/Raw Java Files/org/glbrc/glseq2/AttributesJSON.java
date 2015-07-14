@@ -1,6 +1,4 @@
-package org.glbrc.glseq2;
-
-import javax.swing.JCheckBox;
+package org.glbrc.glseq2.Project_Files;
 
 public enum AttributesJSON {
   directory(Category.DATA.name, "The location containing the raw files."), unzipped(
@@ -91,6 +89,8 @@ public enum AttributesJSON {
   public final String defaultVal;
   public final String description;
 
+  public static final int size = AttributesJSON.values().length;
+  
   AttributesJSON(String category, String description) {
     this.category = category;
     this.description = description;
