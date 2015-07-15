@@ -203,10 +203,10 @@ test.copy.preprocessed.files <- function() {
   checkException(copy.preprocessed.files(NULL,NULL),"Arguments should not be NULL")
 }
 
-test.convert.file.list.to.table  <- function(){
-  checkException(copy.preprocessed.files(NULL,"a"),"Arguments should not be NULL")
-  checkException(copy.preprocessed.files(TRUE,NULL),"Arguments should not be NULL")
-  checkException(copy.preprocessed.files(NULL,NULL),"Arguments should not be NULL")
+test.convert.file.list.to.table <- function(){
+  checkException(convert.file.list.to.table(NULL,"a"),"Arguments should not be NULL")
+  checkException(convert.file.list.to.table(TRUE,NULL),"Arguments should not be NULL")
+  checkException(convert.file.list.to.table(NULL,NULL),"Arguments should not be NULL")
 }
 
 test.find.files.for.dataprep <- function(){
