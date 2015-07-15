@@ -16,66 +16,11 @@
 #
 args <- commandArgs(trailingOnly = TRUE)
 text.add <- as.character(args[1])
-attrPath <- as.character(args[2])
-source("GLSeq.Util.R")
+dest.dir <- as.character(args[2])
+attrPath <- as.character(args[3])
 source(attrPath)
+source("GLSeq.Dataprep.Functions.R")
 #
-###########################
-# loading variables for the current run (from the current directory) 
-###########################
-#
-currentRun.dataFile <- paste("GLSeq.vars.", text.add, ".rda", sep="")
-load(currentRun.dataFile) # loads all parameters for the run with the runID indicated in the text.add object
-#
-################################################################################
-##################### PROCESS COMPRESSED FASTQ FILES ###########################
-################################################################################
-# Routine for compressed (".gz") fastq files, paired-end sequencing and 
-# concatenated (1-st and 2-nd reads pooled) FASTQ files,  
-# i.e. current situation in GLBRC/JGI for both E.coli and yeast data (April 2013);
-# with appearence of new data types, respective data preparation blocks will 
-# be added as needed
-################################################################################
-# 
-###########################
-# assembling Trimmomatic system commands: 
-###########################
-#
-if (paired.end) {
-  trimAssemble <- function(leftDirtyName, rightDirtyName, trimPath, qScore, headcrop=12, artifactsFile) {
-    #
-    dashqScore <- paste("-", qScore, sep="")
-    #
-    logName <- paste(leftDirtyName, "pairedtrim.log", sep=".")
-    #
-    pairedTrimmed.1 <- paste("p", leftDirtyName, sep=".")
-    unpairedTrimmed.1 <- paste("u",  leftDirtyName, sep=".")
-    #
-    pairedTrimmed.2 <- paste("p",  rightDirtyName, sep=".")
-    unpairedTrimmed.2 <- paste("u", rightDirtyName, sep=".") 
-    #
-    trimParam <- paste("ILLUMINACLIP:", artifactsFile, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
-    tcomm <- paste("java -jar", trimPath, "PE -threads 20", dashqScore, "-trimlog", logName, leftDirtyName, rightDirtyName, pairedTrimmed.1, unpairedTrimmed.1, pairedTrimmed.2, unpairedTrimmed.2, trimParam)
-    # Return
-    tcomm
-  }
-}
-#
-###########################
-# With single-end libraries, Trimmomatic commands are shorter.
-# Let's keep 'p' prefix for the trimmed .fq files for consistency
-###########################
-#
-if (!(paired.end)) {
-  trimAssemble <- function(leftDirtyName, trimPath, qScore, headcrop=12, artifactsFile) {
-    dashqScore <- paste("-", qScore, sep="")
-    logName <- paste(leftDirtyName, "pairedtrim.log", sep=".")
-    pairedTrimmed.1 <- paste("p", leftDirtyName, "fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
-    trimParam <- paste("ILLUMINACLIP:", artifactsFile, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
-    tcomm <- paste("java -jar", trimPath, "SE -threads 20", dashqScore, "-trimlog", logName, leftDirtyName,  pairedTrimmed.1, trimParam)
-    tcomm
-  }
-}
 ###########################
 setwd(dest.dir)
 ###########################
@@ -85,294 +30,123 @@ files2watch.dataprep <- NULL
 fqFiles.zip <- NULL
 fqFiles.unzip <- NULL
 ###########################
-#
-#
-#
-################################################################################
-##################### GETTING COMPRESSED FQ FILE LIST ##########################
-################################################################################
-#
-###########################
-# 1) Using supplied list of raw files (planned to be the standard way): 
-###########################
-#
+load.dataFile(text.add)
+
+# Grab the files
 if (unzipped){
-  if (!(is.null(libList))) {
-    fqFiles.unzip <- libList
-  }
+  fqFiles.unzip <- get.files.unzipped(raw.dir)
+  fqFiles <- prepare.unzipped.file.names(fqFiles.unzip)
 }
-#
 if (!unzipped){
-  if (!(is.null(libList))) fqFiles.zip <- libList
-}
-#
-###########################
-# 2) All the raw files are in the same directory 
-# and the list of files is not explicitly supplied (the situation we had before introducing a route of communication with CBDB): 
-###########################
-#
-if (unzipped){  
-  if (length(unique(raw.dir)) == 1){
-    # Now takes either .fq or .fastq
-    fqFiles.unzip <- dir(raw.dir[1])[grep(".fq|fastq", dir(raw.dir[1]))]
-  }
+  fqFiles.zip <- get.files.zipped(raw.dir)
+  fqFiles <- prepare.zipped.file.names(fqFiles.zip)
 }
 #
 #
-if (!unzipped){
-  if (length(unique(raw.dir)) == 1 & is.null(libList))  fqFiles.zip <- dir(raw.dir[1])[grep("fq.gz|fastq.gz", dir(raw.dir[1]))]
+#
+check.ifFiles(fqFiles.zip,fqFiles.unzip)
+#
+# Check the values of two variables.
+presplit <- check.presplit(paired.end,presplit)
+nStreamsDataPrep <- check.nStreamsDataPrep(fqFiles,nStreamsDataPrep)
+#
+# Chunk the files into segments to be run in parallel.
+#
+# Note: This is a safe operation, nStreamsDataPrep can exceed the number
+# of files and not cause a crash (It is checked above and within the function so it is modular, but explicit also)
+if (presplit){
+  rangelist.Dataprep <- chunk.data.files.presplit(fqFiles,nStreamDataPrep)
 }
-#
-############################
-# If fqFiles.zip and fqFiles.unzip vectors are still empty for some reason:
-# Kill program with error
-###########################
-#
-if (is.null(fqFiles.zip) && is.null(fqFiles.unzip)) stop("Please check the list of raw FASTQ files and the contents of the raw directory \n Please remember that files must be in .fq or .fq.gz format \n")
-#
-###########################
-# Names of the respective uncompressed FASTQ files (to be generated): 
-# Takes whole file name minus the ''.fq.gz' or '.fq' endings
-###########################
-#
-if (unzipped){
-  # Assumes the file is in the format of {name}_#.fq (Presplit) OR {name}_fq
-  # Thus, the file example.1.fq along with its pair of example.2.fq
-  # would become example.1.fq and example.2.fq
-  # and an unsplit file example.fq would become example.fq
-  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-0)
-}
-#
-if (!unzipped){
-  # Assumes file is in the format of {name}_#.fq.gz (Presplit) OR {name}.fq.gz (Unsplit)
-  # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
-  # would become example.1.fq and example.2.fq
-  # and an unsplit file example.fq.gz would become example.fq
-  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-3)
+if (!presplit){
+  rangelist.Dataprep <- chunk.data.files.unsplit(fqFiles.nStreamsDataPrep)
 }
 
-#
-###########################
-# Ranges for data preparation: 
-###########################
-# Special case to push paired end into !presplit group
-# This is to make it so the user doesn't have to care about the presplit command
-# When working with SE data
-#
-if (nStreamsDataPrep > length(fqFiles)) nStreamsDatapPep <- length(fqFiles)
-if (!paired.end) presplit <- FALSE
-chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
-if (presplit) rangelist.Dataprep <- chunk(2*(1:(length(fqFiles)/2)), nStreamsDataPrep)
-if (!presplit) rangelist.Dataprep <- chunk(1:length(fqFiles), nStreamsDataPrep)
-#
+# Copy the artificial.fq file in
+copy.artificial.fq(base.dir,artificial.fq,dest.dir)
+# Construct command to be run.
 for (zz in 1:nStreamsDataPrep) {
   if (zz==1) comm.pool <- "date"
   if (zz!=1) comm.pool <- paste(comm.pool,"date")
-  #
-  ############################################################################################################
-  ######################################## UNSPLIT PRESPLIT FILES ############################################
-  ############################################################################################################
-  #
-  # These are zipped or unzipped files created
-  # From paired-end jobs that have already been
-  # Divided into two files
-  #
-  if (presplit){
-    for (j in rangelist.Dataprep[[zz]]) {
-      copy.comm <- "date"
+  for (j in rangelist.Dataprep[[zz]]) {
+    #
+    # GENERAL PROCESS
+    #
+    # Constructs a command to copy over a file.
+    if (unzipped){
+      copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.unzip[j],dest.dir))
       #
-      if (j==2) copy.comm <- paste(copy.comm,"&&","cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-      ###########################
-      # Copy and Unzip files (If necessary)
-      ###########################
-      #
-      # Gunzip is what does the unzipping, just use cp to copy.
-      #
-      if (unzipped){
-        copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.unzip[j-1],sep=""),dest.dir,";","cp",paste(raw.dir,fqFiles.unzip[j],sep=""),dest.dir)
+      if(presplit){
+        # Makes sure both are copied over in the same command so there is not a parallelization issue here.
+        copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.unzip[j+1],dest.dir))
       }
-      if(!unzipped){
-        copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.zip[j-1],sep=""),dest.dir,";","cp",paste(raw.dir,fqFiles.zip[j],sep=""),dest.dir)
-        gunzip.comm <- paste("gunzip", fqFiles.zip[j-1],";","gunzip",fqFiles.zip[j])
-      }
-      fqFile.base <- fqFiles
-      first.read.filename <- paste(fqFile.base[j-1], ".fq", sep="")
-      second.read.filename <- paste(fqFile.base[j], ".fq", sep="")
-      #
-      ###########################
-      # Trimming Reads
-      ###########################
-      #
-      if (readTrim) {
-        leftDirtyFname <-  paste("dirty.", fqFile.base[j-1], ".fq", sep="")
-        rightDirtyFname <-  paste("dirty.", fqFile.base[j], ".fq", sep="")
-        pairedTrimmed.1 <-  paste("p.", fqFile.base[j-1], ".fq", sep="")
-        pairedTrimmed.2 <- paste("p.", fqFile.base[j], ".fq", sep="")
-        trimCommand <- trimAssemble(first.read.filename, second.read.filename, trimPath, qScores, trimhead, artificial.fq)
-        fileShuffle <- paste("mv", first.read.filename, leftDirtyFname, "&&", "mv", second.read.filename, rightDirtyFname, "&&", "mv", pairedTrimmed.1, first.read.filename, "&&", "mv", pairedTrimmed.2, second.read.filename)
-        preQC <- paste(fastqcPath, leftDirtyFname, rightDirtyFname)
-        postQC <- paste(fastqcPath, first.read.filename, second.read.filename)
-      }
-      #
-      if (!readTrim){
-        preQC <- paste(fastqcPath, first.read.filename, second.read.filename)
-      }
-      #
-      ###########################
-      # Construct Command Stack
-      ###########################
-      # Put these in order
-      #
-      comm.pool <- paste(comm.pool,"&&",copy.comm)
-      if (!unzipped) comm.pool <- paste(comm.pool,"&&",gunzip.comm)
-      if (readTrim) comm.pool <- paste(comm.pool,"&&",trimCommand,"&&",fileShuffle)
-      comm.pool <- paste(comm.pool,"&&",preQC)
-      if(readTrim) comm.pool <- paste(comm.pool,"&&",postQC)
-      comm.pool <- paste(comm.pool)
     }
-  }
-  #
-  ############################################################################################################
-  #################################### UNSPLIT PAIRED-END FILES ##############################################
-  ############################################################################################################
-  #
-  # These are zipped or unzipped files created
-  # From paired-end jobs that will be split into two
-  # And then processed accordingly
-  #
-  if (!presplit && paired.end){
-    for (j in rangelist.Dataprep[[zz]]) {
-      copy.comm <- "date"
+    if (!unzipped){
+      # Constructs a command to unzip .gz zipped files.
+      copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.zip[j],dest.dir))
+      copy.comm <- paste(copy.comm,"&&",unzip.gz.files(fqFile.zip[j]))
       #
-      ####################
-      # UNZIPPED
-      ####################
-      if (unzipped){
-        if (j==1){
-          copy.comm <- paste(copy.comm,"&&","cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-          copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.unzip[j],sep=""),dest.dir)
-        }
-        if (j!=1) copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.unzip[j],sep=""),dest.dir)
+      if(presplit){
+        # Makes sure both are copied over in the same command so there is not a parallelization issue here.
+        copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.zip[j+1],dest.dir))
+        copy.comm <- paste(copy.comm,"&&",unzip.gz.files(fqFile.zip[j+1]))
       }
-      #
-      ####################
-      # ZIPPED
-      ####################
-      if (!unzipped){
-        if (j==1){
-          copy.comm <- paste(copy.comm,"&&","cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-          copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.zip[j],sep=""),dest.dir)
-        }
-        if (j!=1) copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.zip[j],sep=""),dest.dir)
-        gunzip.comm <- paste("gunzip",fqFiles.zip[j])
-        copy.comm <- paste(copy.comm,"&&",gunzip.comm)
-      }
-      #
-      fqFile.base <- fqFiles
-      first.read.filename <- paste(fqFile.base[j], ".1.fq", sep="")
-      second.read.filename <- paste(fqFile.base[j], ".2.fq", sep="")
-      #
-      ##################
-      # SPLITTING
-      ##################
-      # (The ruby code incorporated into the line above was adapted from SeqAnsweres forum (seqanswers.com))
-      split.comm <- paste("cat ", dest.dir, fqFiles[j], " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[1234]/; @i = 0 if @i == 8' > ", first.read.filename, " && cat ",   dest.dir, fqFiles[j], " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[5678]/; @i = 0 if @i == 8' > ", second.read.filename, sep="")
-      #
-      ##################
-      # READ TRIM
-      ##################
-      if (readTrim) {
-        leftDirtyFname <-  paste("dirty.", fqFile.base[j], ".1.fq", sep="")
-        rightDirtyFname <-  paste("dirty.", fqFile.base[j], ".2.fq", sep="")
-        pairedTrimmed.1 <-  paste("p.", fqFile.base[j], ".1.fq", sep="")
-        pairedTrimmed.2 <- paste("p.", fqFile.base[j], ".2.fq", sep="")
-        #
-        trimCommand <- trimAssemble(first.read.filename, second.read.filename, trimPath, qScores, trimhead, artificial.fq)
-        #
-        fileShuffle <- paste("mv", first.read.filename, leftDirtyFname, " && ", "mv", second.read.filename, rightDirtyFname, " && ", "mv", pairedTrimmed.1, first.read.filename, " && ", "mv", pairedTrimmed.2, second.read.filename)
-        #
-        preQC <- paste(fastqcPath, leftDirtyFname, rightDirtyFname)
-        #
-        postQC <- paste(fastqcPath, first.read.filename, second.read.filename)
-        #
-        comm.pool <- paste(comm.pool,"&&",copy.comm,"&&",split.comm,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC)
-      }
-      #
-      ##################
-      # NO READ TRIM
-      ##################
-      if (!readTrim){
-        preQC <- paste(fastqcPath, first.read.filename, second.read.filename)
-        comm.pool <- paste(comm.pool,"&&",copy.comm,"&&",split.comm,"&&",preQC)
-      }  
     }
-  }
-  ############################################################################################################
-  ######################################## SINGLE ENDED FILES ################################################
-  ############################################################################################################
-  #
-  if(!paired.end){
-    for (j in rangelist.Dataprep[[zz]]) {
-      copy.comm <- "date"
+    comm.pool <- paste(comm.pool,"&&",copy.comm)
+    #
+    # Paired Ended Files
+    #
+    if (paired.end){
       #
-      #
-      ####################
-      # UNZIPPED
-      ####################
-      if (unzipped){
-        if (j==1) {
-          copy.comm <- paste(copy.comm,"&&","cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-          copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.unzip[j],sep=""),dest.dir)
-        }
-        if (j!=1) copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.unzip[j],sep=""),dest.dir)
-        comm.pool <- paste(comm.pool,"&&",copy.comm)
-        fqFile.base <- fqFiles
+      # Unsplit
+      if (!presplit){
+        # Add to command pool
+        comm.pool <- paste(comm.pool,"&&",split.unsplit.files.PE(dest.dir,fqFile[j]))
       }
-      #
-      ####################
-      # ZIPPED
-      ####################
-      if (!unzipped){
-        if (j==1) {
-          copy.comm <- paste(copy.comm,"&&","cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-          copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.zip[j],sep=""),dest.dir)
-        }
-        if (j!=1) copy.comm <- paste(copy.comm,"&&","cp",paste(raw.dir,fqFiles.zip[j],sep=""),dest.dir)
-        gunzip.comm <- paste("gunzip",fqFiles.zip[j])
-        comm.pool <- paste(comm.pool,"&&",copy.comm,"&&",gunzip.comm)
-        fqFile.base <- fqFiles
-      }
-      #
-      ####################
-      # Trimming
-      ####################
-      if(readTrim){
-        unpaired.fq <- paste(fqFile.base[j], ".fq", sep="")
-        SE.dirtyFname <-  paste("dirty.", fqFile.base[j],".fq", sep="")
-        SE.trimmedFname <-  paste("p.", unpaired.fq,".fq",sep="")
-        #
-        trimCommand <- trimAssemble(unpaired.fq, trimPath, qScores, trimhead, artificial.fq)
-        #
-        fileShuffle <- paste("mv", unpaired.fq, SE.dirtyFname, " && ",  "mv", SE.trimmedFname, unpaired.fq)
-        #
-        preQC <- paste(fastqcPath, SE.dirtyFname)
-        #
-        postQC <- paste(fastqcPath, unpaired.fq)
-        # moba
-        comm.pool <- paste(comm.pool,"&&",trimCommand,"&&",fileShuffle,"&&",preQC,"&&",postQC)
-      }
-      #
-      ####################
-      # Not Trimming
-      ####################
-      if (!readTrim){
-        unpaired.fq <- paste(fqFile.base[j], ".fq", sep="") 
-        preQC <- paste(fastqcPath, unpaired.fq)
+      if (readTrim){
+        # The trim command
+        trimCommand <- trimAssemble.PE(fqFile[j], trimPath, qScores, trimhead, artificial.fq)
+        comm.pool <- paste(comm.pool,"&&",trimCommand)
+        # Modifies the names of a few files to retain naming
+        file.shuffle <- file.shuffle.PE(fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",file.shuffle)
+        # Quality control check via Fastqc of dirty file
+        preQC <- preQualityCheck.PE(fastqcPath,fqFile[j])
         comm.pool <- paste(comm.pool,"&&",preQC)
+        # Quality control check via Fastqc of result files
+        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",postQC) 
+      }
+      if (!readTrim){
+        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",postQC) 
+      }
+      if(presplit){
+        # Move onto the next set of pairs if presplit data.
+        j = j + 1
       }
     }
-    comm.pool <- paste(comm.pool,"&")
+    if (!paired.end){
+      if (readTrim){
+        # The trim command
+        trimCommand <- trimAssemble.SE(fqFile[j], trimPath, qScores, trimhead, artificial.fq)
+        comm.pool <- paste(comm.pool,"&&",trimCommand)
+        # Modifies the names of a few files to retain naming
+        file.shuffle <- file.shuffle.PE(fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",file.shuffle)
+        # Quality control check via Fastqc of dirty file
+        preQC <- preQualityCheck.PE(fastqcPath,fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",preQC)
+        # Quality control check via Fastqc of result files
+        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",postQC) 
+      }
+      if (!readTrim){
+        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
+        comm.pool <- paste(comm.pool,"&&",postQC) 
+      }
+    }
   }
+  comm.pool <- paste(comm.pool,"&")
 }
 dataReady.signal <- paste("echo > ", text.add, ".DataReady", sep="") 
 comm.pool <- paste(comm.pool,"wait","&&",dataReady.signal)
