@@ -57,26 +57,16 @@ test.instantiate.logs <- function(){
 test.create.run.directory <- function(){
   # Function takes in two args
   # Dest.dir = The destination directory of the folder
-  # (Optional) = Log.file location
   checkEquals("mkdir /home/",create.run.directory("/home/"))
-  checkEquals("mkdir /home/",create.run.directory("/home/"))
-  checkEquals("mkdir /home/",create.run.directory("/home/","ok"))
-  checkEquals("mkdir /home/",create.run.directory("/home/","ok"))
-  checkEquals("mkdir /home/",create.run.directory("/home/",NULL))
-  checkEquals("mkdir /home/",create.run.directory("/home/",NULL))
+  checkEquals("mkdir /home/",create.run.directory("/home"))
   checkException(create.run.directory(NULL),"Arguments should not be NULL")
 }
 
 test.create.log.directory <- function(){
   # Function takes in two args
   # DestDirLog = Log directory
-  # (Optional) = Log file location
   checkEquals("mkdir /home/",create.run.directory("/home/"))
-  checkEquals("mkdir /home/",create.run.directory("/home/"))
-  checkEquals("mkdir /home/",create.run.directory("/home/","ok"))
-  checkEquals("mkdir /home/",create.run.directory("/home/","ok"))
-  checkEquals("mkdir /home/",create.run.directory("/home/",NULL))
-  checkEquals("mkdir /home/",create.run.directory("/home/",NULL))
+  checkEquals("mkdir /home/",create.run.directory("/home"))
   checkException(create.run.directory(NULL),"Arguments should not be NULL")
 }
 

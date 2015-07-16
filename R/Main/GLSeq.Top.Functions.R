@@ -1,12 +1,4 @@
-source("../Main/GLSeq.Util.R")
-
-create.rda <- function(base.dir,expID) {
-  earlierResults <- dir(base.dir)
-  earlierResults <- earlierResults[grep(".rda", earlierResults)]
-  earlierResults <- earlierResults[grep(expID, earlierResults)]
-  runAttempt <- length(earlierResults) + 1
-  runAttempt <- formatC(runAttempt, width=4, flag="0") # Width of 4 was used after a bug was found, 4 should mean no one ever needs to worry about this.
-}
+source("GLSeq.Util.R")
 
 create.text.add <- function(expID,runAttempt) {
   if(is.null(expID) || is.null(runAttempt)) stop("Arguments should not be NULL")
@@ -17,9 +9,7 @@ create.text.add <- function(expID,runAttempt) {
   text.add <- paste(expID, runAttempt, sep=".")
   text.add
 }
-
 # Destination directory for the processed files (if no connection to DB performed):
-
 create.dest.dir <- function(dest.dir.base,text.add){
   if(is.null(dest.dir.base) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir.base <- trailDirCheck(dest.dir.base)
@@ -27,7 +17,6 @@ create.dest.dir <- function(dest.dir.base,text.add){
   dest.dir <- trailDirCheck(dest.dir)
   dest.dir
 }
-
 # Destination directory for log /stat files:
 create.dest.dir.log <- function(dest.dir,text.add){
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
@@ -35,7 +24,6 @@ create.dest.dir.log <- function(dest.dir,text.add){
   destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="")
   destDirLog
 }
-
 add.basic.logs <- function(log.file=NULL){
   if(is.null(log.file)) stop("Log file is null")
   add.to.logs(paste("PREPARING DATA:",dataPrepare),log.file)
@@ -64,9 +52,7 @@ add.basic.logs <- function(log.file=NULL){
   add.to.logs(paste("Counting Algorithm(s):",HTSeq,FeatureCounts,RSEM),log.file)
   add.to.logs("################## END OF ATTRIBUTE OPTIONS ##################",log.file)
 }
-
 instantiate.logs <- function(dest.dir,text.add,destDirTest=NULL){
-  #
   # Creates a log file
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   log.file <- NULL
@@ -84,36 +70,26 @@ instantiate.logs <- function(dest.dir,text.add,destDirTest=NULL){
     create.log.file <- paste("echo \"RUN LOG FILE\"",">",log.file)
     try(system(create.log.file))
   }
-  #
   # Handle each case individually in case we end up reworking these more
-  #
   try(add.basic.logs(log.file))
   log.file
 }
-
-
-
-create.run.directory <- function(dest.dir,log.file=NULL) {
+create.run.directory <- function(dest.dir) {
   if(is.null(dest.dir)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
-  add.to.logs("################## Creating directories for the run ##################",log.file)
   destDir.create <- paste("mkdir ", dest.dir, sep="")
-  add.to.logs(destDir.create,log.file)
   try(system(destDir.create))
   #
   # Returns command for unit tests
   destDir.create
 }
-
-create.log.directory <- function(destDirLog,log.file=NULL){
+create.log.directory <- function(destDirLog){
   if(is.null(destDirLog)) stop("Arguments should not be NULL")
   destDirLog <- trailDirCheck(destDirLog)
-  destDirLog.create <- paste("mkdir ", destDirLog, sep="")
-  add.to.logs(destDirLog.create,log.file)
+  destDirLog.create <- paste("mkdir", destDirLog)
   try(system(destDirLog.create))
   destDirLog.create
 }
-
 create.HtSeq.folder <- function (dest.dir, text.add,log.file=NULL){
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
@@ -124,7 +100,6 @@ create.HtSeq.folder <- function (dest.dir, text.add,log.file=NULL){
   try(system(destDirHTSeqCount.create))
   destDirHTSeqCount
 }
-
 create.FeatureCounts.folder <- function (dest.dir, text.add,log.file=NULL){
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
@@ -135,7 +110,6 @@ create.FeatureCounts.folder <- function (dest.dir, text.add,log.file=NULL){
   try(system(destDirFeatureCountsCount.create))
   destDirFeatureCountsCount
 }
-
 create.RSEM.folder <- function (dest.dir, text.add,log.file=NULL){
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
@@ -146,7 +120,6 @@ create.RSEM.folder <- function (dest.dir, text.add,log.file=NULL){
   try(system(destDirRSEMCount.create))
   destDirRSEMCount
 }
-
 create.Cufflinks.folder <- function (dest.dir, text.add,log.file=NULL){
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
@@ -157,7 +130,6 @@ create.Cufflinks.folder <- function (dest.dir, text.add,log.file=NULL){
   try(system(destDirCufflinksCount.create))
   destDirCufflinksCount
 }
-
 create.Collect.folder <- function (dest.dir, text.add,log.file=NULL){
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
@@ -168,7 +140,6 @@ create.Collect.folder <- function (dest.dir, text.add,log.file=NULL){
   try(system(collectDir.create))
   collectDir
 }
-
 create.oldRun.Collect.folder <- function(previous.dir,text.add,log.file=NULL){
   if(is.null(previous.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   previous.dir <- trailDirCheck(previous.dir)
@@ -178,9 +149,6 @@ create.oldRun.Collect.folder <- function(previous.dir,text.add,log.file=NULL){
   try(system(collectDir.create))
   collectDir
 }
-
-
-
 copy.attribute.file.to.dest <- function(attrPath,dest.dir,log.file=NULL){
   if(is.null(dest.dir) || is.null(attrPath)) stop("Arguments should not be NULL")
   add.to.logs("################## Copying attribute file for this run into destination folder ##################",log.file)
@@ -191,23 +159,18 @@ copy.attribute.file.to.dest <- function(attrPath,dest.dir,log.file=NULL){
   # Returns command for unit tests
   copyAttributeFile
 }
-
 create.run.logs <- function(destDirLog,text.add) {
   ###############
   # Log-tail command addition
   ###############
-  #
   runLogFile1 <- paste(destDirLog, text.add, ".runLog1.txt", sep="")
   runLogFile2 <- paste(destDirLog, text.add, ".runLog2.txt", sep="")
-  #
   runErrFile1 <- paste(destDirLog, text.add, ".runErr1.txt", sep="")
   runErrFile2 <- paste(destDirLog, text.add, ".runErr2.txt", sep="")
 }
-#
 ############################
 # Preparing data file names (ready for expression computation)
 ############################
-# 
 # reusable function for assembly split fastq file names (see below)
 fqfiles.table.pe.assemble <- function(fqfiles.base) {
   if (is.null(fqfiles.base)) stop("Arguments should not be NULL")
@@ -219,11 +182,9 @@ fqfiles.table.pe.assemble <- function(fqfiles.base) {
     fqfiles.table <- rbind(fqfiles.table, c(left.fq, right.fq)) }
   fqfiles.table
 }
-#
 ##########################################################################
 ########################## NO DATA PREP ##################################
 ##########################################################################
-###########
 rename.preprocessed.files <- function(dest.dir){
   # 
   # Rename .fastq files to .fq files
@@ -243,7 +204,6 @@ rename.preprocessed.files <- function(dest.dir){
   # Returns command for unit tests
   rename.command
 }
-
 # Copying the ready-to-process fastq files to the destination directory:
 copy.preprocessed.files <- function(readyData.dir,dest.dir,log.file=NULL) {
   if (is.null(readyData.dir) || is.null(dest.dir)) stop("Arguments should not be NULL")
@@ -269,39 +229,33 @@ copy.preprocessed.files <- function(readyData.dir,dest.dir,log.file=NULL) {
   # Returns command for unit tests
   readyDataCopy
 }
-
 convert.file.list.to.table <- function(paired.end,dest.dir) {
   if (is.null(paired.end) || is.null(dest.dir)) stop("Arguments should not be NULL")
+  # Paired End
   if (paired.end) {
     fqfiles <- dir(dest.dir) 
-    fqfiles <- fqfiles[grep(".fq", fqfiles)]
+    fqfiles <- fqfiles[grep(".fq$", fqfiles)]
     fqfiles.base <- substr(fqfiles, 1,nchar(fqfiles) - 5)
     fqfiles.base <- unique(fqfiles.base)
-    # table of pairs of FASTQ file names (1 pair per row):
-    # we assemble left and right file names explicitly here because 
-    # we don't want to rely on file sequence in the directory and get wrong results if there are occasional unpaired files etc. 
-    #
-    # assemble function for paired-end libraries:
+    # Table of pairs of FASTQ file names (1 pair per row):
+    # We assemble left and right file names explicitly here because 
+    # We don't want to rely on file sequence in the directory and get wrong results if there are occasional unpaired files etc. 
+    # Assemble function for paired-end libraries:
     fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
-  } # if paired-end
-  #
-  # for single-ended libraries: 
+  }
+  # Single End
   if (!(paired.end)) {
-    fqfiles <- dir(dest.dir) 
-    fqfiles <- fqfiles[grep(".fq", fqfiles)]
-    fqfiles.table <- cbind(NULL, fqfiles) 
+    fqfiles <- dir(dest.dir)
+    fqfiles <- fqfiles[grep(".fq$", fqfiles)]
+    fqfiles.table <- cbind(NULL, fqfiles)
   }
   fqfiles.table
 }
-
 ##########################################################################
 ########################## DATA PREP #####################################
 ##########################################################################
-####### 
 # If the data needs to be processed all the way
 # from the compressed archives in the raw directory
-######
-#
 find.files.for.dataprep <- function(raw.dir,unzipped,log.file=NULL){
   if (is.null(raw.dir) || is.null(unzipped)) stop("Arguments should not be NULL")
   ##############
@@ -312,7 +266,6 @@ find.files.for.dataprep <- function(raw.dir,unzipped,log.file=NULL){
     ############ NO UPDATE #################
     ########################################
     # Raw Directory of files supplied 
-    #
     gzfiles <- dir(raw.dir)
     fqfiles <- dir(raw.dir)
     if (!unzipped) {
@@ -322,7 +275,6 @@ find.files.for.dataprep <- function(raw.dir,unzipped,log.file=NULL){
       if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
       fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
     }
-    #
     if (unzipped) {
       add.to.logs("################## Finding unzipped files to prepare ##################",log.file)
       fqfiles <- fqfiles[grep(".fq|.fastq",fqfiles)]
@@ -332,7 +284,6 @@ find.files.for.dataprep <- function(raw.dir,unzipped,log.file=NULL){
     }
     fqfiles.table
   }
-  #
   ##############
   # Single End
   ##############
@@ -356,11 +307,9 @@ find.files.for.dataprep <- function(raw.dir,unzipped,log.file=NULL){
     fqfiles.table
   }
 }
-#
 ##########################################################################
 ########################## RANGES OF DATA ################################
 ##########################################################################
-#
 prepare.chunk.function <- function(fqfiles.table,nStreams){
   if (is.null(fqfiles.table) || is.null(nStreams)) stop("Arguments should not be NULL")
   nStreams <- check.nStreams(fqfiles.table,nStreams)
@@ -375,18 +324,15 @@ check.nStreams <- function(fqfiles.table,nStreams){
   if (nStreams > nrow(fqfiles.table)) nStreams <- nrow(fqfiles.table) # quiet and nice solution but there will de descrepancy between nStreams in the attribute file and the actual nStreams
   nStreams
 }
-#
 ##########################################################################
 ###################### EXPRESSION QUANTIFICATION #########################
 ##########################################################################
-# 
 # Some alignments have special case commands which need to be handled
 # This will allow for that to be done in the top script
 #
 # This special case is to facilitate CUSHAW-GPU which processes data
 # A bit differently then all the other alignment protocols
 # Doesn't run the Alignment if no expresion calculation is desired
-#
 start.alignment.process <- function(base.dir,rangelist,nStreams,log.file=NULL){
   add.to.logs(rangelist,log.file)
   setwd(base.dir)
@@ -397,9 +343,6 @@ start.alignment.process <- function(base.dir,rangelist,nStreams,log.file=NULL){
   # RETURNS THE COMM STACK
   comm.stack.pool
 }
-
-
-
 start.counting.process <- function(countable.sams.dir,dest.dir,base.dir,log.file=NULL){
   add.to.logs(paste("Starting counting:", fqfiles.table),log.file)
   #
@@ -424,24 +367,16 @@ start.counting.process <- function(countable.sams.dir,dest.dir,base.dir,log.file
   comm.stack.pool
 }
 #
-
-
-
 RSEM.finish <- function(comm.stack.pool,destDirRSEMCount,dest.dir) {
   if (is.null(comm.stack.pool) || is.null(destDirRSEMCount) || is.null(dest.dir)) stop("Arguments should not be NULL")
     destDirRSEMCount <- trailDirCheck(destDirRSEMCount)
     dest.dir <- trailDirCheck(dest.dir)
     comm.stack.pool <- paste(comm.stack.pool,"wait")
     comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir,"&&","mv",paste("*.RSEM.counts.*"),destDirRSEMCount)
-    comm.stack.pool <- paste(comm.stack.pool,"&&","mv","*.index.*",destDirRSEMCount)
-    
+    comm.stack.pool <- paste(comm.stack.pool,"&&","mv","*.index.*",destDirRSEMCount)   
     # RETURNS THE COMM STACK
     comm.stack.pool
 }
-
-
-
-
 ##########################################################################
 ####################### SAVE RUN VARIABLES ###############################
 ##########################################################################
@@ -461,20 +396,17 @@ save.run.data <- function(base.dir,text.add) {
   # Returns file name
 }
 #
-#
-
 ##########################################################################
 ####################### PREPARE DATA #####################################
 ##########################################################################
 run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir){
   if (is.null(destDirLog) || is.null(text.add) || is.null(attrPath) || is.null(dest.dir)) stop("Arguments should not be NULL")
   destDirLog <- trailDirCheck(destDirLog)
-  dest.dir <- trailDircheck(dest.dir)
-  
+  dest.dir <- trailDirCheck(dest.dir) 
   Sys.sleep(10) 
   dataPrepLog <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")
   dataPrepErr <- paste(destDirLog, text.add, ".DataPrepErr.txt", sep="")
-  dataPrep <- paste("Rscript GLSeq.dataprep.R ", text.add," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="") 
+  dataPrep <- paste("Rscript GLSeq.dataprep.R ", text.add," ",dest.dir," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="") 
   print("Starting Data Preparation")
   system(dataPrep)
   #
@@ -488,19 +420,13 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir){
     DataIsWaiting <- FALSE 
   }
   dataReady.ind <- paste(text.add, ".DataReady", sep="") 
-  # 
   # Waiting
-  #
   while(!(DataIsWaiting)) {
     Sys.sleep(21)
     DataIsWaiting <- dataReady.ind %in% dir(dest.dir)
   }
   if (DataIsWaiting) print("Data Preparation Complete")
 }
-#
-
-
-
 ##########################################################################
 #################### EXPRESSION CALCULATION ##############################
 ##########################################################################
@@ -515,10 +441,6 @@ cushaw.gpu.run <- function (Cushawgpu.special.case,log.file=NULL) {
   #
   warning("The alignment step has now completed.")
 }
-
-
-
-
 execute.comm.stack <- function (comm.stack.pool, log.file=NULL) {
   if (is.null(comm.stack.pool)) stop("Arguments should not be NULL")
   add.to.logs("################## Executing communication script ##################",log.file)
@@ -535,20 +457,11 @@ execute.comm.stack <- function (comm.stack.pool, log.file=NULL) {
     add.to.logs("Communication script exited with a failure message.",log.file)
   }
 }
-
-
-
-
-
-
-
-
 #
 ###########################################################################
 ###################### COLLECT ############################################
 ###########################################################################
 #
-
 previous.run.directories <- function(previous.dir,previous.run.name){
   if (is.null(previous.dir) || is.null(previous.run.name)) stop("Arguments should not be NULL")
   dest.dir <- previous.dir
@@ -576,10 +489,6 @@ previous.run.RSEM <- function(previous.dir,previous.run.name){
   destDirRSEMCount <-  paste(dest.dir,previous.run.name,".RSEM.counting/", sep="")
   destDirRSEMCount
 }
-
-
-
-
 collect.counted.results <- function() {
   setwd(base.dir)
   add.to.logs("################## Starting Results Collection ##################",log.file)
