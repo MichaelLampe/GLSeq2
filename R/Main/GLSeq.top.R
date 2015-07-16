@@ -26,8 +26,6 @@ updateFromDb <- as.character(args[1])
 #
 #
 #
-#
-#
 # prepare data from fastq.gz files? (if not, the split and ready fastq files must be already in the dest.dir)
 # values: "dataprep", "nodataprep"
 dataPrepare <- as.character(args[2])
@@ -87,7 +85,6 @@ runDate <- gsub(":", "_", runDate)
 ###########
 # Create general files and folders.
 ###########
-create.rda(base.dir,expID)
 # Checks the directories
 dest.dir.base <- trailDirCheck(dest.dir.base)
 base.dir <- trailDirCheck(base.dir)
@@ -99,28 +96,16 @@ base.dir <- trailDirCheck(base.dir)
 
 # Create the destination directory
 dest.dir <- create.dest.dir(dest.dir.base, text.add)
-# Create destinatino directory for log/ stat files
-
+create.run.directory(dest.dir)
+# Create destination directory for log/ stat files
 destDirLog <- create.dest.dir.log(dest.dir,text.add)
+create.log.directory(destDirLog)
+log.file <- instantiate.logs(dest.dir,text.add,destDirTest)
 
 # Raw directory name with guaranteed trailing slash: 
 if (!is.null(raw.dir)) raw.dir <- trailDirCheck(raw.dir)
 if (!is.null(readyData.dir)) readyData.dir <- trailDirCheck(readyData.dir)
 if (!is.null(picardToolsPath)) picardToolsPath <- trailDirCheck(picardToolsPath)
-
-
-
-dest.dir.base <- trailDirCheck(dest.dir.base) # may be redundant; still, fixed an error
-# base directory name with guaranteed trailing slash: 
-base.dir <- trailDirCheck(base.dir)
-
-log.file <- instantiate.logs(destDirTest,text.add,dest.dir)
-
-if (!is.null(destDirLog)){
-  create.log.directory()
-}
-
-create.run.directory(dest.dir,log.file)
 
 if (alignment == "alignment" || counting == "counting"){
   #
@@ -154,59 +139,43 @@ create.run.logs(destDirLog,text.add)
 ###########
 # Prepare raw data
 ###########
-if (dataPrepare == "dataprep"){
+if (dataPrepare == "dataprep") {
   find.files.for.dataprep(raw.dir,unzipped,log.file)
   run.data.prep(destDirLog,text.add,attrPath,dest.dir)
 }
 
-
-if (dataPrepare == "nodataprep"){
-  
-  # Construct alignment + counting comm stack
-  if (alignment == "alignment"){
-    copy.preprocessed.files(readyData.dir,dest.dir,log.file=NULL)  
-    fqfiles.table <- convert.file.list.to.table(paired.end,dest.dir)
-    nStreams <- check.nStreams(fqfiles.table,nStreams)
-    rangelist <- prepare.chunk.function(fqfiles.table,nStreams)
-    comm.stack.pool <- start.alignment.process(base.dir,rangelist,nStreams,log.file)
+# Construct alignment + counting comm stack
+if (alignment == "alignment") {
+  if (dataPrepare == "nodataprep") {
+    copy.preprocessed.files(readyData.dir,dest.dir,log.file=NULL) 
   }
-  
-  
-  if (alignment == "noalignment"){
-    
-    # If only counting, construct counting comm stack
-    if (counting == "counting"){
-      comm.stack.pool <- start.counting.process(countable.sams.dir,dest.dir,base.dir,log.file=NULL)
-    }
-    
-    if (counting == "nocounting"){
-      destDirFeatureCountsCount <- previous.run.FeatureCounts(previous.dir,previous.run.name)
-      destDirHTSeqCount <- previous.run.HTSeq(previous.dir,previous.run.name)
-      destDirRSEMCount <-previous.run.RSEM(previous.dir,previous.run.name)
-    }
-  }
-  
-  if (counting == "counting"){
-    if ("RSEM" %in% cAlgor){
-      RSEM.finish(comm.stack.pool,destDirRSEMCount,dest.dir)
-    }
-  }
-  save.run.data(base.dir,text.add)
+  fqfiles.table <- convert.file.list.to.table(paired.end,dest.dir)
+  nStreams <- check.nStreams(fqfiles.table,nStreams)
+  rangelist <- prepare.chunk.function(fqfiles.table,nStreams)
+  comm.stack.pool <- start.alignment.process(base.dir,rangelist,nStreams,log.file)
 }
 
 
-if (dataPrepare == "dataprep"){
-  if (DataIsWaiting){
-    if (GPU.accel && aAlgor == "Cushaw"){
-      cushaw.gpu.run(Cushawgpu.special.case,log.file)
-    } else{
-      comm.stack.pool <- start.alignment.process(base.dir,rangelist,log.file)
-    }
+if (alignment == "noalignment") {
+  # If only counting, construct counting comm stack
+  if (counting == "counting") {
+    comm.stack.pool <- start.counting.process(countable.sams.dir,dest.dir,base.dir,log.file=NULL)
+  }
+  
+  if (counting == "nocounting"){
+    destDirFeatureCountsCount <- previous.run.FeatureCounts(previous.dir,previous.run.name)
+    destDirHTSeqCount <- previous.run.HTSeq(previous.dir,previous.run.name)
+    destDirRSEMCount <-previous.run.RSEM(previous.dir,previous.run.name)
   }
 }
 
+if (counting == "counting"){
+  if ("RSEM" %in% cAlgor){
+    RSEM.finish(comm.stack.pool,destDirRSEMCount,dest.dir)
+  }
+}
+save.run.data(base.dir,text.add)
 execute.comm.stack(comm.stack.pool,log.file)
-
 add.to.logs(paste("The process took:",(proc.time()[3]-start.time[3]),"seconds to complete."),log.file)
 stop("Program complete.")
 ##################################################################################################

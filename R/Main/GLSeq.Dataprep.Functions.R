@@ -1,19 +1,226 @@
-source("../Main/GLSeq.Util.R")
+source("GLSeq.Util.R")
 
-###########################
-# loading variables for the current run (from the current directory) 
-###########################
-#
-load.dataFile <- function(text.add){
-  if (is.null(text.add)) stop("Arguments should not be NULL")
-  currentRun.dataFile <- paste("GLSeq.vars.", text.add, ".rda", sep="")
-  try(load(currentRun.dataFile)) # loads all parameters for the run with the runID indicated in the text.add object
-  currentRun.dataFile
+##################
+# Load and check variables
+##################
+### Create QC Folder
+
+create.QC.folder <- function(dest.dir,text.add){
+  if (is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
+  dest.dir <- trailDirCheck(dest.dir)
+  quality.check.folder <- paste(dest.dir,text.add,."DataprepQualityCheck",sep="")
+  create.folder <- paste("mkdir",quality.check.folder)
+  try(system(create.folder))
+  quality.check.folder
 }
-#
-###########################
-# assembling Trimmomatic system commands: 
-###########################
+
+
+### Makes sure the presplit setting is correctly set.
+check.presplit <- function(paired.end,presplit){
+  if (is.null(paired.end) || is.null(presplit))  stop("Arguments should not be NULL")
+  if (!is.logical(paired.end) || !is.logical(presplit)) stop("Arguments must be LOGICALS")
+  # A file can only be presplit if it is paired ended, so let's cover any misoptioning in that regard here.
+  if (!paired.end) presplit <- FALSE
+  presplit
+}
+
+### Makes sure that the number of streams is correctly set.
+check.nStreamsDataPrep <- function(fqFiles,nStreamsDataPrep){
+  if (is.null(fqFiles) || is.null(nStreamsDataPrep))  stop("Arguments should not be NULL")
+  # Problems can occur if the user tries to initiate more streams than tehre are files.
+  # Let's correct that here by just setting the max as the length of files if that is the case.
+  if (nStreamsDataPrep > length(fqFiles)) nStreamsDataPrep <- length(fqFiles)
+  nStreamsDataPrep
+}
+
+### Checks if the program has found files to process.
+check.ifFiles <- function(fqFiles.zip,fqFiles.unzip){
+  # Stop the process if there are no files found.
+  if (is.null(fqFiles.zip) && is.null(fqFiles.unzip)) stop("Please check the list of raw FASTQ files and the contents of the raw directory \n Please remember that files must be in .fq or .fq.gz format \n")
+  NULL
+}
+##################
+# Load and prepare files
+##################
+
+# Gets files that are unzipped.
+# These files have .fq or .fastq extensions
+get.files.unzipped <- function(raw.dir){
+  if (is.null(raw.dir)) stop("Arguments should not be NULL")
+  raw.dir <- trailDirCheck(raw.dir)
+  if (length(unique(raw.dir)) == 1){
+    # Takes either fasta or fq files
+    fqFiles.unzip <- dir(raw.dir[1])[grep(".fq$|.fastq$", dir(raw.dir[1]))]
+  }
+  fqFiles.unzip
+}
+
+# Copies all the unzipped files from the raw directory
+# that match the .fq or .fastq extension into the dest.dir folder.
+copy.files.to.dest.unzipped <- function(raw.dir,dest.dir){
+  if (is.null(raw.dir) || is.null(dest.dir)) stop("Arguments should not be NULL")
+  raw.dir <- trailDirCheck(raw.dir)
+  dest.dir <- trailDirCheck(dest.dir)
+  # Copy all relevant file types into the folder.
+  fqFiles <- paste(raw.dir,"*.fq",sep="")
+  fastqFiles <- paste(raw.dir,"*.fastq",sep="")
+  copy <- paste("cp",fqFiles,dest.dir,"; cp",fastqFiles,dest.dir)
+  try(system(copy))
+  copy
+}
+
+# Copies all the zipped files from the raw directory
+# that match the .gz extension into the dest.dir folder
+copy.files.to.dest.zipped <- function(raw.dir,dest.dir){
+  if (is.null(raw.dir) || is.null(dest.dir)) stop("Arguments should not be NULL")
+  raw.dir <- trailDirCheck(raw.dir)
+  dest.dir <- trailDirCheck(dest.dir)
+  # Copy all relevant file types into the folder
+  gzFiles <- paste(raw.dir,"*.gz",sep="")
+  copy <- paste("cp",gzFiles,dest.dir)
+  try(system(copy))
+  copy
+}
+
+# Gets a list of all the zipped files 
+get.files.zipped <- function(raw.dir){
+  if (is.null(raw.dir)) stop("Arguments should not be NULL")
+  raw.dir <- trailDirCheck(raw.dir)
+  # Gets the zipped files with the compressed extension .gz
+  if (length(unique(raw.dir)) == 1) {
+    fqFiles.zip <- dir(raw.dir[1])[grep(".fq.gz$|.fastq.gz$", dir(raw.dir[1]))]
+  }
+  fqFiles.zip
+}
+
+# For the unzipped files, we don't remove anything from them.
+# This function is here, though, in case we decide to change how our files
+# Are structured.  
+prepare.unzipped.file.names <- function(fqFiles.unzip){
+  if (is.null(fqFiles.unzip))  stop("Arguments should not be NULL")
+  # Assumes the file is in the format of {name}_#.fq (Presplit) OR {name}_fq
+  # Thus, the file example.1.fq along with its pair of example.2.fq
+  # would become example.1.fq and example.2.fq
+  # and an unsplit file example.fq would become example.fq
+  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-0)
+  fqFiles
+}
+
+# Removes the .gz extension from zipped files.
+prepare.zipped.file.names <- function(fqFiles.zip){
+  if (is.null(fqFiles.zip))  stop("Arguments should not be NULL")
+  # Assumes file is in the format of {name}_#.fq.gz (Presplit) OR {name}.fq.gz (Unsplit)
+  # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
+  # would become example.1.fq and example.2.fq
+  # and an unsplit file example.fq.gz would become example.fq
+  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-3)
+  fqFiles
+}
+
+# Divides up the data in chunks based on the set number of data streams.
+# This is for presplit files (Paired files already found in .1.fq, .2.fq format)
+chunk.data.files.presplit <- function(fqFiles,nStreamsDataPrep){
+  if (is.null(fqFiles) || is.null(nStreamsDataPrep))  stop("Arguments should not be NULL")
+  nStreamsDataPrep <- check.nStreamsDataPrep(fqFiles,nStreamsDataPrep)
+  chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
+  rangelist.Dataprep <- chunk(2*(1:(length(fqFiles)/2)), nStreamsDataPrep)
+  rangelist.Dataprep
+}
+
+# Divides up the data in chunks based on the set number of data streams.
+# This is for unsplit or SE files.
+chunk.data.files.unsplit <- function(fqFiles,nStreamsDataPrep){
+  if (is.null(fqFiles) || is.null(nStreamsDataPrep))  stop("Arguments should not be NULL")
+  nStreamsDataPrep <- check.nStreamsDataPrep(fqFiles,nStreamsDataPrep)
+  chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
+  rangelist.Dataprep <- chunk(1:length(fqFiles), nStreamsDataPrep)
+  rangelist.Dataprep
+}
+
+# Grabs the artificial fq sequence that the trimmomatic uses.
+copy.artificial.fq <- function(base.dir,artificial.fq,dest.dir){
+  if (is.null(base.dir) || is.null(artificial.fq) || is.null(dest.dir)) stop("Arguments should not be NULL")
+  dest.dir <- trailDirCheck(dest.dir)
+  base.dir <- trailDirCheck(base.dir)
+  copy <- paste("cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
+  try(system(copy))
+  copy
+}
+
+# Strips the string of any extensions we add or exist on the file.
+# This includes numbering (.#), zipped extension (gz), or file type extension (fastq vs fq)
+get.file.base <- function(fqFile){
+  if (grepl(".gz$",fqFile)){
+    fqFile <- substr(fqFile, 1, nchar(fqFile)-3)
+  }
+  
+  if (grepl(".fastq$",fqFile)){
+    fqFile <- substr(fqFile, 1, nchar(fqFile)-6)
+  }  else if (grepl(".fq$",fqFile)){
+    fqFile <- substr(fqFile, 1, nchar(fqFile)-3)
+  }
+  
+  if (grepl(".1$",fqFile)){
+    fqFile <- substr(fqFile, 1, nchar(fqFile)-2)
+  } else if (grepl(".2$",fqFile)){
+    fqFile <- substr(fqFile, 1, nchar(fqFile)-2)
+  }
+  fqFile
+}
+
+############ Shell commands used by all protocols.
+# Copies a file in from the raw directory to the destination directory
+copy.file<- function(raw.dir,fqFile,dest.dir){
+  if (is.null(raw.dir) || is.null(fqFile) || is.null(dest.dir)) stop("Arguments should not be NULL")
+  dest.dir <- trailDirCheck(dest.dir)
+  raw.dir <- trailDirCheck(raw.dir)
+  #
+  copy.comm <- paste("cp",paste(raw.dir,fqFile,sep=""),dest.dir)
+  copy.comm
+}
+
+# Uses gunzip to unzip a gz zipped file.
+unzip.gz.files <- function(fqFile.zip){
+  if (is.null(fqFile.zip)) stop("Arguments should not be NULL")
+  #
+  gunzip.comm <- paste("gunzip",fqFile.zip)
+  gunzip.comm
+}
+
+###############
+# Paired end processing
+###############
+
+
+
+############# NAMING
+first.read.name <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  first.read.filename <- paste(fqFile, ".1.fq", sep="")
+  first.read.filename
+}
+
+second.read.name <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  second.read.filename <- paste(fqFile, ".2.fq", sep="")
+  second.read.filename
+}
+
+left.dirty.name <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  leftDirtyFname <-  paste("dirty.", fqFile, ".1.fq", sep="")
+  leftDirtyFname
+}
+
+right.dirty.name <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  rightDirtyFname <-  paste("dirty.", fqFile, ".2.fq", sep="")
+  rightDirtyFname
+}
+
+
+############# SHELL COMMAND CONSTRUCTION
+# Creates the command that will call the Trimmomatic Jar file to clip sequences.
 trimAssemble.PE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq,trimMin) {
   if (is.null(fqFile) || is.null(trimPath) || is.null(qScore) || is.null(artificial.fq) || is.null(trimMin)){
     stop("Arguments should not be NULL")
@@ -39,184 +246,7 @@ trimAssemble.PE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq
   tcomm
 }
 
-trimAssemble.SE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq, trimMin) {
-  if (is.null(fqFile) || is.null(trimPath) || is.null(qScore) || is.null(artificial.fq) || is.null(trimMin)){
-    stop("Arguments should not be NULL")
-  }
-  if (substr(trimPath,nchar(trimPath),nchar(trimPath))=="/") stop("Invalid path to Trimmomatic JAR file")
-  dashqScore <- paste("-", qScore, sep="")
-  logName <- paste(fqFile, "pairedtrim.log", sep=".")
-  pairedTrimmed.1 <- paste("p", fqFile, "fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
-  trimParam <- paste("ILLUMINACLIP:", artificial.fq, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
-  tcomm <- paste("java -jar", trimPath, "SE -threads 20", dashqScore, "-trimlog", logName, fqFile,  pairedTrimmed.1, trimParam)
-  tcomm
-}
-
-get.files.unzipped <- function(raw.dir){
-  if (is.null(raw.dir)) stop("Arguments should not be NULL")
-  raw.dir <- trailDirCheck(raw.dir)
-  if (length(unique(raw.dir)) == 1) {
-    # Now takes either .fq or .fastq
-    fqFiles.unzip <- dir(raw.dir[1])[grep(".fq$|.fastq$", dir(raw.dir[1]))]
-  }
-  fqFiles.unzip
-}
-
-get.files.zipped <- function(raw.dir){
-  if (is.null(raw.dir)) stop("Arguments should not be NULL")
-  raw.dir <- trailDirCheck(raw.dir)
-  # Gets the zipped files with the compressed extension .gz
-  if (length(unique(raw.dir)) == 1) {
-    fqFiles.zip <- dir(raw.dir[1])[grep(".fq.gz$|.fastq.gz$", dir(raw.dir[1]))]
-  }
-  fqFiles.zip
-}
-
-
-prepare.unzipped.file.names <- function(fqFiles.unzip){
-  if (is.null(fqFiles.unzip))  stop("Arguments should not be NULL")
-  # Assumes the file is in the format of {name}_#.fq (Presplit) OR {name}_fq
-  # Thus, the file example.1.fq along with its pair of example.2.fq
-  # would become example.1.fq and example.2.fq
-  # and an unsplit file example.fq would become example.fq
-  fqFiles <- substr(fqFiles.unzip, 1, nchar(fqFiles.unzip)-0)
-  fqFiles
-}
-
-prepare.zipped.file.names <- function(fqFiles.zip){
-  if (is.null(fqFiles.zip))  stop("Arguments should not be NULL")
-  # Assumes file is in the format of {name}_#.fq.gz (Presplit) OR {name}.fq.gz (Unsplit)
-  # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
-  # would become example.1.fq and example.2.fq
-  # and an unsplit file example.fq.gz would become example.fq
-  fqFiles <- substr(fqFiles.zip, 1, nchar(fqFiles.zip)-3)
-  fqFiles
-}
-
-check.presplit <- function(paired.end,presplit){
-  if (is.null(paired.end) || is.null(presplit))  stop("Arguments should not be NULL")
-  if (!is.logical(paired.end) || !is.logical(presplit)) stop("Arguments must be LOGICALS")
-  if (!paired.end) presplit <- FALSE
-  presplit
-}
-
-check.nStreamsDataPrep <- function(fqFiles,nStreamsDataPrep){
-  if (is.null(fqFiles) || is.null(nStreamsDataPrep))  stop("Arguments should not be NULL")
-  if (nStreamsDataPrep > nrow(fqFiles)) nStreamsDataPrep <- nrow(fqFiles)
-  nStreamsDataPrep
-}
-
-chunk.data.files.presplit <- function(fqFiles,nStreamsDataPrep){
-  if (is.null(fqFiles) || is.null(nStreamsDataPrep))  stop("Arguments should not be NULL")
-  nStreamsDataPrep <- check.nStreamsDataPrep(fqFiles,nStreamsDataPrep)
-  chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
-  rangelist.Dataprep <- chunk(2*(1:(nrow(fqFiles)/2)), nStreamsDataPrep)
-  rangelist.Dataprep
-}
-
-chunk.data.files.unsplit <- function(fqFiles,nStreamsDataPrep){
-  if (is.null(fqFiles) || is.null(nStreamsDataPrep))  stop("Arguments should not be NULL")
-  nStreamsDataPrep <- check.nStreamsDataPrep(fqFiles,nStreamsDataPrep)
-  chunk <- function(x, n) split(x, sort(rank(x) %% n)) # commonly known solution to divide data equally
-  rangelist.Dataprep <- chunk(1:nrow(fqFiles), nStreamsDataPrep)
-  rangelist.Dataprep
-}
-
-check.ifFiles <- function(fqFiles.zip,fqFiles.unzip){
-  if (is.null(fqFiles.zip) && is.null(fqFiles.unzip)) stop("Please check the list of raw FASTQ files and the contents of the raw directory \n Please remember that files must be in .fq or .fq.gz format \n")
-  NULL
-}
-
-copy.artificial.fq <- function(base.dir,artificial.fq,dest.dir){
-  if (is.null(base.dir) || is.null(artificial.fq) || is.null(dest.dir)) stop("Arguments should not be NULL")
-  dest.dir <- trailDirCheck(dest.dir)
-  base.dir <- trailDirCheck(base.dir)
-  copy <- paste("cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-  try(system(copy))
-  copy
-}
-
-get.file.base <- function(fqFile){
-  if (grepl(".gz$",fqFile)){
-    fqFile <- substr(fqFile, 1, nchar(fqFile)-3)
-  }
-  if (grepl(".fastq$",fqFile)){
-    fqFile <- substr(fqFile, 1, nchar(fqFile)-6)
-  }
-  if (grepl(".fq$",fqFile)){
-    fqFile <- substr(fqFile, 1, nchar(fqFile)-3)
-  }
-  if (grepl(".1$",fqFile)){
-    fqFile <- substr(fqFile, 1, nchar(fqFile)-2)
-  }
-  if (grepl(".2$",fqFile)){
-    fqFile <- substr(fqFile, 1, nchar(fqFile)-2)
-  }
-  fqFile
-}
-
-copy.file<- function(raw.dir,fqFile,dest.dir){
-  if (is.null(raw.dir) || is.null(fqFile) || is.null(dest.dir)) stop("Arguments should not be NULL")
-  dest.dir <- trailDirCheck(dest.dir)
-  raw.dir <- trailDirCheck(raw.dir)
-  #
-  copy.comm <- paste("cp",paste(raw.dir,fqFile,sep=""),dest.dir)
-  copy.comm
-}
-
-unzip.gz.files <- function(fqFile.zip){
-  if (is.null(fqFile.zip)) stop("Arguments should not be NULL")
-  #
-  gunzip.comm <- paste("gunzip",fqFile.zip)
-  gunzip.comm
-}
-
-first.read.name <- function(fqFile){
-  if (is.null(fqFile)) stop("Arguments should not be NULL")
-  fqFile <- get.file.base(fqFile)
-  first.read.filename <- paste(fqFile, ".1.fq", sep="")
-  first.read.filename
-}
-
-second.read.name <- function(fqFile){
-  if (is.null(fqFile)) stop("Arguments should not be NULL")
-  fqFile <- get.file.base(fqFile)
-  second.read.filename <- paste(fqFile, ".2.fq", sep="")
-  second.read.filename
-}
-
-split.unsplit.files.PE <- function(dest.dir,fqFile){
-  if (is.null(dest.dir) || is.null(fqFile)) stop("Arguments should not be NULL")
-  dest.dir <- trailDirCheck(dest.dir)
-  fqFile.base <- get.file.base(fqFile)
-  first.read.filename <- first.read.name(fqFile.base)
-  second.read.filename <- second.read.name(fqFile.base)
-  # (The ruby code incorporated into the line above was adapted from SeqAnsweres forum (seqanswers.com))
-  split.comm <- paste("cat ", dest.dir, fqFile, " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[1234]/; @i = 0 if @i == 8' > ", first.read.filename, " && cat ",   dest.dir, fqFile, " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[5678]/; @i = 0 if @i == 8' > ", second.read.filename, sep="")
-  split.comm
-}
-
-left.dirty.name <- function(fqFile){
-  if (is.null(fqFile)) stop("Arguments should not be NULL")
-  fqFile <- get.file.base(fqFile)
-  leftDirtyFname <-  paste("dirty.", fqFile, ".1.fq", sep="")
-  leftDirtyFname
-}
-
-right.dirty.name <- function(fqFile){
-  if (is.null(fqFile)) stop("Arguments should not be NULL")
-  fqFile <- get.file.base(fqFile)
-  rightDirtyFname <-  paste("dirty.", fqFile, ".2.fq", sep="")
-  rightDirtyFname
-}
-
-#
-#
-# Paired Ended Functions
-#
-#
-#
-
+# Moves some file names around to make it so that the resulting file will have the same name as the base file.
 file.shuffle.PE <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
   fqFile <- get.file.base(fqFile)
@@ -233,20 +263,122 @@ file.shuffle.PE <- function(fqFile){
   fileShuffle
 }
 
-preQualityCheck.PE <- function(fastqcPath, fqFile){
-  if (is.null(fastqcPath) || is.null(fqFile)) stop("Arguments should not be NULL")
+# Calls a bit of ruby code that splits an unsplit file into two files, file.1.fq and file.2.fq
+split.unsplit.files.PE <- function(dest.dir,fqFile){
+  if (is.null(dest.dir) || is.null(fqFile)) stop("Arguments should not be NULL")
+  dest.dir <- trailDirCheck(dest.dir)
+  fqFile.base <- get.file.base(fqFile)
+  first.read.filename <- first.read.name(fqFile.base)
+  second.read.filename <- second.read.name(fqFile.base)
+  # (The ruby code incorporated into the line above was adapted from SeqAnsweres forum (seqanswers.com))
+  split.comm <- paste("cat ", dest.dir, fqFile, " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[1234]/; @i = 0 if @i == 8' > ", first.read.filename, " && cat ",   dest.dir, fqFile, " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[5678]/; @i = 0 if @i == 8' > ", second.read.filename, sep="")
+  split.comm
+}
+
+# Calls the Fastqc quality check on the initial files.
+preQualityCheck.PE <- function(fastqcPath, fqFile,qcFolder){
+  if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
   fqFile <- get.file.base(fqFile)
   leftDirtyFname <- left.dirty.name(fqFile)
   rightDirtyFname <- right.dirty.name(fqFile)
-  preQC <- paste(fastqcPath, leftDirtyFname, rightDirtyFname)
+  preQC <- paste(fastqcPath,"-o",qcFolder,leftDirtyFname, rightDirtyFname)
   preQC
 }
-
-postQualityCheck.PE <- function(fastqcPath,fqFile){
+# Calls the Fastqc quality check on the produced files.
+postQualityCheck.PE <- function(fastqcPath,fqFile,qcFolder){
+  if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
   fqFile <- get.file.base(fqFile)
-  if (is.null(fastqcPath) || is.null(fqFile)) stop("Arguments should not be NULL")
   first.read.filename <- first.read.name(fqFile)
   second.read.filename <- second.read.name(fqFile)
-  postQC <- paste(fastqcPath, first.read.filename, second.read.filename)
+  postQC <- paste(fastqcPath,"-o",qcFolder, first.read.filename, second.read.filename)
   postQC
+}
+
+# Removes a bunch of files that were used during the processing, but no longer are needed
+remove.unneeded.files <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  fqFile <- get.file.base(fqFile)
+  #
+  first.read.file <- first.read.name(fqFile)
+  second.read.file <- second.read.name(fqFile)
+  leftDirtyFname <- left.dirty.name(fqFile)
+  rightDirtyFname <- right.dirty.name(fqFile)
+  unpairedTrimmed.1 <- paste("u",  first.read.file, sep=".")
+  unpairedTrimmed.2 <- paste("u", second.read.file, sep=".") 
+  #
+  remove.command <- paste("rm",leftDirtyFname,"; rm",rightDirtyFname,"; rm",unpairedTrimmed.1,"; rm",unpairedTrimmed.2)
+  remove.command
+}
+###############
+# Single end processing
+###############
+
+############# NAMING
+dirty.name.SE <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  dirty.name <-  paste("dirty.", fqFile, ".fq", sep="")
+  dirty.name
+}
+
+final.name.SE <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  final.name <-  paste(fqFile, ".fq", sep="")
+  final.name
+}
+
+############# SHELL COMMAND CONSTRUCTION
+# Creates the command that will call the Trimmomatic Jar file to clip sequences.
+trimAssemble.SE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq, trimMin) {
+  if (is.null(fqFile) || is.null(trimPath) || is.null(qScore) || is.null(artificial.fq) || is.null(trimMin)){
+    stop("Arguments should not be NULL")
+  }
+  if (substr(trimPath,nchar(trimPath),nchar(trimPath))=="/") stop("Invalid path to Trimmomatic JAR file")
+  dashqScore <- paste("-", qScore, sep="")
+  logName <- paste(fqFile, "pairedtrim.log", sep=".")
+  pairedTrimmed.1 <- paste("p", fqFile, "fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
+  trimParam <- paste("ILLUMINACLIP:", artificial.fq, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
+  tcomm <- paste("java -jar", trimPath, "SE -threads 20", dashqScore, "-trimlog", logName, fqFile,  pairedTrimmed.1, trimParam)
+  tcomm
+}
+# Renames it so that the final resulting file has the same name as the original. 
+file.shuffle.SE <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  fqFile <- get.file.base(fqFile)
+  dirty.name <- dirty.name.SE(fqFile)
+  final.name <- final.name.SE(fqFile)
+  trimmed.name <- paste("p.",final.name,sep="")
+  #
+  fileShuffle <- paste("mv", final.name, dirty.name, " && ",  "mv", trimmed.name, final.name)
+  #
+  #
+  fileShuffle
+}
+# Quality checks the initial file
+preQualityCheck.SE <- function(fastqcPath, fqFile,qcFolder){
+  if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
+  fqFile <- get.file.base(fqFile)
+  dirty.name <- dirty.name.SE(fqFile)
+  preQC <- paste(fastqcPath,"-o",qcFolder,dirty.name)
+  preQC
+}
+# Quality checks the resulting file.
+postQualityCheck.SE <- function(fastqcPath,fqFile,qcFolder){
+  if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
+  fqFile <- get.file.base(fqFile)
+  final.name <- final.name.SE(fqFile)
+  postQC <- paste(fastqcPath,"-o",qcFolder,final.name)
+  postQC
+}
+# Removes all the unneeded files.
+remove.unneeded.files.SE <- function(fqFile){
+  if (is.null(fqFile)) stop("Arguments should not be NULL")
+  fqFile <- get.file.base(fqFile)
+  final.name <- final.name.SE(fqFile)
+  unpairedTrimmed <- paste("u",final.name,sep=".")
+  dirty.name <- dirty.name.SE(fqFile)
+  remove.command <- paste("rm",dirty.name,"; rm",unpairedTrimmed)
 }

@@ -29,7 +29,7 @@ system(index)
 ### If using the GPU, alignment occurs in sequence so as to not overload the GPU memory (Each process is ~6GB)
 ### Our NVidia Titan can sometimes run two at a time without alignment corruption, but this is a safer route.
 ####################################
-sam.create <- NULL
+sam.create <- "date"
 if (GPU.accel){
   for (zz in 1:nStreams) {
     for (i in rangelist[[zz]]) {
@@ -75,11 +75,7 @@ if (GPU.accel){
       if (!(paired.end)) create <- paste(CUSHAW.GPU.path, "-r", refFASTAname, "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
       # Checks to make sure that this process actually is GPU
       # The is.null is there for later on implementation of parallel GPU runs. (Hopefully!)
-      if (is.null(sam.create)){
-        sam.create <- paste(create)
-      } else{
-        sam.create <- paste(sam.create,"&&",create)
-      }
+      sam.create <- paste(sam.create,"&&",create)
       #
       # Fixes the order of processing so that
       # The SAM file gets created when the user
@@ -89,14 +85,9 @@ if (GPU.accel){
     } # i
   } #nStreams (zz)
 } #GPU.Accel
-if (!is.null(sam.create)) {
-  Cushawgpu.special.case <- paste(sam.create)
-}
 if (GPUspecialCase) {
-  if (dataPrepare == "nodataprep"){
-    system(Cushawgpu.special.case)
+    system(sam.create)
     warning("The alignment step has now completed.")
-  }
 }
 comm.stack.pool <- NULL # 
 #################

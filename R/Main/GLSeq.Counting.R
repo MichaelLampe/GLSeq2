@@ -2,14 +2,6 @@ source ("GLSeq.Util.R")
 occured <- FALSE
 count.comm <- ""
 ################################################
-#HTSeq Counting Protocol
-################################################
-if ("HTSeq" %in% cAlgor){
-  occured <- TRUE
-  setwd(base.dir)
-  source ("GLSeq.HTSeq.R")
-}
-################################################
 #Cufflinks Counting Protocol
 ################################################
 if ("Cufflinks" %in% cAlgor){
@@ -61,6 +53,15 @@ if ("RSEM" %in% cAlgor){
     source ("GLSeq.RsemCount.R")
   }
 }
+################################################
+#HTSeq Counting Protocol
+################################################
+if ("HTSeq" %in% cAlgor){
+  occured <- TRUE
+  setwd(base.dir)
+  source ("GLSeq.HTSeq.R")
+}
+
 if (!occured){
   warning("No counting protocol was initiated.  Please make sure you have supplied a supported counting setting")
 }

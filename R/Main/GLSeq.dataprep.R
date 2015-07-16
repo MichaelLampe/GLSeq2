@@ -30,19 +30,19 @@ files2watch.dataprep <- NULL
 fqFiles.zip <- NULL
 fqFiles.unzip <- NULL
 ###########################
-load.dataFile(text.add)
+# Create QC Folder
+qcFolder <-  create.QC.folder(dest.dir,text.add)
 
-# Grab the files
 if (unzipped){
   fqFiles.unzip <- get.files.unzipped(raw.dir)
   fqFiles <- prepare.unzipped.file.names(fqFiles.unzip)
+  copy.files.to.dest.unzipped(raw.dir,dest.dir)
 }
 if (!unzipped){
   fqFiles.zip <- get.files.zipped(raw.dir)
   fqFiles <- prepare.zipped.file.names(fqFiles.zip)
+  copy.files.to.dest.zipped(raw.dir,dest.dir)
 }
-#
-#
 #
 check.ifFiles(fqFiles.zip,fqFiles.unzip)
 #
@@ -55,7 +55,7 @@ nStreamsDataPrep <- check.nStreamsDataPrep(fqFiles,nStreamsDataPrep)
 # Note: This is a safe operation, nStreamsDataPrep can exceed the number
 # of files and not cause a crash (It is checked above and within the function so it is modular, but explicit also)
 if (presplit){
-  rangelist.Dataprep <- chunk.data.files.presplit(fqFiles,nStreamDataPrep)
+  rangelist.Dataprep <- chunk.data.files.presplit(fqFiles,nStreamsDataPrep)
 }
 if (!presplit){
   rangelist.Dataprep <- chunk.data.files.unsplit(fqFiles.nStreamsDataPrep)
@@ -69,85 +69,50 @@ for (zz in 1:nStreamsDataPrep) {
   if (zz!=1) comm.pool <- paste(comm.pool,"date")
   for (j in rangelist.Dataprep[[zz]]) {
     #
-    # GENERAL PROCESS
-    #
-    # Constructs a command to copy over a file.
-    if (unzipped){
-      copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.unzip[j],dest.dir))
-      #
-      if(presplit){
-        # Makes sure both are copied over in the same command so there is not a parallelization issue here.
-        copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.unzip[j+1],dest.dir))
-      }
-    }
-    if (!unzipped){
-      # Constructs a command to unzip .gz zipped files.
-      copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.zip[j],dest.dir))
-      copy.comm <- paste(copy.comm,"&&",unzip.gz.files(fqFile.zip[j]))
-      #
-      if(presplit){
-        # Makes sure both are copied over in the same command so there is not a parallelization issue here.
-        copy.comm <- paste(copy.comm,"&&",copy.file(copy.comm,raw.dir,fqFiles.zip[j+1],dest.dir))
-        copy.comm <- paste(copy.comm,"&&",unzip.gz.files(fqFile.zip[j+1]))
-      }
-    }
-    comm.pool <- paste(comm.pool,"&&",copy.comm)
-    #
-    # Paired Ended Files
-    #
     if (paired.end){
       #
       # Unsplit
       if (!presplit){
         # Add to command pool
-        comm.pool <- paste(comm.pool,"&&",split.unsplit.files.PE(dest.dir,fqFile[j]))
+        comm.pool <- paste(comm.pool,"&&",split.unsplit.files.PE(dest.dir,fqFiles[j]))
       }
       if (readTrim){
         # The trim command
-        trimCommand <- trimAssemble.PE(fqFile[j], trimPath, qScores, trimhead, artificial.fq)
+        trimCommand <- trimAssemble.PE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
         comm.pool <- paste(comm.pool,"&&",trimCommand)
         # Modifies the names of a few files to retain naming
-        file.shuffle <- file.shuffle.PE(fqFile[j])
+        file.shuffle <- file.shuffle.PE(fqFiles[j])
         comm.pool <- paste(comm.pool,"&&",file.shuffle)
         # Quality control check via Fastqc of dirty file
-        preQC <- preQualityCheck.PE(fastqcPath,fqFile[j])
+        preQC <- preQualityCheck.PE(fastqcPath,fqFiles[j],qcFolder)
         comm.pool <- paste(comm.pool,"&&",preQC)
-        # Quality control check via Fastqc of result files
-        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
-        comm.pool <- paste(comm.pool,"&&",postQC) 
-      }
-      if (!readTrim){
-        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
-        comm.pool <- paste(comm.pool,"&&",postQC) 
-      }
-      if(presplit){
-        # Move onto the next set of pairs if presplit data.
-        j = j + 1
-      }
+        remove.command <- remove.unneeded.files(fqFiles[j])
+        comm.pool <- paste(comm.pool,"&&",remove.command)
+      }   
+      # Quality control check via Fastqc of result files
+      postQC <- postQualityCheck.PE(fastqcPath,fqFiles[j],qcFolder)
+      comm.pool <- paste(comm.pool,"&&",postQC)
     }
+    #
     if (!paired.end){
       if (readTrim){
         # The trim command
-        trimCommand <- trimAssemble.SE(fqFile[j], trimPath, qScores, trimhead, artificial.fq)
+        trimCommand <- trimAssemble.SE(fqFile[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
         comm.pool <- paste(comm.pool,"&&",trimCommand)
         # Modifies the names of a few files to retain naming
-        file.shuffle <- file.shuffle.PE(fqFile[j])
+        file.shuffle <- file.shuffle.SE(fqFile[j])
         comm.pool <- paste(comm.pool,"&&",file.shuffle)
         # Quality control check via Fastqc of dirty file
-        preQC <- preQualityCheck.PE(fastqcPath,fqFile[j])
+        preQC <- preQualityCheck.SE(fastqcPath,fqFile[j],qcFolder)
         comm.pool <- paste(comm.pool,"&&",preQC)
-        # Quality control check via Fastqc of result files
-        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
-        comm.pool <- paste(comm.pool,"&&",postQC) 
+        remove.command <- remove.unneeded.files.SE(fqFiles[j])
+        comm.pool <- paste(comm.pool,"&&",remove.command)
       }
-      if (!readTrim){
-        postQC <- postQualityCheck.PE(fastqcPath,fqFile[j])
-        comm.pool <- paste(comm.pool,"&&",postQC) 
-      }
+      # Quality control check via Fastqc of result files
+      postQC <- postQualityCheck.SE(fastqcPath,fqFiles[j],qcFolder)
+      comm.pool <- paste(comm.pool,"&&",postQC)
     }
   }
   comm.pool <- paste(comm.pool,"&")
 }
-dataReady.signal <- paste("echo > ", text.add, ".DataReady", sep="") 
-comm.pool <- paste(comm.pool,"wait","&&",dataReady.signal)
 system(comm.pool)
