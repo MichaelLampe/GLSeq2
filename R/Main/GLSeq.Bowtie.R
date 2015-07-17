@@ -1,11 +1,11 @@
 source("GLSeq.Util.R")
+source("GLSeq.Alignment.Functions.R")
 setwd(dest.dir)
-# copy genome indices to the destimation dir: 
-ref.dir <- paste(base.dir, rGenome, sep="")
-indCopy <- paste("cd ", ref.dir, " && cp ",refFASTAname," ",dest.dir, sep="")
+
+comm.stack.pool <- NULL
+
+indCopy <- copyGenome(base.dir,rGenome,refFASTAname,dest.dir)
 system(indCopy)
-#
-comm.stack.pool <- NULL # 
 ####################
 # Index the Bowtie or Bowtie2 Aligner
 #
@@ -32,9 +32,9 @@ for (zz in 1:nStreams) {
     # names of current fastq files:
     fq.left <- fqfiles.table[i,1]
     if (paired.end) fq.right <- fqfiles.table[i,2]
-    this.library <- substr(fqfiles.table[i,1], 1,libNchar)
-    this.resName <- paste(this.library, text.add, sep=".")
-    countable.sam <- paste(this.resName, "countable.sam", sep=".")
+    name <- assign.name(fqfiles.table[i,1],paired.end)
+    this.resName <- assign.resName(name,text.add)
+    countable.sam <- countable.sam.name(this.resName)
     ###################
     # Alignment
     ###################
@@ -51,16 +51,15 @@ for (zz in 1:nStreams) {
       }
     }
     ###################
-    # Might need to change a few things in Bowtie2
-    # It gets hung soemtimes, though I'm not sure 
-    # if it is the same issue as in the Bowtie algo
-    ###################
     if (aAlgor == "Bowtie2"){
-      #
       # All these options are necessary just to get it to conform with the RSEM counting protocol... (Except -t and -q)
-      # 
+      # Found on the RSEM website (http://deweylab.biostat.wisc.edu/rsem/rsem-calculate-expression.html)
+      # This is under the --bowtie2 option that is coupled with the RSEM package.
+      # Might be worth moving off the RSEM counting protocol if we believe Bowtie will better serve us with the current
+      # counting protocols.  
       Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
       if (paired.end){
+        # These are options normally used by the RSEM peeps, see the same link as above for documentation on this.
         Bowtie2Options <- paste(Bowtie2Options,"--no-mixed","--no-discordant")
         align <- paste("bowtie2",Bowtie2Options,rGenome,"-1",fq.left,"-2",fq.right,"-S",countable.sam)
       }else{
@@ -70,23 +69,22 @@ for (zz in 1:nStreams) {
     ###################
     # Counting Step
     ###################
-    #
-    count <- FALSE
+    count.comm <- ""
     if (counting == "counting"){
       setwd(base.dir)
-      count <- TRUE
       source("GLSeq.Counting.R")
     }
     ###################
     # Command Construction
     ###################
     comm.i <- paste(align)
-    if (count) comm.i <- paste(comm.i, "&&", count.comm)
-    # for the very first assembly in the stack: 
+    comm.i <- paste(comm.i, "&&", count.comm)
+    # For the very first assembly in the stack: 
     if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"cd",dest.dir,"&& ",comm.i)
-    # for subsequent assemblies of every stack: 
+    # For subsequent assemblies of every stack: 
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir,"&&",comm.i)
     #
   }
   comm.stack.pool <- paste(comm.stack.pool,"&")
-} 
+}
+comm.stack.pool <- paste(comm.stack.pool,"wait")

@@ -248,10 +248,10 @@ test.check.nStreams <- function(){
 
 test.RSEM.finish <- function() {
   
-  checkEquals(" wait && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("","/home/runs/test.RSEM.counting/","/home/runs/"))
-  checkEquals(" wait && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("","/home/runs/test.RSEM.counting","/home/runs/"))
-  checkEquals(" wait && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("","/home/runs/test.RSEM.counting/","/home/runs"))
-  checkEquals(" wait && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("","/home/runs/test.RSEM.counting","/home/runs"))
+  checkEquals("date && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("date","/home/runs/test.RSEM.counting/","/home/runs/"))
+  checkEquals("date && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("date","/home/runs/test.RSEM.counting","/home/runs/"))
+  checkEquals("date && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("date","/home/runs/test.RSEM.counting/","/home/runs"))
+  checkEquals("date && cd /home/runs/ && mv *.RSEM.counts.* /home/runs/test.RSEM.counting/ && mv *.index.* /home/runs/test.RSEM.counting/",RSEM.finish("date","/home/runs/test.RSEM.counting","/home/runs"))
   
   checkException(check.RSEM.finish(NULL,NULL,NULL),"Arguments should not be NULL")
   checkException(check.RSEM.finish("a",NULL,NULL),"Arguments should not be NULL")

@@ -10,13 +10,19 @@
 #
 source("GLSeq.Util.R")
 setwd(dest.dir)
-#
+
+comm.stack.pool <- NULL
+
 file.name.change <- "date"
 if (paired.end){
   for (zz in 1:nStreams) {
     for (i in rangelist[[zz]]){
       #
       # Tophat uses different file name conventions, so we need to switch them here.
+      # TopHat wants paired files to be in the format
+      # {FileNameBase}_1.fq while we normally put them in the format {FileNameBase}.1.fq
+      # or
+      # {FileNameBase}_2.fq while we normally put them in the format {FileNameBase}.2.fq
       #
       file.name.change <- paste(file.name.change,"&&","mv",fqfiles.table[i,1])
       fqfiles.table[i,1] <- sub(".1.fq","_1.fq",fqfiles.table[i,1])
@@ -53,13 +59,12 @@ for (zz in 1:nStreams) {
     ###################
     # Alignment with SAM output
     ###################
-    # names of current fastq files:
+    # Grabbing all the correct naming conventions and such.
     fq.left <- fqfiles.table[i,1]
     if (paired.end) fq.right <- fqfiles.table[i,2]
-    this.library <- substr(fqfiles.table[i,1], 1,libNchar)
-    this.resName <- paste(this.library, text.add, sep=".")
-    unsorted.sam <- paste(this.resName, "unsorted", sep=".")
-    ##
+    name <- assign.name(fqfiles.table[i,1],paired.end)
+    this.resName <- assign.resName(name,text.add)
+    #
     # -o Tells the aligner where to put the output, which is a unique folder based on the inputs.  
     # This makes sure we don't overwrite any results and can pull them individually from their folder to
     # the main folder for further processing/display, but retain some of TopHat's excellent post-run notes
@@ -70,9 +75,9 @@ for (zz in 1:nStreams) {
     if (paired.end){
       align <- paste(align,fq.right)
     }
+    # After the alignment, we'll want to move some files around and rename some files to line up more with our standard naming conventions.
     acceptedHitsName <- paste("Accepted_Hits.",this.resName,".bam",sep="")
     file.rename.and.move <- paste("cd",tophat.output.dir,"&&","mv","accepted_hits.bam",acceptedHitsName,"&&","mv",acceptedHitsName,dest.dir,"&&","cd",dest.dir)
-    
     bam.index <- paste("samtools index", acceptedHitsName)
     #
     ###################
@@ -80,10 +85,10 @@ for (zz in 1:nStreams) {
     # to name-sorted  sam:  
     ###################
     #
-    countable.sam <- paste(this.resName, "countable.sam", sep=".")
+    countable.sam <- countable.sam.name(this.resName)
     paired.arg <- paste(this.resName, "paired", sep=".")
     paired.bam <- paste(this.resName, "paired.bam", sep=".")
-    # let's avoid pipe here to save RAM
+    # Let's avoid pipe here to save RAM
     # Directly write the samtools output to a new countable file after sorting
     # -n in the samtools sort indicates that the document will be sorted by read name rather than chromosome
     # -h in the samtools view indicates a header will be printed

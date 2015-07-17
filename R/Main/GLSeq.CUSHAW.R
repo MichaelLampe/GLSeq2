@@ -8,14 +8,13 @@
 #
 #
 source("GLSeq.Util.R")
+source("GLSeq.Alignment.Functions.R")
 setwd(dest.dir)
-####################################
-# Copy genome indices to the destination dir: 
-####################################
-ref.dir <- paste(base.dir, rGenome, sep="")
-indCopy <- paste("cd ", ref.dir, " && cp ",refFASTAname," ",dest.dir, sep="")
+
+comm.stack.pool <- NULL
+
+indCopy <- copyGenome(base.dir,rGenome,refFASTAname,dest.dir)
 system(indCopy)
-#
 # This will index the CUSHAW with your FASTA file, necessary.  
 # Previously the user needed to do this, but it should be easier if we just take care of
 # This stuff on our end during each run (It is fast && cheap anyway)
@@ -39,8 +38,13 @@ if (GPU.accel){
       # names of current fastq files:
       fq.left <- fqfiles.table[i,1]
       if (paired.end) fq.right <- fqfiles.table[i,2]
-      this.library <- substr(fqfiles.table[i,1], 1,libNchar)
-      this.resName <- paste(this.library, text.add, sep=".")
+      name <- fqfiles.table[i,1]
+      if (paired.end){
+        name <- substr(name,1,length(name) - 5)
+      } else{
+        name <- substr(name,1,length(name) - 3)
+      }
+      this.resName <- paste(name, text.add, sep=".")
       unsorted.sam <- paste(this.resName, "unsorted", sep=".")
       #
       ###################
@@ -102,9 +106,9 @@ for (zz in 1:nStreams) {
     # names of current fastq files:
     fq.left <- fqfiles.table[i,1]
     if (paired.end) fq.right <- fqfiles.table[i,2]
-    this.library <- substr(fqfiles.table[i,1], 1,libNchar)
-    this.resName <- paste(this.library, text.add, sep=".")
-    unsorted.sam <- paste(this.resName, "unsorted", sep=".")
+    name <- assign.name(fqfiles.table[i,1],paired.end)
+    this.resName <- assign.resName(name,text.add)
+    countable.sam <- countable.sam.name(this.resName)
     #
     ###################
     # If no GPU, we can run all of the above files in parallel
@@ -126,6 +130,10 @@ for (zz in 1:nStreams) {
     ################### 
     countable.sam <- paste(this.resName,"countable","sam",sep=".")
     # This removes certain read errors that can cause counting programs to crash
+    # Is the argument to an AWK command that the data is piped into before being written.
+    # This is only needed when using paired.ended data, so you can see we avoid that pipe when
+    # we are utilizing SE data.
+    # Can't remember where I found this, so no link (But it works!).
     remove <- paste("'!/\t\\*\t/'")
     sorted.bam <- paste(this.resName,"sorted.bam",sep=".")
     if(paired.end) convert.to.sam <- paste ("samtools view -h",sorted.bam,"|","awk",remove,">",countable.sam)

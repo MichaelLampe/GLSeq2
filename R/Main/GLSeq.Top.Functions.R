@@ -371,7 +371,6 @@ RSEM.finish <- function(comm.stack.pool,destDirRSEMCount,dest.dir) {
   if (is.null(comm.stack.pool) || is.null(destDirRSEMCount) || is.null(dest.dir)) stop("Arguments should not be NULL")
     destDirRSEMCount <- trailDirCheck(destDirRSEMCount)
     dest.dir <- trailDirCheck(dest.dir)
-    comm.stack.pool <- paste(comm.stack.pool,"wait")
     comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir,"&&","mv",paste("*.RSEM.counts.*"),destDirRSEMCount)
     comm.stack.pool <- paste(comm.stack.pool,"&&","mv","*.index.*",destDirRSEMCount)   
     # RETURNS THE COMM STACK
