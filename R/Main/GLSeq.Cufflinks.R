@@ -1,3 +1,12 @@
+#########################################################
+# Great Lakes Seq package for low-level processing of RNA-Seq data
+# Trimmomatic-BWA-HTSeq quantification of the expression values
+# Cufflinks Counting Method
+#
+# Date: June 2015
+# Author: Michael Lampe
+#########################################################
+
 source ("GLSeq.Util.R")
 #
 ref.dir <- paste(base.dir, rGenome, sep="")
