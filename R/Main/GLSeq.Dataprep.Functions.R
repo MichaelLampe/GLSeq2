@@ -8,7 +8,7 @@ source("GLSeq.Util.R")
 create.QC.folder <- function(dest.dir,text.add){
   if (is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
-  quality.check.folder <- paste(dest.dir,text.add,."DataprepQualityCheck",sep="")
+  quality.check.folder <- paste(dest.dir,text.add,".DataPrep",sep="")
   create.folder <- paste("mkdir",quality.check.folder)
   try(system(create.folder))
   quality.check.folder
@@ -39,6 +39,7 @@ check.ifFiles <- function(fqFiles.zip,fqFiles.unzip){
   if (is.null(fqFiles.zip) && is.null(fqFiles.unzip)) stop("Please check the list of raw FASTQ files and the contents of the raw directory \n Please remember that files must be in .fq or .fq.gz format \n")
   NULL
 }
+
 ##################
 # Load and prepare files
 ##################
@@ -145,6 +146,13 @@ copy.artificial.fq <- function(base.dir,artificial.fq,dest.dir){
   copy <- paste("cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
   try(system(copy))
   copy
+}
+
+store.artificial.seqs.file <- function(artificial.fq,qcFolder){
+  if(is.null(artificial.fq) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
+  move.to.storage <- paste("mv",artificial.fq,qcFolder)
+  move.to.storage
 }
 
 # Strips the string of any extensions we add or exist on the file.
@@ -311,6 +319,19 @@ remove.unneeded.files <- function(fqFile){
   remove.command <- paste("rm",leftDirtyFname,"; rm",rightDirtyFname,"; rm",unpairedTrimmed.1,"; rm",unpairedTrimmed.2)
   remove.command
 }
+
+move.paired.files.PE <- function(fqFile,qcFolder){
+  if (is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
+  fqFile <- get.file.base(fqFile)
+  first.read.file <- first.read.name(fqFile)
+  second.read.file <- second.read.name(fqFile)
+  logName.first <- paste(first.read.file, "pairedtrim.log", sep=".")
+  logName.second <- paste(second.read.file, "pairedtrim.log", sep=".")
+  command <- paste("mv",logName.first,qcFolder,"&&","mv",logName.second,qcFolder)
+  command
+}
+
 ###############
 # Single end processing
 ###############
@@ -335,9 +356,10 @@ trimAssemble.SE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq
     stop("Arguments should not be NULL")
   }
   if (substr(trimPath,nchar(trimPath),nchar(trimPath))=="/") stop("Invalid path to Trimmomatic JAR file")
+  fqFile.base <- get.file.base(fqFile)
   dashqScore <- paste("-", qScore, sep="")
   logName <- paste(fqFile, "pairedtrim.log", sep=".")
-  pairedTrimmed.1 <- paste("p", fqFile, "fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
+  pairedTrimmed.1 <- paste("p", fqFile.base, "fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
   trimParam <- paste("ILLUMINACLIP:", artificial.fq, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
   tcomm <- paste("java -jar", trimPath, "SE -threads 20", dashqScore, "-trimlog", logName, fqFile,  pairedTrimmed.1, trimParam)
   tcomm
@@ -351,7 +373,6 @@ file.shuffle.SE <- function(fqFile){
   trimmed.name <- paste("p.",final.name,sep="")
   #
   fileShuffle <- paste("mv", final.name, dirty.name, " && ",  "mv", trimmed.name, final.name)
-  #
   #
   fileShuffle
 }
@@ -377,8 +398,14 @@ postQualityCheck.SE <- function(fastqcPath,fqFile,qcFolder){
 remove.unneeded.files.SE <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
   fqFile <- get.file.base(fqFile)
-  final.name <- final.name.SE(fqFile)
-  unpairedTrimmed <- paste("u",final.name,sep=".")
   dirty.name <- dirty.name.SE(fqFile)
-  remove.command <- paste("rm",dirty.name,"; rm",unpairedTrimmed)
+  remove.command <- paste("rm",dirty.name)
+}
+
+move.paired.files.SE <- function(fqFile,qcFolder){
+  if (is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
+  qcFolder <- trailDirCheck(qcFolder)
+  logName <- paste(fqFile, "pairedtrim.log", sep=".")
+  command <- paste("mv",logName,qcFolder)
+  command
 }
