@@ -1,6 +1,6 @@
 create.QC.folder <- function(){
-  checkEquals("/home/test.DataPrepQualityCheck",create.QC.folder("/home/",test))
-  checkEquals("/home/test.DataPrepQualityCheck",create.QC.folder("/home",test))
+  checkEquals("/home/test.DataPrep",create.QC.folder("/home/",test))
+  checkEquals("/home/test.DataPrep",create.QC.folder("/home",test))
   checkException(create.QC.folder(NULL,NULL))
   checkException(create.QC.folder("NULL",NULL))
   checkException(create.QC.folder(NULL,"NULL"))
@@ -234,7 +234,8 @@ tests.file.shuffle.PE <- function(){
 }
 
 tests.preQualityCheck.PE <- function(){
-  checkEquals("/home/fastqcpath -o qualityCheckData dirty.test.1.fq dirty.test.2.fq",preQualityCheck.PE("/home/fastqcpath","test.fq","qualityCheckData"))
+  checkEquals("/home/fastqcpath -o qualityCheckData/ dirty.test.1.fq dirty.test.2.fq",preQualityCheck.PE("/home/fastqcpath","test.fq","qualityCheckData/"))
+  checkEquals("/home/fastqcpath -o qualityCheckData/ dirty.test.1.fq dirty.test.2.fq",preQualityCheck.PE("/home/fastqcpath","test.fq","qualityCheckData"))
   checkException(preQualityCheck.PE(NULL,NULL,NULL),"Arguments should not be NULL")
   checkException(preQualityCheck.PE("NULL","NULL",NULL),"Arguments should not be NULL")
   checkException(preQualityCheck.PE("NULL",NULL,"NULL"),"Arguments should not be NULL")
@@ -242,7 +243,8 @@ tests.preQualityCheck.PE <- function(){
 }
 
 tests.postQualityCheck.PE <- function(){
-  checkEquals("/home/fastqcpath -o qualityCheckData test.1.fq test.2.fq",postQualityCheck.PE("/home/fastqcpath","test.fq","qualityCheckData"))
+  checkEquals("/home/fastqcpath -o qualityCheckData/ test.1.fq test.2.fq",postQualityCheck.PE("/home/fastqcpath","test.fq","qualityCheckData/"))
+  checkEquals("/home/fastqcpath -o qualityCheckData/ test.1.fq test.2.fq",postQualityCheck.PE("/home/fastqcpath","test.fq","qualityCheckData"))
   checkException(postQualityCheck.PE(NULL,NULL,NULL),"Arguments should not be NULL")
   checkException(postQualityCheck.PE("NULL","NULL",NULL),"Arguments should not be NULL")
   checkException(postQualityCheck.PE("NULL",NULL,"NULL"),"Arguments should not be NULL")
@@ -267,22 +269,22 @@ tests.final.name.SE <- function(){
 tests.trimAssemble.SE <- function(){
   trimPath <- "/home/trim.jar"
   qScore <- "phred33"
-  leftDirtyName <- "dirty.l"
+  fqFile <- "result.fq"
   headcrop <- 12
   artificial.fq <- "test.art"
   trimMin <- 2
   
   test1.trimCommand <- paste("ILLUMINACLIP:test.art:2:30:10 HEADCROP:12 SLIDINGWINDOW:3:30 MINLEN:2")
-  test1.command <- paste("java -jar /home/trim.jar SE -threads 20 -phred33 -trimlog dirty.l.pairedtrim.log dirty.l p.dirty.l.fq", test1.trimCommand)
-  checkEquals(test1.command,trimAssemble.SE(leftDirtyName,trimPath,qScore,headcrop,artificial.fq,trimMin))
+  test1.command <- paste("java -jar /home/trim.jar SE -threads 20 -phred33 -trimlog result.fq.pairedtrim.log result.fq p.result.1.fq",test1.trimCommand)
   
   trimPath <- "/home/trim.jar/"
-  checkException(trimAssemble.SE(leftDirtyName,trimPath,qScore,headcrop,artificial.fq,trimMin),"Invalid path to Trimmomatic JAR file")
+  checkException(trimAssemble.SE(fqFile,trimPath,qScore,headcrop,artificial.fq,trimMin),"Invalid path to Trimmomatic JAR file")
   
-  checkException(trimAssemble.PE(NULL,NULL,,NULL,NULL,NULL,NULL),"Arguments should not be NULL")
-  checkException(trimAssemble.PE("NULL","NULL","NULL",NULL,"NULL",NULL),"Arguments should not be NULL")
-  checkException(trimAssemble.PE(NULL,"NULL",NULL,"NULL",NULL,NULL),"Arguments should not be NULL")
+  checkException(trimAssemble.SE(NULL,NULL,NULL,NULL,NULL,NULL),"Arguments should not be NULL")
+  checkException(trimAssemble.SE("NULL","NULL","NULL",NULL,"NULL",NULL),"Arguments should not be NULL")
+  checkException(trimAssemble.SE(NULL,"NULL",NULL,"NULL",NULL,NULL),"Arguments should not be NULL")
 }
+
 
 tests.file.shuffle.SE <- function(){
   checkEquals("mv test.fq dirty.test.fq  &&  mv p.test.fq test.fq",file.shuffle.SE("test.fq"))
@@ -290,7 +292,8 @@ tests.file.shuffle.SE <- function(){
 }
 
 tests.preQualityCheck.SE <- function(){
-  checkEquals("/home/fastqc -o qualityCheckData dirty.test.fq",preQualityCheck.SE("/home/fastqc","test.fq","qualityCheckData"))
+  checkEquals("/home/fastqc -o qualityCheckData/ dirty.test.fq",preQualityCheck.SE("/home/fastqc","test.fq","qualityCheckData/"))
+  checkEquals("/home/fastqc -o qualityCheckData/ dirty.test.fq",preQualityCheck.SE("/home/fastqc","test.fq","qualityCheckData"))
   checkException(preQualityCheck.SE(NULL,NULL,NULL),"Arguments should not be NULL")
   checkException(preQualityCheck.SE("NULL","NULL",NULL),"Arguments should not be NULL")
   checkException(preQualityCheck.SE("NULL",NULL,"NULL"),"Arguments should not be NULL")
@@ -298,7 +301,8 @@ tests.preQualityCheck.SE <- function(){
 }
 
 tests.postQualityCheck.SE <- function(){
-  checkEquals("/home/fastqc -o qualityCheckData test.fq",postQualityCheck.SE("/home/fastqc","test.fq","qualityCheckData"))
+  checkEquals("/home/fastqc -o qualityCheckData/ test.fq",postQualityCheck.SE("/home/fastqc","test.fq","qualityCheckData"))
+  checkEquals("/home/fastqc -o qualityCheckData/ test.fq",postQualityCheck.SE("/home/fastqc","test.fq","qualityCheckData/"))
   checkException(postQualityCheck.SE(NULL,NULL,NULL),"Arguments should not be NULL")
   checkException(postQualityCheck.SE("NULL","NULL",NULL),"Arguments should not be NULL")
   checkException(postQualityCheck.SE("NULL",NULL,"NULL"),"Arguments should not be NULL")
@@ -306,6 +310,6 @@ tests.postQualityCheck.SE <- function(){
 }
 
 remove.unneeded.files.SE <- function(){
-  checkEquals("rm dirty.test.fq ; rm u.test.fq",remove.unneeded.files("test.fq"))
+  checkEquals("rm dirty.test.fq",remove.unneeded.files("test.fq"))
   checkException(remove.unneeded.files(NULL),"Arguments should not be NULL")
 }

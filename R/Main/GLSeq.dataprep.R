@@ -42,6 +42,10 @@ if (!unzipped){
   fqFiles.zip <- get.files.zipped(raw.dir)
   fqFiles <- prepare.zipped.file.names(fqFiles.zip)
   copy.files.to.dest.zipped(raw.dir,dest.dir)
+  for (i in 1:length(fqFiles.zip)){
+    unzip.comm <- unzip.gz.files(fqFiles.zip[i])
+    try(system(unzip.comm))
+  }
 }
 #
 check.ifFiles(fqFiles.zip,fqFiles.unzip)
@@ -58,7 +62,7 @@ if (presplit){
   rangelist.Dataprep <- chunk.data.files.presplit(fqFiles,nStreamsDataPrep)
 }
 if (!presplit){
-  rangelist.Dataprep <- chunk.data.files.unsplit(fqFiles.nStreamsDataPrep)
+  rangelist.Dataprep <- chunk.data.files.unsplit(fqFiles,nStreamsDataPrep)
 }
 
 # Copy the artificial.fq file in
@@ -88,6 +92,8 @@ for (zz in 1:nStreamsDataPrep) {
         comm.pool <- paste(comm.pool,"&&",preQC)
         remove.command <- remove.unneeded.files(fqFiles[j])
         comm.pool <- paste(comm.pool,"&&",remove.command)
+        move.file.log <- move.paired.files.PE((fqFiles[j]),qcFolder)
+        comm.pool <- paste(comm.pool,"&&",move.file.log)
       }   
       # Quality control check via Fastqc of result files
       postQC <- postQualityCheck.PE(fastqcPath,fqFiles[j],qcFolder)
@@ -97,16 +103,19 @@ for (zz in 1:nStreamsDataPrep) {
     if (!paired.end){
       if (readTrim){
         # The trim command
-        trimCommand <- trimAssemble.SE(fqFile[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
+        trimCommand <- trimAssemble.SE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
         comm.pool <- paste(comm.pool,"&&",trimCommand)
         # Modifies the names of a few files to retain naming
-        file.shuffle <- file.shuffle.SE(fqFile[j])
+        file.shuffle <- file.shuffle.SE(fqFiles[j])
         comm.pool <- paste(comm.pool,"&&",file.shuffle)
         # Quality control check via Fastqc of dirty file
-        preQC <- preQualityCheck.SE(fastqcPath,fqFile[j],qcFolder)
+        preQC <- preQualityCheck.SE(fastqcPath,fqFiles[j],qcFolder)
         comm.pool <- paste(comm.pool,"&&",preQC)
         remove.command <- remove.unneeded.files.SE(fqFiles[j])
         comm.pool <- paste(comm.pool,"&&",remove.command)
+        move.file.log <- move.paired.files.SE((fqFiles[j]),qcFolder)
+        comm.pool <- paste(comm.pool,"&&",move.file.log)
+                                        
       }
       # Quality control check via Fastqc of result files
       postQC <- postQualityCheck.SE(fastqcPath,fqFiles[j],qcFolder)
@@ -115,4 +124,6 @@ for (zz in 1:nStreamsDataPrep) {
   }
   comm.pool <- paste(comm.pool,"&")
 }
-system(comm.pool)
+store.artificial <- store.artificial.seqs.file(artificial.fq,qcFolder)
+comm.pool <- paste(comm.pool,"wait","&&", store.artificial)
+try(system(comm.pool))

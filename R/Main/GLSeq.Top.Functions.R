@@ -247,7 +247,7 @@ convert.file.list.to.table <- function(paired.end,dest.dir) {
   if (!(paired.end)) {
     fqfiles <- dir(dest.dir)
     fqfiles <- fqfiles[grep(".fq$", fqfiles)]
-    fqfiles.table <- cbind(NULL, fqfiles)
+    fqfiles.table <- cbind(fqfiles)
   }
   fqfiles.table
 }
@@ -409,23 +409,7 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir){
   dataPrep <- paste("Rscript GLSeq.dataprep.R ", text.add," ",dest.dir," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="") 
   print("Starting Data Preparation")
   system(dataPrep)
-  #
-  #################
-  # Watch for readiness of the data files 
-  # before starting the expression calculations
-  ################
-  DataIsWaiting <- TRUE
-  if (dataPrepare == "dataprep"){
-    setwd(dest.dir)
-    DataIsWaiting <- FALSE 
-  }
-  dataReady.ind <- paste(text.add, ".DataReady", sep="") 
-  # Waiting
-  while(!(DataIsWaiting)) {
-    Sys.sleep(21)
-    DataIsWaiting <- dataReady.ind %in% dir(dest.dir)
-  }
-  if (DataIsWaiting) print("Data Preparation Complete")
+  print("Done with Data Preparation")
 }
 ##########################################################################
 #################### EXPRESSION CALCULATION ##############################
