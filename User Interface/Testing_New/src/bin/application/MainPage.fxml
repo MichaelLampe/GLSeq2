@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox prefHeight="786.0" prefWidth="873.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="application.MainPageController">
+   <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+        <items>
+          <Button fx:id="data_locations" mnemonicParsing="false" text="Data Locations" />
+            <Button fx:id="data_character" mnemonicParsing="false" text="Data Characteristics" />
+            <Button fx:id="algorithms" mnemonicParsing="false" text="Processing Algorithms" />
+            <Button fx:id="computation_settings" mnemonicParsing="false" text="Computation Settings" />
+            <Button fx:id="trim_settings" mnemonicParsing="false" text="Trim Settings" />
+            <Button fx:id="environment" mnemonicParsing="false" text="Environment" />
+            <Button fx:id="generate_attribute_file" mnemonicParsing="false" text="Generate Attribute File" />
+            <Button fx:id="run" mnemonicParsing="false" text="Run" />
+        </items>
+      </ToolBar>
+      <Pane fx:id="application_pane" prefHeight="722.0" prefWidth="873.0" />
+   </children>
+</VBox>

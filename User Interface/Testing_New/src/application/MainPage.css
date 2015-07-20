@@ -1,0 +1,10 @@
+.tab_pane {
+	-fx-background-color:#508CB9;
+}
+#footer_bar {
+	-fx-background-color:#3C7FB1;
+}
+.slider .axis:bottom .axis-label {
+    	-fx-fill: white;
+	-fx-font-size: 200px;
+}
