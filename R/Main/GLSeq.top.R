@@ -171,10 +171,9 @@ if (alignment == "noalignment") {
 
 if (counting == "counting"){
   if ("RSEM" %in% cAlgor){
-    RSEM.finish(comm.stack.pool,destDirRSEMCount,dest.dir)
+    comm.stack.pool <- RSEM.finish(comm.stack.pool,destDirRSEMCount,dest.dir)
   }
 }
-save.run.data(base.dir,text.add)
 execute.comm.stack(comm.stack.pool,log.file)
 add.to.logs(paste("The process took:",(proc.time()[3]-start.time[3]),"seconds to complete."),log.file)
 stop("Program complete.")

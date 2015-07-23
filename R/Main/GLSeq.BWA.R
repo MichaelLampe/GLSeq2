@@ -2,9 +2,7 @@ source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
 setwd(dest.dir)
 
-comm.stack.pool <- NULL
-
-indCopy <- copyGenome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
 system(indCopy)
 ###################################################################################
 # Index the BWA 
@@ -14,15 +12,22 @@ system(index)
 #
 for (zz in 1:nStreams) {
   # Assembly and runing the system command, one library at a time:
+  # For the very first assembly in the stack: 
+  if (zz == 1) comm.stack.pool <- "date"
+  if (zz != 1) comm.stack.pool <- paste(comm.stack.pool,"date")
+  
   for (i in rangelist[[zz]]) {
-    ###################
-    # Alignment with SAM output
-    ###################
-    # Grab and name everything correctly
+    # Names of current fastq files:
     fq.left <- fqfiles.table[i,1]
     if (paired.end) fq.right <- fqfiles.table[i,2]
-    name <- assign.name(fqfiles.table[i,1],paired.end)
+    name <- fq.left
+    if (paired.end){
+      name <- substr(name,1,nchar(name) - 5)
+    } else{
+      name <- substr(name,1,nchar(name) - 3)
+    }
     this.resName <- assign.resName(name,text.add)
+    unsorted.sam <- paste(this.resName, "unsorted", sep=".")
     # Names of the expected sai files
     # Sai files are an intermediate file type for BWA only.
     # Read the original paper for more info: http://bioinformatics.oxfordjournals.org/content/25/14/1754.full
@@ -38,32 +43,6 @@ for (zz in 1:nStreams) {
     # We take the output of the Sam*e program and appends the content to the unsorted SAM file
     if (paired.end) sam.create <- paste(bwaPath, "sampe", refFASTAname, sainame.left, sainame.right, fq.left, fq.right, ">>", unsorted.sam)
     if (!(paired.end)) sam.create <- paste(bwaPath, "samse", refFASTAname, sainame.left, fq.left, ">>", unsorted.sam)
-    #
-    ###################
-    # SAM file Cleanup
-    ###################
-    # Picard tools has a Sam cleaner that helps us out here
-    cleanSAM <- paste("java -Xmx2g -jar ",picardToolsPath, "CleanSam.jar", sep="")
-    # We give the file that will be output from the CleanSam.jar the Resname + a cleaned.sam suffix
-    cleaned.sam <- paste(this.resName, "cleaned.sam", sep=".")
-    # 
-    # SAM cleanup system command:
-    # I = Input file; O= Output file
-    cleansam.comm <- paste(cleanSAM, " I=", unsorted.sam, " O=", cleaned.sam, sep="") # System command #4
-    #
-    ###################
-    # Adding RG Header + sorting
-    ###################
-    # Picard tool also lets us modifty the Read group headers
-    headersortSAM <- paste("java -Xmx2g -jar ",picardToolsPath, "AddOrReplaceReadGroups.jar", sep="")
-    # Name of the processed (final) SAM file
-    final.sam <- paste(this.resName, "final.sam", sep=".")
-    # 
-    # Implement the logic for sequencer specificity here.  
-    #
-    # This solution may not work for data derived from Non-illumina sequencing data. Haven't tested that yet as I don't have any data to.
-    # I = Input file; O= Output File
-    finalsam.comm <- paste(headersortSAM, " I=", cleaned.sam, " O=", final.sam, " SO=coordinate LB=", refFASTAname, " PL=ILLUMINA PU=unknown SM=", this.resName, " VALIDATION_STRINGENCY=LENIENT", sep="")
     ###################
     # SAM => BAM file with index 
     ###################
@@ -76,7 +55,7 @@ for (zz in 1:nStreams) {
     # -t = TAB-delimited file
     # I'm not sure if we need to first pipe it from into the sorted.arg format and index or if we could just sort
     # This is something I will test in the future to possibly speed up the protocol a bit.
-    bam.create <- paste("samtools view -uS -t ", ref.index, final.sam, " | samtools sort - ", sorted.arg)
+    bam.create <- paste("samtools view -uS -t ", ref.index, unsorted.sam, " | samtools sort - ", sorted.arg)
     bam.index <- paste("samtools index", sorted.bam) # System command #7
     ###################
     # Converting the final bam (coordinate-sorted)
@@ -105,8 +84,9 @@ for (zz in 1:nStreams) {
     # Housekeeping 
     ###################
     # We remove a bunch of files here to make sure we don't clog up the hard drives too much with all the intermediate steps
-    if (paired.end) spaceCleanup <- paste("rm", sainame.left, "&& rm", sainame.right, "&& rm", unsorted.sam, "&& rm", cleaned.sam, "&& rm", final.sam, "&& rm", paired.bam)
-    if (!(paired.end)) spaceCleanup <- paste("rm", sainame.left, "&& rm", unsorted.sam, "&& rm", cleaned.sam, "&& rm", final.sam, "&& rm", paired.bam)
+    bai <- paste(sorted.bam,"bai",sep=".")
+    if (paired.end) spaceCleanup <- paste("rm",fq.left,"&& rm",fq.right,"&& rm", sainame.left, "&& rm", sainame.right, "&& rm", unsorted.sam, "&& rm", paired.bam,"&& rm",sorted.bam,"&& rm", bai)
+    if (!(paired.end)) spaceCleanup <- paste("rm", sainame.left, "&& rm",fq.left,"&& rm", unsorted.sam,"&& rm", paired.bam,"&& rm",sorted.bam,"&& rm", bai)
     # Paired Ended Samples vs Unpaired
     # Paired end align two files are once (Because they are paired)
     # So we add in both teh right and the left.
@@ -116,25 +96,17 @@ for (zz in 1:nStreams) {
       if (!paired.end){
         comm.i <- paste(aln.left)
       }
-      comm.i <- paste(comm.i,"&&",sam.create,"&&",cleansam.comm,"&&",finalsam.comm,"&&",bam.create,"&&",bam.index,"&&",countable.comm)
+      comm.i <- paste(comm.i,"&&",sam.create,"&&",bam.create,"&&",bam.index,"&&",countable.comm)
     # Counting
     # Whatever was added to count.comm when it looked for counting protocols is added here
     comm.i <- paste(comm.i,"&&",count.comm)
     # Cleanup File 
     # Removes unneeded files.
     comm.i <- paste(comm.i,"&&",spaceCleanup)
-    # For the very first assembly in the stack: 
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "date && ", comm.i)
-    # for subsequent assemblies of every stack: 
-    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, " && date && ", comm.i)
     # system(comm.i)
-    if (resCollect == "collect"){
-      collLog <- paste(destDirLog, text.add, ".ResultsCollectLog.txt", sep="")
-      collerr <- paste(destDirLog, text.add, ".ResultsCollectErrors.txt", sep="")
-      collResults <- paste("cd ", base.dir, " && ", "Rscript GLSeqResultsCollect.R ", text.add, base.dir, dest.dir, " 0 1>> ", collLog, " 2>> ", collerr, sep="")
-      if (is.null(comm.stack.pool)) comm.stack.pool <- paste(collResults)
-      if (!is.null(comm.stack.pool)) comm.stack.pool <- paste(comm.stack.pool,"&&",collResults)
-    }
+    # For the very first assembly in the stack: 
+    # For the very first assembly in the stack (i = 1)
+    comm.stack.pool <- paste(comm.stack.pool,"&&",comm.i)
   } # for i 
   comm.stack.pool <- paste(comm.stack.pool,"&")
 } 
