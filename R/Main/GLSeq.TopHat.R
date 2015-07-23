@@ -8,10 +8,19 @@
 #########################################################
 #
 #
+source("GLSeq.Alignment.Functions.R")
 source("GLSeq.Util.R")
 setwd(dest.dir)
 
 comm.stack.pool <- NULL
+
+#
+####################################
+# Copy genome indices to the destimation dir: 
+####################################
+indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
+system(indCopy)
+####################
 
 file.name.change <- "date"
 if (paired.end){
@@ -35,14 +44,6 @@ if (paired.end){
     system(file.name.change)
   }
 }
-#
-####################################
-# Copy genome indices to the destimation dir: 
-####################################
-ref.dir <- paste(base.dir, rGenome, sep="")
-indCopy <- paste("cd ", ref.dir, " && cp ",refFASTAname," ",dest.dir, sep="")
-system(indCopy)
-####################
 # Index for TopHat Aligner with Bowtie2
 #
 # Prepare reference, what aligner to use, what reference to use, file name

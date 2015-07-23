@@ -4,7 +4,7 @@ setwd(dest.dir)
 
 comm.stack.pool <- NULL
 
-indCopy <- copyGenome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
 system(indCopy)
 ####################
 # Index the Bowtie or Bowtie2 Aligner

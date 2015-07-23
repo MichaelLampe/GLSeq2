@@ -29,7 +29,7 @@ system(index)
 ### Our NVidia Titan can sometimes run two at a time without alignment corruption, but this is a safer route.
 ####################################
 sam.create <- "date"
-if (GPU.accel){
+if (aAlgor == "Cushaw_GPU"){
   for (zz in 1:nStreams) {
     for (i in rangelist[[zz]]) {
       ###################
@@ -113,7 +113,7 @@ for (zz in 1:nStreams) {
     ###################
     # If no GPU, we can run all of the above files in parallel
     ###################
-    if (!GPU.accel){
+    if (aAlgor == "Cushaw"){
       if (paired.end) sam.create<- paste(CUSHAW.path, "-r", refFASTAname, "-q", fq.left, fq.right, "-o", unsorted.sam , "-t", nCores) 
       if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", refFASTAname, "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
     }
@@ -150,15 +150,15 @@ for (zz in 1:nStreams) {
     ###################
     # Current command:
     ###################
-    if (!GPU.accel) comm.i <- paste(sam.create, "&&",bam.create,"&&",bam.index,"&&",convert.to.sam)
-    if (GPU.accel) comm.i <- paste(bam.create,"&&",bam.index,"&&",convert.to.sam)
+    if (aAlgor == "Cushaw") comm.i <- paste(sam.create, "&&",bam.create,"&&",bam.index,"&&",convert.to.sam)
+    if (aAlgor == "Cushaw_GPU") comm.i <- paste(bam.create,"&&",bam.index,"&&",convert.to.sam)
     if (count.comm != "") comm.i <- paste(comm.i, "&&", count.comm)
     #
     # For the very first assembly in the stack (i = 1)
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "cd",dest.dir,"&&", comm.i)
+    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "cd date","&&", comm.i)
     #
     # For subsequent assemblies of every stack (i > 1)
-    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "&&","cd",dest.dir,"&&", comm.i)
+    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "&&","cd date","&&", comm.i)
     # system(comm.i)
   } # for i 
   comm.stack.pool <- paste(comm.stack.pool,"&")

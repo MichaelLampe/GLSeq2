@@ -28,6 +28,15 @@ if (aAlgor == "Cushaw"){
 }
 
 ################################################
+#Cushaw w/ and w/o GPU Accel Alignment Protocol
+################################################
+if (aAlgor == "Cushaw_GPU"){
+  occured <- TRUE
+  source ("GLSeq.CUSHAW.R")
+}
+
+
+################################################
 # TopHat Alignment Protocol
 ################################################
 if (aAlgor == "TopHat"){
