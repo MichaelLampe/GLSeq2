@@ -85,8 +85,8 @@ for (zz in 1:nStreams) {
     ###################
     # We remove a bunch of files here to make sure we don't clog up the hard drives too much with all the intermediate steps
     bai <- paste(sorted.bam,"bai",sep=".")
-    if (paired.end) spaceCleanup <- paste("rm",fq.left,"&& rm",fq.right,"&& rm", sainame.left, "&& rm", sainame.right, "&& rm", unsorted.sam, "&& rm", paired.bam,"&& rm",sorted.bam,"&& rm", bai)
-    if (!(paired.end)) spaceCleanup <- paste("rm", sainame.left, "&& rm",fq.left,"&& rm", unsorted.sam,"&& rm", paired.bam,"&& rm",sorted.bam,"&& rm", bai)
+    if (paired.end) spaceCleanup <- paste("rm",fq.left,"&& rm",fq.right,"&& rm", sainame.left, "&& rm", sainame.right, "&& rm", unsorted.sam, "&& rm", paired.bam,"&& rm",sorted.bam,"&& rm", bai,"&& rm",paste(refFASTAname,"*",sep=""))
+    if (!(paired.end)) spaceCleanup <- paste("rm", sainame.left, "&& rm",fq.left,"&& rm", unsorted.sam,"&& rm", paired.bam,"&& rm",sorted.bam,"&& rm", bai,"&& rm",,paste(refFASTAname,"*",sep=""))
     # Paired Ended Samples vs Unpaired
     # Paired end align two files are once (Because they are paired)
     # So we add in both teh right and the left.

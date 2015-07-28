@@ -56,6 +56,12 @@ system(index)
 #
 #
 for (zz in 1:nStreams) {
+  comm <- "date"
+  if (is.null(comm.stack.pool)) {
+    comm.stack.pool <- "date"
+  } else{
+    comm.stack.pool <- paste(comm.stack.pool,"date")
+  }
   for (i in rangelist[[zz]]) {
     ###################
     # Alignment with SAM output
@@ -78,7 +84,7 @@ for (zz in 1:nStreams) {
     }
     # After the alignment, we'll want to move some files around and rename some files to line up more with our standard naming conventions.
     acceptedHitsName <- paste("Accepted_Hits.",this.resName,".bam",sep="")
-    file.rename.and.move <- paste("cd",tophat.output.dir,"&&","mv","accepted_hits.bam",acceptedHitsName,"&&","mv",acceptedHitsName,dest.dir,"&&","cd",dest.dir)
+    file.rename.and.move <- paste("mv",paste(dest.dir,tophat.output.dir,"/accepted_hits.bam",sep=""),paste(dest.dir,acceptedHitsName,sep=""))
     bam.index <- paste("samtools index", acceptedHitsName)
     #
     ###################
@@ -102,14 +108,17 @@ for (zz in 1:nStreams) {
     }
     #
     # Add any counting
+    accepted.index <- paste(acceptedHitsName,".bai",sep="")
+    remove.indexes <- paste(rGenome,".*.bt2",sep="")
+    spaceCleanup <- paste("rm",paired.bam,"&& rm",acceptedHitsName)
     # Need to move the files that are made back into the normal folder
-    if (i == 1) comm.stack.pool <- paste("cd",dest.dir) 
-    if (i != 1) comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir)
+    comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir) 
     comm.stack.pool <- paste(comm.stack.pool,'&&',align)
     comm.stack.pool <- paste(comm.stack.pool,"&&",file.rename.and.move)
     comm.stack.pool <- paste(comm.stack.pool,"&&",bam.index)
     comm.stack.pool <- paste(comm.stack.pool,"&&",countable.comm)
     if (count.comm != "") comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm)
+    comm.stack.pool <- paste(comm.stack.pool,"&&",spaceCleanup)
     #    
   }
   comm.stack.pool <- paste(comm.stack.pool,"&")

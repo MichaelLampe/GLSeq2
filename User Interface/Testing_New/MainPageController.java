@@ -203,9 +203,24 @@ public final class MainPageController extends MainPageItems implements Initializ
       }
     });
   }
-  public void runBindings(){
-    start_run.disableProperty().bind(Bindings.when(run_name.textProperty().isNotEqualTo("")).then(false).otherwise(true));
+
+  public void runBindings() {
+    start_run.disableProperty().bind(
+        Bindings
+            .when(
+                // Requires a run name
+                run_name
+                    .textProperty()
+                    .isNotEqualTo("")
+                    .and(
+                        // One of the boxes must be check to do something.
+                        alignment_check.selectedProperty().or(
+                            data_prep_check.selectedProperty()
+                                .or(counting_check.selectedProperty())
+                                .or(collect_check.selectedProperty())))).then(false)
+            .otherwise(true));
   }
+
   /*
    * Make all the args for the script
    */

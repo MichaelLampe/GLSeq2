@@ -63,9 +63,12 @@ attrPath <- as.character(args[8])
 destDirTest <- NULL
 #
 #
+source(attrPath)
+# Little trick that allows us to run the top script from anywhere instead of having to be within the RScript folder
+setwd(base.dir)
 source("GLSeq.Util.R")
 source("GLSeq.Top.Functions.R")
-source(attrPath)
+
 #
 #
 ##################################################################################################
