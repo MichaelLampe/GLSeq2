@@ -79,10 +79,12 @@ for (zz in 1:nStreams) {
     ###################
     comm.i <- paste(align)
     comm.i <- paste(comm.i, "&&", count.comm)
+    spaceCleanup <- paste("rm",paste(rGenome,"*",sep=""),"&& rm",refFASTAname)
     # For the very first assembly in the stack: 
     if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"cd",dest.dir,"&& ",comm.i)
     # For subsequent assemblies of every stack: 
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir,"&&",comm.i)
+    comm.stack.pool <- paste(comm.stack.pool,"&&",spaceCleanup)
     #
   }
   comm.stack.pool <- paste(comm.stack.pool,"&")

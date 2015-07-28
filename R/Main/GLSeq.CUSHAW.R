@@ -13,7 +13,7 @@ setwd(dest.dir)
 
 comm.stack.pool <- NULL
 
-indCopy <- copyGenome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
 system(indCopy)
 # This will index the CUSHAW with your FASTA file, necessary.  
 # Previously the user needed to do this, but it should be easier if we just take care of
@@ -122,9 +122,9 @@ for (zz in 1:nStreams) {
     ################### 
     sorted <- paste(this.resName,"sorted",sep=".")
     ref.index <- paste(refFASTAname, "fai", sep=".") 
-    unsorted.bam <- paste(this.resName, "unsorted.bam", sep=".") 
+    sorted.bam <- paste(this.resName, "sorted.bam", sep=".") 
     bam.create <- paste("samtools view -uS -t ", ref.index, unsorted.sam, " | samtools sort -n -",sorted) # System command #6
-    bam.index <- paste("samtools index", unsorted.bam) # System command #7
+    bam.index <- paste("samtools index", sorted.bam) # System command #7
     ###################
     # Convert back to SAM file
     ################### 
@@ -150,6 +150,8 @@ for (zz in 1:nStreams) {
     ###################
     # Current command:
     ###################
+    
+    spaceCleanup <- paste("rm",unsorted.sam,"&& rm",sorted.bam,"&& rm",paste(refFASTAname,"*",sep=""))
     if (aAlgor == "Cushaw") comm.i <- paste(sam.create, "&&",bam.create,"&&",bam.index,"&&",convert.to.sam)
     if (aAlgor == "Cushaw_GPU") comm.i <- paste(bam.create,"&&",bam.index,"&&",convert.to.sam)
     if (count.comm != "") comm.i <- paste(comm.i, "&&", count.comm)
@@ -160,6 +162,7 @@ for (zz in 1:nStreams) {
     # For subsequent assemblies of every stack (i > 1)
     if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "&&","cd date","&&", comm.i)
     # system(comm.i)
+    comm.stack.pool <- paste(comm.stack.pool,"&&",spaceCleanup)
   } # for i 
   comm.stack.pool <- paste(comm.stack.pool,"&")
 } 
