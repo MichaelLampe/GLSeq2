@@ -80,19 +80,15 @@ if (aAlgor == "Cushaw_GPU"){
       # Checks to make sure that this process actually is GPU
       # The is.null is there for later on implementation of parallel GPU runs. (Hopefully!)
       sam.create <- paste(sam.create,"&&",create)
-      #
+      
       # Fixes the order of processing so that
       # The SAM file gets created when the user
       # Preps data, but it still executes in sequence
       #
-      GPUspecialCase <- TRUE
     } # i
   } #nStreams (zz)
+  system(sam.create)
 } #GPU.Accel
-if (GPUspecialCase) {
-    system(sam.create)
-    warning("The alignment step has now completed.")
-}
 comm.stack.pool <- NULL # 
 #################
 # Rest of the cleanup to get to counting, or CPU only CUSHAW
@@ -109,6 +105,7 @@ for (zz in 1:nStreams) {
     name <- assign.name(fqfiles.table[i,1],paired.end)
     this.resName <- assign.resName(name,text.add)
     countable.sam <- countable.sam.name(this.resName)
+    unsorted.sam <- paste(this.resName, "unsorted", sep=".")
     #
     ###################
     # If no GPU, we can run all of the above files in parallel
@@ -157,10 +154,10 @@ for (zz in 1:nStreams) {
     if (count.comm != "") comm.i <- paste(comm.i, "&&", count.comm)
     #
     # For the very first assembly in the stack (i = 1)
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "cd date","&&", comm.i)
+    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "date","&&", comm.i)
     #
     # For subsequent assemblies of every stack (i > 1)
-    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "&&","cd date","&&", comm.i)
+    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool, "&&","date","&&", comm.i)
     # system(comm.i)
     comm.stack.pool <- paste(comm.stack.pool,"&&",spaceCleanup)
   } # for i 
