@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -296,12 +298,27 @@
                      </children></AnchorPane>
                </content>
             </Tab>
+            <Tab text="Runs in Progress">
+               <content>
+                  <TableView fx:id="table_runs" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="column_run_name" prefWidth="454.0" text="Run Name" />
+                      <TableColumn fx:id="column_status" prefWidth="118.0" text="Status" />
+                        <TableColumn fx:id="column_start" prefWidth="90.0" text="Start Time" />
+                        <TableColumn fx:id="column_end" prefWidth="104.0" text="End Time" />
+                        <TableColumn fx:id="column_duration" prefWidth="107.0" text="Run Duration" />
+                    </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+               </content>
+            </Tab>
         </tabs>
       </TabPane>
       <Pane fx:id="footer_bar" prefHeight="61.0" prefWidth="68.0">
          <children>
-            <ProgressBar fx:id="footer_progress" layoutX="14.0" layoutY="14.0" prefHeight="18.0" prefWidth="846.0" progress="0.24" />
-         </children>
-      </Pane>
+            <ProgressBar fx:id="footer_progress" layoutX="14.0" layoutY="22.0" prefHeight="18.0" prefWidth="847.0" progress="0.0" />
+         </children></Pane>
    </children>
 </VBox>

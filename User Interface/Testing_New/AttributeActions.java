@@ -97,9 +97,12 @@ public final class AttributeActions {
     for (String param : inputArgs) {
       String[] parts = param.split("=");
       Attribute current = Attributes.getInstance().attributesCollection.get(parts[0]);
-      current.setValue(parts[1]);
+      try {
+        current.setValue(parts[1]);
+      } catch (IndexOutOfBoundsException e) {
+        // Improper field was entered
+      }
     }
-    UpdateUI.getInstance().updateDefaults();
   }
 
   /**
@@ -148,7 +151,7 @@ public final class AttributeActions {
     ArrayList<Attribute> attributeArray = new ArrayList<Attribute>(
         Attributes.getInstance().attributesCollection.values());
     for (int i = 0; i < attributeArray.size(); i++) {
-      System.out.print(formatJson(attributeArray.get(i).getName()));
+      System.out.print(formatJson(attributeArray.get(i).getUiName()));
       if (i < Attributes.getInstance().attributesCollection.size() - 2) {
         System.out.print(",");
       }
@@ -162,6 +165,7 @@ public final class AttributeActions {
    */
   private String formatJson(String field_name) {
     String jsonKey = "{\"key\":";
+    System.out.println(field_name);
     AttributesJSON current = Enum.valueOf(AttributesJSON.class, field_name);
     jsonKey += "\"" + current.name() + "\"";
     if (current.category != null) {
@@ -222,7 +226,9 @@ public final class AttributeActions {
     // Converts the hashmap to an arraylist for for eachin'
     for (Attribute attribute : new ArrayList<Attribute>(
         Attributes.getInstance().attributesCollection.values())) {
-      writer.write(generateLine(attribute));
+      if (!attribute.getCategory().equals(Category.SCRIPT.name)) {
+        writer.write(generateLine(attribute));
+      }
     }
     // Special code to make the R script's life easier.
     // Add anything to further process the data here.

@@ -9,6 +9,8 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 
 class MainPageItems {
@@ -158,5 +160,17 @@ class MainPageItems {
   protected TabPane tab_check;
   @FXML
   protected ProgressBar footer_progress;
-
+  
+  @FXML
+  protected TableView<RunTableEntry> table_runs;
+  @FXML
+  protected TableColumn<RunTableEntry, String> column_run_name;
+  @FXML
+  protected TableColumn<RunTableEntry, String> column_status;
+  @FXML
+  protected TableColumn<RunTableEntry, String> column_start;
+  @FXML
+  protected TableColumn<RunTableEntry, String> column_end;
+  @FXML
+  protected TableColumn<RunTableEntry, String> column_duration;
 }

@@ -2,11 +2,11 @@ package application;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -15,7 +15,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public final class MainPageController extends MainPageItems implements Initializable {
 
@@ -29,6 +31,7 @@ public final class MainPageController extends MainPageItems implements Initializ
     group = radioButtonGroup();
     progressBarListener();
     runBindings();
+    setupRunTable();
   }
 
   /*
@@ -191,10 +194,15 @@ public final class MainPageController extends MainPageItems implements Initializ
         } catch (IOException e) {
           e.printStackTrace();
         }
-        List<String> args = constructArgs();
+        // Creates a run instance
+        Run currentRun = constructRun();
+        // Grabs the args from that instance
+        List<String> args = currentRun.constructArgs();
         if (args != null) {
           args.add(attributeFileLocation);
-          Task<Object> task = new RunWorker(args);
+          // Might add some logic in the future that starts an SSH on
+          // windows/mac
+          Task<Object> task = new RunWorker(args, currentRun.getActiveRun());
           // Run on a different thread so it doesn't lock up the UI.
           new Thread(task).start();
         } else {
@@ -204,16 +212,32 @@ public final class MainPageController extends MainPageItems implements Initializ
     });
   }
 
+  private void setupRunTable() {
+    table_runs.setItems(RunTableEntry.getTableEntries());
+    column_run_name.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("runName"));
+    column_start.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("startTime"));
+    column_status.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("status"));
+    column_end.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("endTime"));
+    column_duration.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>(
+        "runDuration"));
+
+  }
+
   public void runBindings() {
     start_run.disableProperty().bind(
         Bindings
             .when(
-                // Requires a run name
+            // Requires a run name
                 run_name
                     .textProperty()
+                    // There is some text
                     .isNotEqualTo("")
                     .and(
-                        // One of the boxes must be check to do something.
+                    // 45 char names max
+                    // Just makes the table easier to handle.
+                        textCountLimit(run_name, 45))
+                    .and(
+                    // One of the boxes must be check to do something.
                         alignment_check.selectedProperty().or(
                             data_prep_check.selectedProperty()
                                 .or(counting_check.selectedProperty())
@@ -221,47 +245,19 @@ public final class MainPageController extends MainPageItems implements Initializ
             .otherwise(true));
   }
 
-  /*
-   * Make all the args for the script
-   */
-  private List<String> constructArgs() {
-    List<String> args = new ArrayList<String>();
-    boolean doingSomething = false;
-    args.add("Rscript");
-    args.add("GLSeq.top.R");
+  private BooleanBinding textCountLimit(TextArea run_name, int char_count) {
+    BooleanBinding binding = Bindings.createBooleanBinding(
+        () -> (run_name.getText().length() <= char_count), run_name.textProperty());
+    return binding;
+  }
+
+  private Run constructRun() {
     // Update no longer in use.
-    args.add("Placeholder");
-    if (data_prep_check.isSelected()) {
-      doingSomething = true;
-      args.add("dataprep");
-    } else {
-      args.add("nodataprep");
-    }
-    if (alignment_check.isSelected()) {
-      doingSomething = true;
-      args.add("alignment");
-    } else {
-      args.add("noalignment");
-    }
-    if (counting_check.isSelected()) {
-      doingSomething = true;
-      args.add("counting");
-    } else {
-      args.add("nocounting");
-    }
-    if (collect_check.isSelected()) {
-      doingSomething = true;
-      args.add("collect");
-    } else {
-      args.add("nocollect");
-    }
-    args.add(run_name.getText());
-    args.add("0");
-    if (doingSomething) {
-      return args;
-    } else {
-      return null;
-    }
+    boolean data_prep = data_prep_check.isSelected();
+    boolean alignment = alignment_check.isSelected();
+    boolean counting = counting_check.isSelected();
+    boolean collect = collect_check.isSelected();
+    return new Run(data_prep, alignment, counting, collect, run_name.getText());
   }
 
   /*
