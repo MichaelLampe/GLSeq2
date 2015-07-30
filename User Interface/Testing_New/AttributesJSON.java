@@ -112,7 +112,24 @@ public enum AttributesJSON {
           Category.ENVIRONMENT.name, "Path to the Rockhopper Aligner"),
   destDirTest("destDirTest",
       Category.ENVIRONMENT.name,
-      "Path to a logging file.  This will create general logs and put them in this directory.");
+      "Path to a logging file.  This will create general logs and put them in this directory."),
+  uiDivider("uiDivider",
+          Category.SCRIPT.name,
+          "Divider for Glow"),
+  Update("Updating",Category.SCRIPT.name,"\"noupdate\",\"update\"","noupdate",
+      "If to update from glow."),
+  DataPrep("Data Preparation",Category.SCRIPT.name,"\"dataprep\",\"nodataprep\"","nodataprep",
+      "If to prepare raw data."),
+  Alignment("Alignment",Category.SCRIPT.name,"\"alignment\",\"noalignment\"", "noalignment",
+      "If to align data."),
+  Counting("Counting",Category.SCRIPT.name,"\"counting\",\"nocounting\"", "nocounting",
+      "If to count data."),
+  Collect("Collect",
+      Category.SCRIPT.name,"\"collect\",\"nocollect\"", "nocollect",
+      "If to collect results summary."),
+  RunName("Run Name",
+      Category.SCRIPT.name,
+      "The name of the run to be started.");
 
   public final String category;
   public final String options;

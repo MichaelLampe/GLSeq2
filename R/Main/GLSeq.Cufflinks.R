@@ -33,7 +33,7 @@ if (!is.na(countable.sam)){
   cufflinks.ready.countable <- paste(dest.dir,cufflinks.ready.countable,sep="")
   #
   # No progress bar makes everything feel better.
-  cufflinks.options <- paste("--quite --output-dir",cufflinks.dest)
+  cufflinks.options <- paste("--quiet --output-dir",cufflinks.dest)
   cufflinks.run <- paste("cufflinks",cufflinks.options,cufflinks.ready.countable)
   #
   if (count.comm != "") count.comm <- paste(count.comm,"&&",create.run.dir,"&&",cufflinks.ready.create,"&&",cufflinks.run)
