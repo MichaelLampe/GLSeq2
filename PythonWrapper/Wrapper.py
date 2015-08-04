@@ -5,7 +5,8 @@ import subprocess
 # GLSeq and receive the output command
 
 class GlSeqRun:
-    def __init__(self,update_database,prepare_data,align,count,collect,run_name,protocol_id,attribute_file_path,condor):
+    def __init__(self,glseq_path,update_database,prepare_data,align,count,collect,run_name,protocol_id,attribute_file_path,condor):
+        self.glseq_path = glseq_path
         self.update = update_database
         self.prepare = prepare_data
         self.align = align
@@ -27,7 +28,7 @@ class GlSeqRun:
     def defineRunArgs(self):
         run = list()
         run.append("Rscript")
-        run.append("GLSeq.top.R")
+        run.append(self.glseq_path)
         run.append(self.update)
         run.append(self.prepare)
         run.append(self.align)
