@@ -1,82 +1,54 @@
 __author__ = 'mlampe'
 
 import re
-command = "command 1 && command2 & parallel1 && parallel2 && parallel3 &"
 
 class CommandsProcessor:
     def __init__(self,commands):
         # The list of all commands broken into the order they were sent
         self.commands = commands
-        # These are keywords that can be matched so we can better groups jobs
-        self.group_keywords = {
-            'mkdir',
-            'cd',
-            'mv',
-            'cp',
-            'date',
-            'samtools'
-            'rm'
-        }
-        self.parallelize_keywords = {
-            'HTSeq.scripts.count'
-            'GLSeq.FeatureCounts.R'
-            'RSEM'
-            'cufflinks'
-        }
 
-    # Just kinda sounds cool when you call it
     # This takes all the commands and divides it into the order they were run and tries
     # to paralleize commands run together and group smaller commands
     def handle(self):
         # All the commands in the order they should appear
-        ordered_commands = list()
+        command_list = list()
+        # Splits the commands by parallel processes (&)
         for command in self.commands:
-            # Parallel commands are divided into another list, so that order is retained, but
-            # the ability to be run in parallel is easily identified.
-            parallel_list = self.parallelize_commands(command)
-            ordered_commands.append(parallel_list)
-        grouped_ordered_commands = list()
-        for command in ordered_commands:
-            grouped_ordered_commands.append(self.group_commands(command))
+            command = self.split_background(command)
+            command = filter(bool,command)
+            command_list.append(command)
+        # Reassign and clear
+        self.commands = command_list
+        command_list = list()
+        for command in self.commands:
+            command = self.split_linked(command)
+            command = filter(bool,command)
+            command_list.append(command)
+        return command_list
 
+    # This breaks parts that have only one "&" into an array that will then be able to be run in parallel
+    def split_background(self,command):
+        re1='(?<!&)&(?!&)'	# Matches only a single & that cannot be preceded or succeeded by another &
+        rg = re.compile(re1,re.IGNORECASE)
+        command_split = rg.split(command)
+        return command_split
 
-    def parallelize_commands(self,command):
-        command = command.split("&&")
-        parallel_commands = list()
-        single_command = list()
-        for comm in command:
-            if ("&" in comm):
-                # Split on parallelizer
-                parts = comm.split("&")
-                # Add the last command of the first to that command
-                if ("wait" not in parts[0]):
-                    single_command.append(parts[0])
-                # This command is finished, add it to the whole deal & remove empty strings
-                single_command = filter(bool,single_command)
-                parallel_commands.append(single_command)
-                # Clear it
-                single_command = list()
-                # Add the first part to the new list
-                if ("wait" not in parts[1]):
-                    single_command.append(parts[1])
-            else:
-                if ("wait" not in comm):
-                    single_command.append(comm)
-        single_command = filter(bool,single_command)
-        parallel_commands.append(single_command)
-        # Remove empty strings
-        parallel_commands = filter(bool,parallel_commands)
-        return parallel_commands
-
-    def group_commands(self,command):
-        print command
-
-# Command 1 needs to be run first
-command1 = "command 1 && command2 & parallel1 && parallel2 && parallel3 &"
-# Command 2 is run after
-command2 = "comm2 && comm3 & wait"
-together = list()
-together.append(command1)
-together.append(command2)
-proc = CommandsProcessor(together)
-proc.handle()
+    # This breaks linked commands (&& or ;) into parts that are in sequence (In this same array)
+    def split_linked(self,command):
+        """
+        I know this somewhat violates duck typing but it is an easy (And really readable) way to check if it is a
+        single command.  Without this, iteration would cause individual string characters to be printed and the lack
+        of iteration would cause a regex error because you can't regex a list type.
+        """
+        if type(command) is list:
+            split_list = list()
+            for c in command:
+                re1 = '&&|;'
+                rg = re.compile(re1,re.IGNORECASE)
+                split_list.append(rg.split(c))
+            return split_list
+        else:
+            re1 = '&&|;'
+            rg = re.compile(re1,re.IGNORECASE)
+            command_split = rg.split(command)
+            return command_split
