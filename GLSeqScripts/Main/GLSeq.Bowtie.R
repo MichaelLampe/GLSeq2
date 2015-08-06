@@ -1,11 +1,10 @@
 source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
-setwd(dest.dir)
 
 comm.stack.pool <- NULL
 
 indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
-system(indCopy)
+printOrExecute(indCopy,Condor)
 ####################
 # Index the Bowtie or Bowtie2 Aligner
 #
@@ -16,12 +15,12 @@ system(indCopy)
 ####################
 IndexOptions <- paste("-f")
 if (aAlgor == "Bowtie"){
-  index <- paste("bowtie-build",IndexOptions,refFASTAname,rGenome)
+  index <- paste("bowtie-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
 }
 if (aAlgor == "Bowtie2"){
-  index <- paste("bowtie2-build",IndexOptions,refFASTAname,rGenome)
+  index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
 }
-system(index)
+printOrExecute(index,Condor)
 #
 for (zz in 1:nStreams) {
   # assembly and runing the system command, one library at a time:
@@ -30,8 +29,8 @@ for (zz in 1:nStreams) {
     # Alignment with SAM output
     ###################
     # names of current fastq files:
-    fq.left <- fqfiles.table[i,1]
-    if (paired.end) fq.right <- fqfiles.table[i,2]
+    fq.left <- paste(dest.dir,fqfiles.table[i,1],sep="")
+    if (paired.end) fq.right <- paste(dest.dir,fqfiles.table[i,2],sep="")
     name <- assign.name(fqfiles.table[i,1],paired.end)
     this.resName <- assign.resName(name,text.add)
     countable.sam <- countable.sam.name(this.resName)
@@ -45,9 +44,9 @@ for (zz in 1:nStreams) {
     if (aAlgor == "Bowtie"){
       BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
       if (paired.end){
-        align <- paste("bowtie",BowtieOptions,rGenome,"-1",fq.left,"-2",fq.right,countable.sam)
+        align <- paste("bowtie",BowtieOptions,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,countable.sam)
       }else{
-        align <- paste("bowtie",BowtieOptions,rGenome,fq.left,countable.sam)
+        align <- paste("bowtie",BowtieOptions,paste(dest.dir,rGenome,sep=""),fq.left,countable.sam)
       }
     }
     ###################
@@ -56,14 +55,14 @@ for (zz in 1:nStreams) {
       # Found on the RSEM website (http://deweylab.biostat.wisc.edu/rsem/rsem-calculate-expression.html)
       # This is under the --bowtie2 option that is coupled with the RSEM package.
       # Might be worth moving off the RSEM counting protocol if we believe Bowtie will better serve us with the current
-      # counting protocols.  
+      # counting protocols.
       Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
       if (paired.end){
         # These are options normally used by the RSEM peeps, see the same link as above for documentation on this.
         Bowtie2Options <- paste(Bowtie2Options,"--no-mixed","--no-discordant")
-        align <- paste("bowtie2",Bowtie2Options,rGenome,"-1",fq.left,"-2",fq.right,"-S",countable.sam)
+        align <- paste("bowtie2",Bowtie2Options,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,"-S",countable.sam)
       }else{
-        align <- paste("bowtie2",Bowtie2Options,rGenome,"-U",fq.left,"-S",countable.sam)
+        align <- paste("bowtie2",Bowtie2Options,paste(dest.dir,rGenome,sep=""),"-U",fq.left,"-S",countable.sam)
       }
     }
     ###################
@@ -79,12 +78,10 @@ for (zz in 1:nStreams) {
     ###################
     comm.i <- paste(align)
     comm.i <- paste(comm.i, "&&", count.comm)
-    spaceCleanup <- paste("rm",paste(rGenome,"*",sep=""),"&& rm",refFASTAname)
-    # For the very first assembly in the stack: 
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"cd",dest.dir,"&& ",comm.i)
-    # For subsequent assemblies of every stack: 
-    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&&","cd",dest.dir,"&&",comm.i)
-    comm.stack.pool <- paste(comm.stack.pool,"&&",spaceCleanup)
+    # For the very first assembly in the stack:
+    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&& ",comm.i)
+    # For subsequent assemblies of every stack:
+    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&&",comm.i)
     #
   }
   comm.stack.pool <- paste(comm.stack.pool,"&")

@@ -5,7 +5,7 @@
 #
 ####################
 ####################
-# checking if the directory 
+# checking if the directory
 # names have trailing slashes
 # and adding them if needed
 ####################
@@ -15,6 +15,13 @@ trailDirCheck <- function(dir.nm) {
   dir.nm
 }
 #@@@@@@@@@@@@@@
+printOrExecute <- function(command,Condor){
+  if (Condor){
+    print(command)
+  } else{
+    system(command)
+  }
+}
 #
 ###################
 ###################
@@ -32,14 +39,14 @@ fileNamesCollect <- function(fNamePattern, wd="./") {
   out <- system(syscomm, intern=TRUE)
   # removing of the "./" in the beginning of the output before adding absolute path in a general way:
   out <- substr(out, 3,nchar(out))
-  # adding absolute path: 
+  # adding absolute path:
   out <- paste(wd, out, sep="")
   # back to starting directory:
   setwd(initial.dir)
   out
 }
 ######
-# usage example: 
+# usage example:
 # source("~/run/GLSeq.Util.R")
 # fileNamesCollect("Y128*")
 ######
@@ -66,20 +73,20 @@ readPoolPE <- function(poolName) {
 path2file <- function(fullPath) {
   bricks <-  unlist(strsplit(fullPath, split="/"))
   fName <- bricks[length(bricks)]
-  fName	
+  fName
 }
 #@@@@@@@@@@@@@@
 #
 ###################
 ###################
-# 
+#
 # Converting all bam files within a directory to wig
 bam2wig.batch <- function(path2util) {
   # path2util is the path to the shell script that takes input and output file names
   allfiles <- dir()
   bamfiles <- allfiles[grep("bam$", allfiles, perl=TRUE)]
   for (i in 1:length(bamfiles)) {
-    wigfile.i <- paste(substr(bamfiles[i], 1, nchar(bamfiles[i])-3), "wig", sep="")	
+    wigfile.i <- paste(substr(bamfiles[i], 1, nchar(bamfiles[i])-3), "wig", sep="")
     system(paste(path2util, bamfiles[i], wigfile.i, "&"))
   }
 }
@@ -97,8 +104,8 @@ dirUpdate <- function(newRunDir, newDestDir, env = parent.frame()) {
   if ("RSEM" %in% cAlgor) env$destDirRsemCount <-  paste(dest.dir, text.add, ".RSEM.counting/", sep="")
   if ("FeatureCounts" %in% cAlgor)env$destDirFeatureCount <-  paste(dest.dir, text.add,".FeatureCounts.counting/", sep="")
   if ("HTSeq" %in% cAlgor) env$destDirRsemHtSeqCount <-  paste(dest.dir, text.add,".HTSeq.counting/", sep="")
-  env$destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="") 
-} 
+  env$destDirLog <-  paste(dest.dir, text.add, ".stat/", sep="")
+}
 #@@@@@@@@@@@@@
 #
 ##################
@@ -119,13 +126,13 @@ wig2BigWig.DIR <- function(exePath="~/run/wigToBigWig", chr.sizes="./chrom.sizes
 ##################
 # Reortingt he vectors of length 1 in the environment and their values
 # (practical purpose: fast extracting patrameter information for the old runs in GLSeq from the rda files)
-# maxNchar is the maximum number of characters we want to see in the value of an individual object 
+# maxNchar is the maximum number of characters we want to see in the value of an individual object
 # (objects with longer character values will be ignored, to avoid flooding the results with system command stacks etc)
 show1Vec <- function(maxNchar=40) {
   fullList <- ls(envir = .GlobalEnv)
   select.IND <- rep(FALSE, length(fullList))
   for (i in 1:length(fullList)) {
-    if (class(get(fullList[i])) != "function" & length(get(fullList[i])) ==1) { 
+    if (class(get(fullList[i])) != "function" & length(get(fullList[i])) ==1) {
       select.IND[i] <- TRUE } }
   fullList <- fullList[select.IND]
   fullList <- fullList[as.logical(nchar(sapply(fullList, get)) < maxNchar)]
@@ -134,9 +141,9 @@ show1Vec <- function(maxNchar=40) {
   for (j in 1:length(fullList)) {
     currentPiece <- c(fullList[j], get(fullList[j]))
     if (j == 1) out <- currentPiece
-    if (j != 1) { out <- rbind(out, currentPiece) 
+    if (j != 1) { out <- rbind(out, currentPiece)
                   if (i == 2) rownames(out)[1] <- 1
-                  rownames(out)[j] <- j } } 
+                  rownames(out)[j] <- j } }
   out <- as.data.frame(out)
   rownames(out) <- out[,1]
   out <- out[,-1,drop=FALSE]
