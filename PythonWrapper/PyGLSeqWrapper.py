@@ -5,6 +5,7 @@ import os
 from Wrapper import GlSeqRun
 from CommandsProcessor import CommandsProcessor
 from CommandStack import Stack
+
 # Command line args incoming~
 glseq_path = sys.argv[1]
 update_database = sys.argv[2]
@@ -26,14 +27,28 @@ commands = current_run.run()
 
 # # Test Stuff
 # command0 = "first"
+# command3 = "mkdir ok"
+# command4 = "mkdir ok && mkdir eh"
+# command5 = "mkdir ok"
+# command6 = "mkdir ok"
+# command7 = "mkdir ok"
+# command8 = "mkdir ok"
 # command1 = "\"mkdir \"I love cookies\" && mkdir 2 && mkdir 3\""
 # # Command 2 is run after
-# command2 = "above && above2 ; above3"
+# command1point5 = "job1 & job2 & job3 &"
+# command2 = "above && mkdir above2 ; mkdir above3"
 # commands = list()
 # commands.append(command0)
+# commands.append(command3)
+# commands.append(command4)
+# commands.append(command5)
+# commands.append(command6)
+# commands.append(command7)
+# commands.append(command8)
 # commands.append(command1)
+# commands.append(command1point5)
 # commands.append(command2)
-
+# run_name = "temp"
 if not os.path.exists(os.path.dirname(run_name + "/")):
     os.makedirs(os.path.dirname(run_name + "/"))
 

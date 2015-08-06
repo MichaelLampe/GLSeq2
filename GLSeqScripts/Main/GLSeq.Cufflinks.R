@@ -9,15 +9,11 @@
 
 source ("GLSeq.Util.R")
 #
-ref.dir <- paste(base.dir, rGenome, sep="")
-refCopy <- paste("cd ", ref.dir, " && cp ",refGFFname," ",dest.dir, sep="")
-system(refCopy)
-setwd(dest.dir)
 #############
 # Null Fixes
 #############
 #
-if (is.null(this.resName)) this.resName <- text.add
+if (is.null(this.resName)) this.resName <- paste(dest.dir,text.add,sep="")
 #
 #
 if (!is.na(countable.sam)){

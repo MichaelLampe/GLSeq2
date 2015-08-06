@@ -1,9 +1,4 @@
 source ("GLSeq.Util.R")
-#
-ref.dir <- paste(base.dir, rGenome, sep="")
-refCopy <- paste("cd ", ref.dir, " && cp ",refGFFname," ",dest.dir, sep="")
-system(refCopy)
-setwd(dest.dir)
 #############
 # Null Fixes
 #############
@@ -18,7 +13,7 @@ header.file <- paste(header.message,">> ",log.file)
 check.file <- paste("rsem-sam-validator",countable.sam,">>",log.file)
 #
 refName <- paste(this.resName,"RSEM","index",sep=".")
-prepareReference <- paste("rsem-prepare-reference",refFASTAname,refName)
+prepareReference <- paste("rsem-prepare-reference",paste(dest.dir,refFASTAname,sep=""),refName)
 #
 countFile <- paste(this.resName,"RSEM","counts",sep=".")
 rsemOptions <- paste("--calc-pme","--calc-ci","-p",nCores)

@@ -3,6 +3,7 @@ __author__ = 'mlampe'
 import sys
 import re
 import os
+from subprocess import Popen
 
 def checkTrail(directory):
     pattern = "/$"
@@ -37,8 +38,6 @@ raw_file_name = sys.argv[2]
 
 directory = checkTrail(directory)
 
-print("Starting conversion script...")
-
 command_arg = ""
 count = 0
 file = directory + raw_file_name
@@ -56,9 +55,9 @@ with open(file,"r+b") as raw_file:
             new_file_dir = getDirName(line,directory)
             os.mkdir(new_file_dir)
             if (command_arg == ""):
-                command_arg = new_file_dir
+                command_arg = "\"" + new_file_dir + "\""
             else:
-                command_arg = command_arg + "," + new_file_dir
+                command_arg = command_arg + "," + "\"" + new_file_dir + "\""
             new_file_name = getFileName(line,new_file_dir)
             dna_sequence = ""
             count = count + 1
@@ -68,10 +67,9 @@ with open(file,"r+b") as raw_file:
 if (dna_sequence != ""):
     writeConvertedFile(new_file_name,header,dna_sequence)
     count = count + 1
-    if (command_arg == ""):
-        command_arg = new_file_dir
-    else:
-        command_arg = command_arg + "," + new_file_dir
 os.remove(file)
-print(command_arg)
-sys.exit("Generated " + str(count) + " files from the original input file.")
+create_formatted_file = "echo " + command_arg + " > referenceGenomes"
+Popen(create_formatted_file,shell=True)
+print("Converted input fastq file into " + str(count) + " fna files.")
+sys.exit(0)
+
