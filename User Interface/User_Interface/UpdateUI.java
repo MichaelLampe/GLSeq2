@@ -35,6 +35,7 @@ public class UpdateUI {
 
   @SuppressWarnings("unchecked")
   public void updateDefaults() {
+    System.out.print("Updating fields...");
     // Create an array that can be iterates through from our HashMap
     ArrayList<Attribute> array = new ArrayList<Attribute>(attributes.attributesCollection.values());
     for (Attribute attribute : array) {
@@ -75,5 +76,6 @@ public class UpdateUI {
         }
       }
     }
+    System.out.println("...Fields updated!");
   }
 }

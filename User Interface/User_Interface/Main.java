@@ -21,11 +21,11 @@ public class Main extends Application {
       primaryStage.setResizable(false);
       primaryStage.setScene(scene);
       primaryStage.setTitle("GLSeq2 User Interface");
+      primaryStage.show();
       // Update attributes from previous save
       att.setAttributes();
-      primaryStage.show();
     } catch (Exception e) {
-      primaryStage.show();
+      // ok
     }
   }
 

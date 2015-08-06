@@ -43,7 +43,7 @@ public final class AttributeActions {
         try {
           Attributes.getInstance().attributesCollection.get(tempArray[0]).setValue(tempArray[1]);
         } catch (Exception e) {
-          // If no value or bad value
+          // No matching value
         }
       }
     }
@@ -81,8 +81,8 @@ public final class AttributeActions {
     } finally {
       // Makes sure to close the scanner
       scnr.close();
+      UpdateUI.getInstance().updateDefaults();
     }
-    UpdateUI.getInstance().updateDefaults();
   }
 
   /**
@@ -94,13 +94,20 @@ public final class AttributeActions {
    *          An array of strings passed in from another source
    */
   public void setAttributes(String[] inputArgs) {
+    ArrayList<Attribute> attributeArray = new ArrayList<Attribute>(
+        Attributes.getInstance().attributesCollection.values());
     for (String param : inputArgs) {
       String[] parts = param.split("=");
-      Attribute current = Attributes.getInstance().attributesCollection.get(parts[0]);
-      try {
-        current.setValue(parts[1]);
-      } catch (IndexOutOfBoundsException e) {
-        // Improper field was entered
+      // Complexity is fine when it is cheap.
+      for (Attribute att : attributeArray) {
+        if (att.getUiName().equals(parts[0])) {
+          Attribute current = Attributes.getInstance().attributesCollection.get(att.getName());
+          try {
+            current.setValue(parts[1]);
+          } catch (Exception e) {
+            // Improper field was entered
+          }
+        }
       }
     }
   }
@@ -150,9 +157,14 @@ public final class AttributeActions {
     System.out.println("{\"attributes\":[");
     ArrayList<Attribute> attributeArray = new ArrayList<Attribute>(
         Attributes.getInstance().attributesCollection.values());
+    for (int i = attributeArray.size() - 1; i >= 0; i--) {
+      if (attributeArray.get(i).getCategory().equals(Category.SCRIPT.name)) {
+        attributeArray.remove(i);
+      }
+    }
     for (int i = 0; i < attributeArray.size(); i++) {
       System.out.print(formatJson(attributeArray.get(i).getUiName()));
-      if (i < Attributes.getInstance().attributesCollection.size() - 2) {
+      if (i < attributeArray.size() - 1) {
         System.out.print(",");
       }
       System.out.println("");
@@ -165,7 +177,6 @@ public final class AttributeActions {
    */
   private String formatJson(String field_name) {
     String jsonKey = "{\"key\":";
-    System.out.println(field_name);
     AttributesJSON current = Enum.valueOf(AttributesJSON.class, field_name);
     jsonKey += "\"" + current.name() + "\"";
     if (current.category != null) {
@@ -175,13 +186,20 @@ public final class AttributeActions {
       jsonKey += ", \"options\":[" + current.options + "]";
     }
     if (current.defaultVal != null) {
-      jsonKey += ", \"default\":\"" + current.defaultVal + "\"";
+      jsonKey += ", \"default\":\"" + defaultNullIsEmpty(current.defaultVal) + "\"";
     }
     if (current.description != null) {
       jsonKey += ", \"description\":\"" + current.description + "\"";
     }
     jsonKey += "}";
     return jsonKey;
+  }
+
+  private String defaultNullIsEmpty(String defaultVal) {
+    if (defaultVal.equals("NULL")) {
+      return "";
+    }
+    return defaultVal;
   }
 
   /**
