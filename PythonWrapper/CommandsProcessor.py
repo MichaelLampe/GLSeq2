@@ -30,6 +30,7 @@ class CommandsProcessor:
     def split_background(self,command):
         re1='(?<!&)&(?!&)'	# Matches only a single & that cannot be preceded or succeeded by another &
         rg = re.compile(re1,re.IGNORECASE)
+        # Would be nice to add counting split processing here.
         command_split = rg.split(command)
         return command_split
 

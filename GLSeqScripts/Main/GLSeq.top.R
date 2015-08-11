@@ -147,15 +147,19 @@ create.run.logs(destDirLog,text.add)
 ###########
 if (dataPrepare == "dataprep") {
   find.files.for.dataprep(raw.dir,unzipped)
-  run.data.prep(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor)
+  relative.fqFiles <- run.data.prep(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor)
 }
 
 # Construct alignment + counting comm stack
 if (alignment == "alignment") {
   if (dataPrepare == "nodataprep") {
     copy.preprocessed.files(readyData.dir,dest.dir,Condor)
+    fqfiles.table <- convert.file.list.to.table(paired.end,readyData.dir,NULL)
   }
-  fqfiles.table <- convert.file.list.to.table(paired.end,readyData.dir)
+  if (dataPrepare == "dataprep"){
+    fqfiles.table <- convert.file.list.to.table(paired.end,NULL,relative.fqFiles)
+
+  }
   nStreams <- check.nStreams(fqfiles.table,nStreams)
   rangelist <- prepare.chunk.function(fqfiles.table,nStreams)
   comm.stack.pool <- start.alignment.process(base.dir,rangelist,nStreams,Condor)
@@ -175,11 +179,6 @@ if (alignment == "noalignment") {
   }
 }
 
-if (counting == "counting"){
-  if ("RSEM" %in% cAlgor){
-    comm.stack.pool <- RSEM.finish(comm.stack.pool,destDirRSEMCount,dest.dir)
-  }
+if (!is.null(comm.stack.pool)){
+  execute.comm.stack(comm.stack.pool,Condor)
 }
-execute.comm.stack(comm.stack.pool,Condor)
-stop("Program complete.")
-##################################################################################################

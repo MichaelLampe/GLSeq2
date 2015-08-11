@@ -16,6 +16,8 @@ referenceFiles = destination_directory+"referenceGenomes"
 reference_genome_command = "cat " + referenceFiles
 output = Popen(reference_genome_command,shell=True,stdout=PIPE)
 directories, err = output.communicate()
+print(directories)
+print(err)
 # Remove any new lines in the file that could cause problems
 directories = directories.strip("\n")
 # Try to kill, otherwise assume dead

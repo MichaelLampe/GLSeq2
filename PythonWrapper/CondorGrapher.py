@@ -1,29 +1,102 @@
 __author__ = 'mlampe'
 
-# Pygraph library
-# Modified from https://github.com/pmatiello/python-graph
-from pygraph.classes.digraph import digraph as graph
+import networkx as nx
+import matplotlib
+# Let's us run this without a display
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
+import CommandStack
+import numpy
 
-class GraphCondor:
-    def __init__(self,dag_file_name):
-        self.dag_file_name = dag_file_name
-        self.condor_graph = graph()
+class Graph:
+    def __init__(self):
+        self.G = nx.Graph()
 
-    def read_connections(self):
-        with open(self.dag_file_name,'r'):
-            for line in file:
-                if "PARENT" in line:
-                    # Splits the line and the left space is the string "PARENT"
-                    # with the right half being the value of that
-                    split = line.split(" ")
-                    parent = split[1]
-                    child = split[3]
-                    self.create_connection(parent,child)
-    def create_connection(self,parent,child):
-        # Adds the parent and child nodes if they don't exist already
-        [self.condor_graph.add_node(n) for n in (parent,child) if not self.condor_graph.has_node(n)]
-        # Adds the edge from parent to child
-        self.condor_graph.add_edge(parent,child)
+    def add_node(self,node):
+        # Indexed by its number
+        self.G.add_node(node.number,Memory=node.memory,CPU=node.cpu,GPU=node.gpu)
 
-    # Still need to add visualization
+    def add_edge(self,parent,child):
+        self.G.add_edge(child,parent)
+
+    def plot_graph(self,run_name):
+        plt.figure(1,figsize=(15,30))
+        limit = plt.axis("off")
+        title= plt.title(run_name + "/" + "Condor Memory Utilization Scheme")
+        pos=nx.spring_layout(self.G,scale=2)
+        nx.draw_networkx(self.G,pos,with_labels=True,node_size = 1500,node_color=self.prepare_colors("memory"))
+        plt.savefig(run_name + "/" + "CondorMemoryUtilization.png")
+        plt.clf()
+        plt.figure(2,figsize=(15,30))
+        limit = plt.axis("off")
+        title= plt.title("Condor CPU Utilization Scheme")
+        pos=nx.spring_layout(self.G,scale=2)
+        nx.draw_networkx(self.G,pos,with_labels=True,node_size = 1500,node_color=self.prepare_colors("cpu"))
+        plt.savefig(run_name + "/" + "CondorCpuUtilization.png")
+        plt.clf()
+        plt.figure(3,figsize=(15,30))
+        limit = plt.axis("off")
+        title= plt.title("Condor GPU Utilization Scheme")
+        pos=nx.spring_layout(self.G,scale=2)
+        nx.draw_networkx(self.G,pos,with_labels=True,node_size = 1500,node_color=self.prepare_colors("gpu"))
+        plt.savefig(run_name + "/" + "CondorGpuUtilization.png")
+        plt.clf()
+
+    def prepare_colors(self,attribute):
+        colors = list()
+        if (attribute == "memory"):
+            for node in Node.Nodes:
+                # If ends with gigabyte
+                if(node.memory.endswith("G")):
+                    memory = node.memory[:-1]
+                    memory = int(memory) * 1024
+                    colors.append(memory)
+                else:
+                    memory = int(node.memory)
+                    colors.append(memory)
+            median = numpy.median(colors)
+            for color in range (0,len(colors)):
+                if (colors[color] > median + 1025):
+                    colors[color] = "r"
+                elif (colors[color] < median - 1025):
+                    colors[color] = "b"
+                else:
+                    colors[color] = "y"
+        elif (attribute == "cpu"):
+            for node in Node.Nodes:
+                # If ends with gigabyte
+                    cpus = int(node.cpu)
+                    colors.append(cpus)
+            median = numpy.median(colors)
+            for color in range (0,len(colors)):
+                if (colors[color] > median + 4):
+                    colors[color] = "r"
+                elif (colors[color] < median - 4):
+                    colors[color] = "b"
+                else:
+                    colors[color] = "y"
+        elif (attribute == "gpu"):
+            for node in Node.Nodes:
+                # If ends with gigabyte
+                    gpus = int(node.gpu)
+                    colors.append(gpus)
+            median = numpy.median(colors)
+            for color in range (0,len(colors)):
+                if (colors[color] > median + 1):
+                    colors[color] = "r"
+                elif (colors[color] < median - 1):
+                    colors[color] = "b"
+                else:
+                    colors[color] = "y"
+        return colors
+
+class Node:
+    Nodes = list()
+    def __init__(self,number,memory,cpu,gpu,command_stack):
+        self.number = number
+        self.memory = memory
+        self.cpu = cpu
+        self.gpu = gpu
+        command_stack.graph.add_node(self)
+        Node.Nodes.append(self)

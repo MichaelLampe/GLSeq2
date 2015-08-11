@@ -1,6 +1,5 @@
 source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
-setwd(dest.dir)
 # copy genome indices to the destimation dir:
 
 rGenome <- trailDirCheck(rGenome)
@@ -10,11 +9,9 @@ indCopy <- paste("mkdir",rGenomeDestination,"&&","cp",paste(ref.dir,refFASTAname
 printOrExecute(indCopy,Condor)
 #
 # Small script I wrote that breaks fasta files into individual FNA files in the format that Rockhopper likes.
-convertReferenceGenome <- paste("python",paste(base.dir,"rhFnaConverter.py",sep=""),rGenomeDestination,refFASTAname)
+convertReferenceGenome <- paste("python",paste(base.dir,"rhFnaConverter.py",sep=""),rGenomeDestination,refFASTAname,dest.dir)
 printOrExecute(convertReferenceGenome,Condor)
 # This needs to catch the output doesnt it
-#
-
 #
 comm.stack.pool <- NULL #
 comm.stack.pools <- NULL
@@ -29,11 +26,10 @@ for (zz in 1:nStreams) {
     ###################
     # Names of current fq files:
     # Need to be renamed to fastq if not already
-    print("HI")
     if (grepl(".fq$",fqfiles.table[i,1])){
       fastq.name <- substr(fqfiles.table[i,1],1,nchar(fqfiles.table[i,1]) - 2)
       fastq.name <- paste(fastq.name,"fastq",sep="")
-      rename.fq.file <- paste("mv",fqfiles.table[i,1],fastq.name)
+      rename.fq.file <- paste("mv",paste(dest.dir,fqfiles.table[i,1],sep=""),paste(dest.dir,fastq.name,sep=""))
       fqfiles.table[i,1] <- fastq.name
       printOrExecute(rename.fq.file,Condor)
     }
@@ -42,7 +38,7 @@ for (zz in 1:nStreams) {
       if (grepl(".fq$",fqfiles.table[i,2])){
         fastq.name <- substr(fqfiles.table[i,2],1,nchar(fqfiles.table[i,2]) - 2)
         fastq.name <- paste(fastq.name,"fastq",sep="")
-        rename.fq.file <- paste("mv",fqfiles.table[i,2],fastq.name)
+        rename.fq.file <- paste("mv",paste(dest.dir,fqfiles.table[i,2],sep=""),paste(dest.dir,fastq.name,sep=""))
         fqfiles.table[i,2] <- fastq.name
         printOrExecute(rename.fq.file,Condor)
       }

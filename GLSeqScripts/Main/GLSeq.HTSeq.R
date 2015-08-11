@@ -15,7 +15,8 @@ source("GLSeq.Util.R")
 #
 if (is.null(this.resName)) this.resName <- paste(destDirHTSeqCount,text.add,sep="")
 #
-countfile <- paste(this.resName,"HTSeq","counts",sep=".")
+# Pushes the count file into the HTSeq counts folder with the appropriate name
+countfile <- paste(destDirHTSeqCount,fqfiles.table[i,1],".HTSeq.counts",sep="")
 # initializing strandness option with a non-strand-specific value:
 countOpt <-  "--stranded=no"
 # overwriting countOpt with information on strand-specificity:

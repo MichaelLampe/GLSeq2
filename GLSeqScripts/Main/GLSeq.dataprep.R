@@ -1,28 +1,23 @@
 #########################################################
 # Great Lakes Seq package for low-level processing of RNA-Seq data
-# Oleg Moskvin; info@scienceforever.com 
-# April 2013 
+# Oleg Moskvin; info@scienceforever.com
+# April 2013
 #########################################################
-# 
+#
 # Preparing the raw data
 #
 #########################################################
 #
 ###########################
-# ID of the computation run (text.add object) should be 
-# supplied to this script directly (by GLSeq.top.R) as 
+# ID of the computation run (text.add object) should be
+# supplied to this script directly (by GLSeq.top.R) as
 # the first and only argument
 ###########################
 #
-args <- commandArgs(trailingOnly = TRUE)
-text.add <- as.character(args[1])
-dest.dir <- as.character(args[2])
-attrPath <- as.character(args[3])
+source("GLSeq.Util.R")
 source(attrPath)
 source("GLSeq.Dataprep.Functions.R")
 #
-###########################
-setwd(dest.dir)
 ###########################
 # Files indicating readiness of the libraries (i.e. split FQ files):
 ###########################
@@ -42,11 +37,21 @@ if (!unzipped){
   fqFiles.zip <- get.files.zipped(raw.dir)
   fqFiles <- prepare.zipped.file.names(fqFiles.zip)
   copy.files.to.dest.zipped(raw.dir,dest.dir)
+  unzip.comm <- NULL
   for (i in 1:length(fqFiles.zip)){
-    unzip.comm <- unzip.gz.files(fqFiles.zip[i])
-    try(system(unzip.comm))
+    if (is.null(unzip.comm)){
+    unzip.comm <- unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep=""))
+    } else{
+      unzip.comm <- paste(unzip.comm,unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep="")))
+    }
   }
+  # Parallel Gunzip
+  printOrExecute(unzip.comm,Condor)
 }
+# Most of the alignment stuffs adds the destination and such on their own, so let's not mess that up and return
+# Just the relative file name
+relative.fqFiles <- fqFiles
+fqFiles <- convert.to.absolute.paths(dest.dir,fqFiles)
 #
 check.ifFiles(fqFiles.zip,fqFiles.unzip)
 #
@@ -64,13 +69,10 @@ if (presplit){
 if (!presplit){
   rangelist.Dataprep <- chunk.data.files.unsplit(fqFiles,nStreamsDataPrep)
 }
-
-# Copy the artificial.fq file in
-copy.artificial.fq(base.dir,artificial.fq,dest.dir)
 # Construct command to be run.
+comm.pool <- NULL
 for (zz in 1:nStreamsDataPrep) {
-  if (zz==1) comm.pool <- "date"
-  if (zz!=1) comm.pool <- paste(comm.pool,"date")
+  comm.pools <- NULL
   for (j in rangelist.Dataprep[[zz]]) {
     #
     if (paired.end){
@@ -78,52 +80,90 @@ for (zz in 1:nStreamsDataPrep) {
       # Unsplit
       if (!presplit){
         # Add to command pool
-        comm.pool <- paste(comm.pool,"&&",split.unsplit.files.PE(dest.dir,fqFiles[j]))
-      }
+        if (is.null(comm.pools)){
+          comm.pools <- paste(split.unsplit.files.PE(dest.dir,fqFiles[j]))
+        }else{
+          comm.pools <- paste(comm.pools,"&&",split.unsplit.files.PE(dest.dir,fqFiles[j]))
+        }
+        }
       if (readTrim){
+        # Copy the artificial.fq file in
+        if (j==1){
+        copy.artificial.fq(base.dir,artificial.fq,dest.dir)
+        }
         # The trim command
         trimCommand <- trimAssemble.PE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
-        comm.pool <- paste(comm.pool,"&&",trimCommand)
+        if (is.null(comm.pools)){
+          comm.pools <- paste(trimCommand)
+        } else{
+          comm.pools <- paste(comm.pools,"&&",trimCommand)
+        }
         # Modifies the names of a few files to retain naming
         file.shuffle <- file.shuffle.PE(fqFiles[j])
-        comm.pool <- paste(comm.pool,"&&",file.shuffle)
+        comm.pools <- paste(comm.pools,"&&",file.shuffle)
         # Quality control check via Fastqc of dirty file
         preQC <- preQualityCheck.PE(fastqcPath,fqFiles[j],qcFolder)
-        comm.pool <- paste(comm.pool,"&&",preQC)
+        comm.pools <- paste(comm.pools,"&&",preQC)
         remove.command <- remove.unneeded.files(fqFiles[j])
-        comm.pool <- paste(comm.pool,"&&",remove.command)
+        comm.pools <- paste(comm.pools,"&&",remove.command)
         move.file.log <- move.paired.files.PE((fqFiles[j]),qcFolder)
-        comm.pool <- paste(comm.pool,"&&",move.file.log)
-      }   
+        comm.pools <- paste(comm.pools,"&&",move.file.log)
+      }
       # Quality control check via Fastqc of result files
       postQC <- postQualityCheck.PE(fastqcPath,fqFiles[j],qcFolder)
-      comm.pool <- paste(comm.pool,"&&",postQC)
+      if (is.null(comm.pools)){
+        comm.pools <- paste(postQC)
+      } else{
+        comm.pools <- paste(comm.pools,"&&",postQC)
+      }
     }
     #
     if (!paired.end){
       if (readTrim){
+        # Copy the artificial.fq file in
+        if (j==1){
+          copy.artificial.fq(base.dir,artificial.fq,dest.dir)
+        }
         # The trim command
         trimCommand <- trimAssemble.SE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
-        comm.pool <- paste(comm.pool,"&&",trimCommand)
+        if (is.null(comm.pools)){
+          comm.pools <- paste(trimCommand)
+        } else{
+          comm.pools <- paste(comm.pools,"&&",trimCommand)
+        }
         # Modifies the names of a few files to retain naming
         file.shuffle <- file.shuffle.SE(fqFiles[j])
-        comm.pool <- paste(comm.pool,"&&",file.shuffle)
+        comm.pools <- paste(comm.pools,"&&",file.shuffle)
         # Quality control check via Fastqc of dirty file
         preQC <- preQualityCheck.SE(fastqcPath,fqFiles[j],qcFolder)
-        comm.pool <- paste(comm.pool,"&&",preQC)
+        comm.pools <- paste(comm.pools,"&&",preQC)
         remove.command <- remove.unneeded.files.SE(fqFiles[j])
-        comm.pool <- paste(comm.pool,"&&",remove.command)
+        comm.pools <- paste(comm.pools,"&&",remove.command)
         move.file.log <- move.paired.files.SE((fqFiles[j]),qcFolder)
-        comm.pool <- paste(comm.pool,"&&",move.file.log)
-                                        
+        comm.pools <- paste(comm.pools,"&&",move.file.log)
+
       }
       # Quality control check via Fastqc of result files
       postQC <- postQualityCheck.SE(fastqcPath,fqFiles[j],qcFolder)
-      comm.pool <- paste(comm.pool,"&&",postQC)
+      if (is.null(comm.pools)){
+        comm.pools <- paste(postQC)
+      } else {
+        comm.pools <- paste(comm.pools,"&&",postQC)
+      }
     }
   }
-  comm.pool <- paste(comm.pool,"&")
+  if (is.null(comm.pool)){
+    comm.pool <- paste(comm.pools,"&")
+  } else {
+    comm.pool <- paste(comm.pool,comm.pools,"&")
+  }
 }
-store.artificial <- store.artificial.seqs.file(artificial.fq,qcFolder)
+if (Condor){
+  store.artificial <- store.artificial.seqs.file(paste(dest.dir,artificial.fq,sep=""),qcFolder)
+  printOrExecute(comm.pool,Condor)
+  printOrExecute(store.artificial,Condor)
+} else{
+store.artificial <- store.artificial.seqs.file(paste(dest.dir,artificial.fq),qcFolder)
 comm.pool <- paste(comm.pool,"wait","&&", store.artificial)
-try(system(comm.pool))
+printOrExecute(comm.pool,Condor)
+}

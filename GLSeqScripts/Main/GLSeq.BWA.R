@@ -6,13 +6,14 @@ printOrExecute(indCopy,Condor)
 ###################################################################################
 # Index the BWA
 ###################################################################################
-index <- paste(bwaPath, "index", paste(dest.dir,refFASTAname,sep="")
+index <- paste(bwaPath, "index", paste(dest.dir,refFASTAname,sep=""))
 printOrExecute(index,Condor)
 #
 # Declare both pools as nulls
 comm.stack.pool <- NULL
 comm.stack.pools <- NULL
 for (zz in 1:nStreams) {
+  comm.stack.pools <- NULL
   for (i in rangelist[[zz]]) {
     # Names of current fastq files:
     fq.left <- paste(dest.dir,fqfiles.table[i,1],sep="")
@@ -51,7 +52,7 @@ for (zz in 1:nStreams) {
     # -t = TAB-delimited file
     # I'm not sure if we need to first pipe it from into the sorted.arg format and index or if we could just sort
     # This is something I will test in the future to possibly speed up the protocol a bit.
-    bam.create <- paste("samtools view -uS", unsorted.sam,unsorted.bam)
+    bam.create <- paste("samtools view -uS", unsorted.sam,"-o",unsorted.bam)
     ###################
     # Converting the final bam (coordinate-sorted)
     # to name-sorted  sam:
@@ -64,9 +65,14 @@ for (zz in 1:nStreams) {
     # Directly write the samtools output to a new countable file after sorting
     # -n in the samtools sort indicates that the document will be sorted by read name rather than chromosome
     # -h in the samtools view indicates a header will be printed
-    sort.bam <- paste("samtools sort -n", unsorted.bam, sorted.bam)
+    if (Condor) {
+      sort.bam <- paste("samtools sort -@ 6 -m 32G -n", unsorted.bam, sorted.bam)
+    } else{
+      sort.bam <- paste("samtools sort -n", unsorted.bam, sorted.bam)
+    }
     index.bam <- paste("samtools index", sorted.bam)
-    countable.comm <- paste("samtools view -h", sorted.bam, ">", countable.sam)
+    # Covnert back to SAM format
+    countable.comm <- paste("samtools view -h", sorted.bam, "-o", countable.sam)
     ###################
     # Counting Step
     ###################
@@ -84,20 +90,28 @@ for (zz in 1:nStreams) {
     # Paired Ended Samples vs Unpaired
     # Paired end align two files are once (Because they are paired)
     # So we add in both teh right and the left.
-      if (paired.end){
-        comm.i <- paste(aln.left,"&&",aln.right)
-      }
-      if (!paired.end){
-        comm.i <- paste(aln.left)
-      }
-      comm.i <- paste(comm.i,"&&",sam.create,"&&",bam.create,"&&",sort.bam,"&&",index.bam"&&",countable.comm)
+    if (paired.end){
+      comm.i <- paste(aln.left,"&&",aln.right)
+    }
+    if (!paired.end){
+      comm.i <- paste(aln.left)
+    }
+    comm.i <- paste(comm.i,"&&",sam.create,"&&",bam.create,"&&",sort.bam,"&&",index.bam,"&&",countable.comm)
     # Counting
     # Whatever was added to count.comm when it looked for counting protocols is added here
     comm.i <- paste(comm.i,"&&",count.comm)
     #
-    if (is.null(comm.stack.pool))
-    comm.stack.pool <- paste(comm.stack.pool,"&&",comm.i)
+    if (is.null(comm.stack.pools)){
+      comm.stack.pools <- paste(comm.i)
+    }
+    else{
+      comm.stack.pools <- paste(comm.stack.pools,"&&",comm.i)
+    }
   } # for i
-  comm.stack.pool <- paste(comm.stack.pool,"&")
+  if (is.null(comm.stack.pool)){
+    comm.stack.pool <- paste(comm.stack.pools,"&")
+  } else{
+    comm.stack.pool <- paste(comm.stack.pool,comm.stack.pools,"&")
+  }
 }
 comm.stack.pool <- paste(comm.stack.pool,"wait")

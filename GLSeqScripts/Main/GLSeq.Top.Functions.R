@@ -271,11 +271,15 @@ copy.preprocessed.files <- function(readyData.dir,dest.dir,Condor=FALSE) {
 
 # Converts the input list of files into a table that can then be understood by
 # The downstream program to either pair files correctly or to
-convert.file.list.to.table <- function(paired.end,readyData.dir) {
-  if (is.null(paired.end) || is.null(dest.dir)) stop("Arguments should not be NULL")
+# Use readyData.dir if we are dealing with nodataprep
+# Use fqFiles if we are dealign with data prep
+convert.file.list.to.table <- function(paired.end,readyData.dir=NULL,fqfiles=NULL) {
+  if (is.null(paired.end)) stop("Arguments should not be NULL")
   # Paired End
   if (paired.end) {
-    fqfiles <- dir(readyData.dir)
+    if (!is.null(readyData.dir)){
+      fqfiles <- dir(readyData.dir)
+    }
     fqfiles <- fqfiles[grep(".fq$|.fastq$", fqfiles)]
     for (num in 1:length(fqfiles)){
       # Remove 8 if a fastq file
@@ -296,18 +300,23 @@ convert.file.list.to.table <- function(paired.end,readyData.dir) {
   }
   # Single End
   if (!(paired.end)) {
-    files <- dir(readyData.dir)
-    files <- files[grep(".fq$|.fastq$", files)]
+    if (!is.null(readyData.dir)){
+      fqfiles <- dir(readyData.dir)
+    }
+    fqfiles <- fqfiles[grep(".fq$|.fastq$", fqfiles)]
     # Fixing the fastq files so they will match when it matters
-    for (num in 1:length(files)){
-      if (grepl(".fastq$",files[num])){
+    for (num in 1:length(fqfiles)){
+      if (grepl(".fastq$",fqfiles[num])){
         # Remove astq
         # Adds a q back to make it a fastq file
-        files[num] <- substr(files[num],1,nchar(files[num]-4))
-        files[num]<- paste(files[num],"q",sep="")
+        fq[num] <- substr(fqfiles[num],1,nchar(fqfiles[num]-5))
+        # Only need to add the q if we take off asta, but this
+        # is a more robust solution if we change it to encompass
+        # more file types in the future
+        fqfiles[num]<- paste(fqfiles[num],"fq",sep="")
       }
     }
-    fqfiles.table <- cbind(files)
+    fqfiles.table <- cbind(fqfiles)
   }
   fqfiles.table
 }
@@ -409,17 +418,6 @@ start.counting.process <- function(countable.sams.dir,dest.dir,base.dir,Condor){
   comm.stack.pool
 }
 
-# When RSEM finishes it needs to do some file movements to make things look nicer
-RSEM.finish <- function(comm.stack.pool,destDirRSEMCount,dest.dir) {
-  if (is.null(comm.stack.pool) || is.null(destDirRSEMCount) || is.null(dest.dir)) stop("Arguments should not be NULL")
-    destDirRSEMCount <- trailDirCheck(destDirRSEMCount)
-    dest.dir <- trailDirCheck(dest.dir)
-    comm.stack.pool <- paste(comm.stack.pool,"&&","mv",paste(dest.dir,"*.RSEM.counts.*",sep=""),destDirRSEMCount)
-    comm.stack.pool <- paste(comm.stack.pool,"&&","mv",paste(dest.dir,"*.index.*",sep=""),destDirRSEMCount)
-    # RETURNS THE COMM STACK
-    comm.stack.pool
-}
-
 # Saves the run data at the end of the run
 save.run.data <- function(base.dir,text.add) {
   base.dir <- trailDirCheck(base.dir)
@@ -443,11 +441,13 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor=
   if (is.null(destDirLog) || is.null(text.add) || is.null(attrPath) || is.null(dest.dir)) stop("Arguments should not be NULL")
   destDirLog <- trailDirCheck(destDirLog)
   dest.dir <- trailDirCheck(dest.dir)
-  Sys.sleep(10)
-  dataPrepLog <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")
-  dataPrepErr <- paste(destDirLog, text.add, ".DataPrepErr.txt", sep="")
-  dataPrep <- paste("Rscript ", paste(base.dir,GLSeq.dataprep.R,sep=""), text.add," ",dest.dir," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="")
-  printOrExecute(dataPrep,Condor)
+  source("GLSeq.dataprep.R")
+  #Sys.sleep(10)
+  # <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")
+  #dataPrepErr <- paste(destDirLog, text.add, ".DataPrepErr.txt", sep="")
+  #dataPrep <- paste("Rscript ", paste(base.dir,GLSeq.dataprep.R,sep=""), text.add," ",dest.dir," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="")
+  #printOrExecute(dataPrep,Condor)
+  relative.fqFiles
 }
 
 # Executes the communication stack

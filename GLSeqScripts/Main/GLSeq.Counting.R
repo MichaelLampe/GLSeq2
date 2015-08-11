@@ -85,9 +85,18 @@ if ("FeatureCounts" %in% cAlgor){
   #
   countfile <- paste(this.resName,"FeatureCounts","counts", sep=".")
   # Feature counts is actually an RScript.  So instead of sourcing it, we simply prepare the program to run another R command.
-  script <- paste("Rscript",paste(base.dir,"GLSeq.FeatureCounts.R",sep=""),countable.sam,rGenome,refGFFname,dest.dir,this.resName,paired.end,idAttr)
-  if (count.comm != "") count.comm <- paste(count.comm,"&& ",script,"&&","mv",countfile,destDirFeatureCountsCount)
-  if (count.comm == "") count.comm <- paste(script,"&&","mv",countfile,destDirFeatureCountsCount)
+  script <- paste("Rscript",paste(base.dir,"GLSeq.FeatureCounts.R",sep=""),countable.sam,destDirFeatureCountsCount,refGFFname,dest.dir,this.resName,paired.end,idAttr)
+  counts.summary <- paste(this.resName,".FeatureCounts.summary.txt",sep="")
+  counts.data <- paste(this.resName,".FeatureCounts.counts.csv",sep="")
+  counts.stats <- paste(this.resName,".FeatureCounts.stats.csv",sep="")
+  counts.annotation <- paste(this.resName,".FeatureCounts.annotations.csv",sep="")
+  #
+  move.command <- paste("mv",counts.summary,destDirFeatureCountsCount)
+  move.command <- paste(move.command,"&& mv",counts.data,destDirFeatureCountsCount)
+  move.command <- paste(move.command,"&& mv",counts.stats,destDirFeatureCountsCount)
+  move.command <- paste(move.command,"&& mv",counts.annotation,destDirFeatureCountsCount)
+  if (count.comm != "") count.comm <- paste(count.comm,"&&",script,"&&",move.command)
+  if (count.comm == "") count.comm <- paste(script,"&&",move.command)
 }
 
 if (!occured){
