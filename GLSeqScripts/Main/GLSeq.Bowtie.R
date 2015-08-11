@@ -1,8 +1,9 @@
 source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
 
+# The final return pool for the program
 comm.stack.pool <- NULL
-
+comm.stack.pools <- NULL
 indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 ####################
@@ -31,7 +32,7 @@ for (zz in 1:nStreams) {
     # names of current fastq files:
     fq.left <- paste(dest.dir,fqfiles.table[i,1],sep="")
     if (paired.end) fq.right <- paste(dest.dir,fqfiles.table[i,2],sep="")
-    name <- assign.name(fqfiles.table[i,1],paired.end)
+    name <- assign.name(fq.left,paired.end)
     this.resName <- assign.resName(name,text.add)
     countable.sam <- countable.sam.name(this.resName)
     ###################
@@ -42,7 +43,11 @@ for (zz in 1:nStreams) {
     # Default for chunkmbs = 64, 512 is 8x larger.  No known problems created by this option.
     ###################
     if (aAlgor == "Bowtie"){
-      BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
+      if (Condor){
+        BowtieOptions <- paste("-S","-p 8","-t","-q","--chunkmbs","512")
+      } else{
+        BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
+      }
       if (paired.end){
         align <- paste("bowtie",BowtieOptions,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,countable.sam)
       }else{
@@ -56,7 +61,12 @@ for (zz in 1:nStreams) {
       # This is under the --bowtie2 option that is coupled with the RSEM package.
       # Might be worth moving off the RSEM counting protocol if we believe Bowtie will better serve us with the current
       # counting protocols.
-      Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
+      if (Condor){
+        # I've set Bowtie to have 8 CPUS when using condor, so let's exploit that.
+        Bowtie2Options <- paste("-t","-p 8","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
+      } else{
+        Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
+      }
       if (paired.end){
         # These are options normally used by the RSEM peeps, see the same link as above for documentation on this.
         Bowtie2Options <- paste(Bowtie2Options,"--no-mixed","--no-discordant")
@@ -79,11 +89,15 @@ for (zz in 1:nStreams) {
     comm.i <- paste(align)
     comm.i <- paste(comm.i, "&&", count.comm)
     # For the very first assembly in the stack:
-    if (i == rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&& ",comm.i)
+    if (i == rangelist[[zz]][1])  comm.stack.pools <- paste(comm.i)
     # For subsequent assemblies of every stack:
-    if (i != rangelist[[zz]][1])  comm.stack.pool <- paste(comm.stack.pool,"&&",comm.i)
+    if (i != rangelist[[zz]][1])  comm.stack.pools <- paste(comm.stack.pools,"&&",comm.i)
     #
   }
-  comm.stack.pool <- paste(comm.stack.pool,"&")
+  if (is.null(comm.stack.pool)){
+    comm.stack.pool <- paste(comm.stack.pools,"&")
+  } else{
+    comm.stack.pool <- paste(comm.stack.pool,comm.stack.pools,"&")
+  }
 }
 comm.stack.pool <- paste(comm.stack.pool,"wait")

@@ -117,6 +117,10 @@ for (zz in 1:nStreams) {
     ###################
     # If no GPU, we can run all of the above files in parallel
     ###################
+    # Condor is set to use 8 cores
+    if (Condor){
+      nCores <- 8
+    }
     if (aAlgor == "Cushaw"){
       if (paired.end) sam.create<- paste(CUSHAW.path, "-r", paste(dest.dir,refFASTAname,sep=""), "-q", fq.left, fq.right, "-o", unsorted.sam, "-t", nCores)
       if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", paste(dest.dir,refFASTAname,sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
@@ -128,7 +132,11 @@ for (zz in 1:nStreams) {
     unsorted.bam <- paste(this.resName,"unsorted.bam",sep=".")
     sorted <- paste(this.resName, "sorted", sep=".")
     bam.create <- paste("samtools view",unsorted.sam,"-uS -o",unsorted.bam)
-    bam.sort <- paste("samtools sort -n ",unsorted.bam,sorted)
+    if (Condor){
+      bam.sort <- paste("samtools sort -@ 6 -m 32G -n ",unsorted.bam,sorted)
+    } else{
+      bam.sort <- paste("samtools sort -n ",unsorted.bam,sorted)
+    }
     bam.index <- paste("samtools index", sorted) # System command #7
     ###################
     # Convert back to SAM file
@@ -138,13 +146,12 @@ for (zz in 1:nStreams) {
     # Is the argument to an AWK command that the data is piped into before being written.
     # This is only needed when using paired.ended data, so you can see we avoid that pipe when
     # we are utilizing SE data.
-    # Can't remember where I found this, so no link (But it works!).
-    remove <- paste("'!/\t\\*\t/'")
+    # Shell script made from a comment found at https://www.biostars.org/p/108702/
     sorted.bam <- paste(this.resName,"sorted.bam",sep=".")
     unclean.sam <- paste(this.resName,"unclean.sam",sep=".")
     if(paired.end) {
-      convert.to.sam <- paste ("samtools view",sorted.bam,"-h -o",unclean.sam)
-      clean.sam <- paste("awk",remove,unclean.sam,">",countable.sam)
+      convert.to.sam <- paste ("samtools view -h",sorted.bam,">",unclean.sam)
+      filter.sam <- paste("bash",paste(base.dir,"CushawCorrection.sh"),unclean.sam,countable.sam)
     }
     if (!paired.end) convert.to.sam <- paste("samtools view",sorted.bam,"-h -o ",countable.sam)
     ###################
@@ -159,12 +166,10 @@ for (zz in 1:nStreams) {
     ###################
     # Current command:
     ###################
-
     if (aAlgor == "Cushaw") comm.i <- paste(sam.create,"&&",bam.create,"&&",bam.sort,"&&",bam.index,"&&",convert.to.sam)
     if (aAlgor == "Cushaw_GPU") comm.i <- paste(bam.create,"&&",bam.sort,"&&",bam.index,"&&",convert.to.sam)
-    if (paired.end){
-      comm.i <- paste(comm.i,"&&",clean.sam)
-    }
+    if (paired.end) comm.i <- paste(comm.i,"&&",filter.sam)
+    #
     if (count.comm != "") comm.i <- paste(comm.i, "&&", count.comm)
     #
     # For the very first assembly in the stack (i = 1)

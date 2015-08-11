@@ -12,8 +12,8 @@ source("GLSeq.Alignment.Functions.R")
 source("GLSeq.Util.R")
 
 comm.stack.pool <- NULL
-
-#
+comm.stack.pools <- NULL
+file.name.change <- NULL
 ####################################
 # Copy genome indices to the destimation dir:
 ####################################
@@ -21,7 +21,6 @@ indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 ####################
 
-file.name.change <- "date"
 if (paired.end){
   for (zz in 1:nStreams) {
     for (i in rangelist[[zz]]){
@@ -32,10 +31,14 @@ if (paired.end){
       # or
       # {FileNameBase}_2.fq while we normally put them in the format {FileNameBase}.2.fq
       #
-      file.name.change <- paste(file.name.change,"&&","mv",paste(dest.dir,fqfiles.table[i,1],sep=""))
+      if (is.null(file.name.change)){
+        file.name.change <- paste("mv",paste(dest.dir,fqfiles.table[i,1],sep=""))
+      } else{
+        file.name.change <- paste(file.name.change,"&& mv",paste(dest.dir,fqfiles.table[i,1],sep=""))
+      }
       fqfiles.table[i,1] <- sub(".1.fq","_1.fq",fqfiles.table[i,1])
-      file.name.change <- paste(file.name.change,fqfiles.table[i,1])
-      file.name.change <- paste(file.name.change,"&&","mv",paste(dest.dir,fqfiles.table[i,2],sep=""))
+      file.name.change <- paste(file.name.change,paste(dest.dir,fqfiles.table[i,1]))
+      file.name.change <- paste(file.name.change,"&& mv",paste(dest.dir,fqfiles.table[i,2],sep=""))
       fqfiles.table[i,2] <- sub(".2.fq","_2.fq",fqfiles.table[i,2])
       file.name.change <- paste(file.name.change,paste(dest.dir,fqfiles.table[i,2],sep=""))
     }
@@ -50,17 +53,11 @@ if (paired.end){
 #-f means FASTA input
 ####################
 IndexOptions <- paste("-f")
-index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),rGenome)
+index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
 printOrExecute(index,Condor)
 #
-#
 for (zz in 1:nStreams) {
-  comm <- "date"
-  if (is.null(comm.stack.pool)) {
-    comm.stack.pool <- "date"
-  } else{
-    comm.stack.pool <- paste(comm.stack.pool,"date")
-  }
+  comm.stack.pools <- NULL
   for (i in rangelist[[zz]]) {
     ###################
     # Alignment with SAM output
@@ -68,7 +65,7 @@ for (zz in 1:nStreams) {
     # Grabbing all the correct naming conventions and such.
     fq.left <- paste(dest.dir,fqfiles.table[i,1],sep="")
     if (paired.end) fq.right <- paste(dest.dir,fqfiles.table[i,2],sep="")
-    name <- assign.name(fqfiles.table[i,1],paired.end)
+    name <- assign.name(fq.left,paired.end)
     this.resName <- assign.resName(name,text.add)
     #
     # -o Tells the aligner where to put the output, which is a unique folder based on the inputs.
@@ -77,14 +74,14 @@ for (zz in 1:nStreams) {
     #
     tophat.output.dir <- paste(this.resName,"TopHat.Alignment",sep=".")
     alignmentOptions <- paste("-o",tophat.output.dir)
-    align <- paste(TopHat.path,alignmentOptions,rGenome,fq.left)
-    print(align)
+    align <- paste(TopHat.path,alignmentOptions,paste(dest.dir,rGenome),fq.left)
     if (paired.end){
       align <- paste(align,fq.right)
     }
     # After the alignment, we'll want to move some files around and rename some files to line up more with our standard naming conventions.
-    acceptedHitsName <- paste(this.resName,"accepted_hits.bam",sep="")
-    file.rename.and.move <- paste("mv",paste(dest.dir,tophat.output.dir,"/accepted_hits.bam",sep=""),acceptedHitsName)
+    acceptedHitsName <- paste(this.resName,".accepted_hits.bam",sep="")
+    tophat.output.dir <- trailDirCheck(tophat.output.dir)
+    file.rename.and.move <- paste("mv",paste(tophat.output.dir,"accepted_hits.bam",sep=""),acceptedHitsName)
     bam.index <- paste("samtools index", acceptedHitsName)
     #
     ###################
@@ -99,7 +96,11 @@ for (zz in 1:nStreams) {
     # Directly write the samtools output to a new countable file after sorting
     # -n in the samtools sort indicates that the document will be sorted by read name rather than chromosome
     # -h in the samtools view indicates a header will be printed
-    countable.comm <- paste("samtools sort -n", acceptedHitsName, paired.arg, "&&", "samtools view -h", paired.bam, ">", countable.sam)
+    if (Condor){
+      countable.comm <- paste("samtools sort -@ 6 -m 32G -n", acceptedHitsName, paired.arg, "&&", "samtools view -h", paired.bam, ">", countable.sam)
+    } else{
+      countable.comm <- paste("samtools sort -n", acceptedHitsName, paired.arg, "&&", "samtools view -h", paired.bam, ">", countable.sam)
+    }
     #
     count.comm <- ""
     if (counting == "counting"){
@@ -111,13 +112,21 @@ for (zz in 1:nStreams) {
     accepted.index <- paste(acceptedHitsName,".bai",sep="")
     remove.indexes <- paste(dest.dir,rGenome,".*.bt2",sep="")
     # Need to move the files that are made back into the normal folder
-    comm.stack.pool <- paste(comm.stack.pool,'&&',align)
-    comm.stack.pool <- paste(comm.stack.pool,"&&",file.rename.and.move)
-    comm.stack.pool <- paste(comm.stack.pool,"&&",bam.index)
-    comm.stack.pool <- paste(comm.stack.pool,"&&",countable.comm)
-    if (count.comm != "") comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm)
+    if (is.null(comm.stack.pools)){
+      comm.stack.pools <- paste(align)
+    } else{
+      comm.stack.pools <- paste(comm.stack.pools,'&&',align)
+    }
+    comm.stack.pools <- paste(comm.stack.pools,"&&",file.rename.and.move)
+    comm.stack.pools <- paste(comm.stack.pools,"&&",bam.index)
+    comm.stack.pools <- paste(comm.stack.pools,"&&",countable.comm)
+    if (count.comm != "") comm.stack.pools <- paste(comm.stack.pools,"&&",count.comm)
     #
   }
-  comm.stack.pool <- paste(comm.stack.pool,"&")
+  if (is.null(comm.stack.pool)){
+    comm.stack.pool <- paste(comm.stack.pools,"&")
+  } else{
+    comm.stack.pool <- paste(comm.stack.pool,comm.stack.pools,"&")
+  }
 }
 comm.stack.pool <- paste(comm.stack.pool,"wait")

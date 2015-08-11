@@ -10,7 +10,7 @@ create.QC.folder <- function(dest.dir,text.add){
   dest.dir <- trailDirCheck(dest.dir)
   quality.check.folder <- paste(dest.dir,text.add,".DataPrep",sep="")
   create.folder <- paste("mkdir",quality.check.folder)
-  try(system(create.folder))
+  printOrExecute(create.folder,Condor)
   quality.check.folder
 }
 
@@ -66,7 +66,7 @@ copy.files.to.dest.unzipped <- function(raw.dir,dest.dir){
   fqFiles <- paste(raw.dir,"*.fq",sep="")
   fastqFiles <- paste(raw.dir,"*.fastq",sep="")
   copy <- paste("cp",fqFiles,dest.dir,"; cp",fastqFiles,dest.dir)
-  try(system(copy))
+  printOrExecute(copy,Condor)
   copy
 }
 
@@ -79,11 +79,11 @@ copy.files.to.dest.zipped <- function(raw.dir,dest.dir){
   # Copy all relevant file types into the folder
   gzFiles <- paste(raw.dir,"*.gz",sep="")
   copy <- paste("cp",gzFiles,dest.dir)
-  try(system(copy))
+  printOrExecute(copy,Condor)
   copy
 }
 
-# Gets a list of all the zipped files 
+# Gets a list of all the zipped files
 get.files.zipped <- function(raw.dir){
   if (is.null(raw.dir)) stop("Arguments should not be NULL")
   raw.dir <- trailDirCheck(raw.dir)
@@ -96,7 +96,7 @@ get.files.zipped <- function(raw.dir){
 
 # For the unzipped files, we don't remove anything from them.
 # This function is here, though, in case we decide to change how our files
-# Are structured.  
+# Are structured.
 prepare.unzipped.file.names <- function(fqFiles.unzip){
   if (is.null(fqFiles.unzip))  stop("Arguments should not be NULL")
   # Assumes the file is in the format of {name}_#.fq (Presplit) OR {name}_fq
@@ -144,7 +144,7 @@ copy.artificial.fq <- function(base.dir,artificial.fq,dest.dir){
   dest.dir <- trailDirCheck(dest.dir)
   base.dir <- trailDirCheck(base.dir)
   copy <- paste("cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
-  try(system(copy))
+  printOrExecute(copy,Condor)
   copy
 }
 
@@ -161,13 +161,13 @@ get.file.base <- function(fqFile){
   if (grepl(".gz$",fqFile)){
     fqFile <- substr(fqFile, 1, nchar(fqFile)-3)
   }
-  
+
   if (grepl(".fastq$",fqFile)){
     fqFile <- substr(fqFile, 1, nchar(fqFile)-6)
   }  else if (grepl(".fq$",fqFile)){
     fqFile <- substr(fqFile, 1, nchar(fqFile)-3)
   }
-  
+
   if (grepl(".1$",fqFile)){
     fqFile <- substr(fqFile, 1, nchar(fqFile)-2)
   } else if (grepl(".2$",fqFile)){
@@ -191,7 +191,7 @@ copy.file<- function(raw.dir,fqFile,dest.dir){
 unzip.gz.files <- function(fqFile.zip){
   if (is.null(fqFile.zip)) stop("Arguments should not be NULL")
   #
-  gunzip.comm <- paste("gunzip",fqFile.zip)
+  gunzip.comm <- paste("gunzip",fqFile.zip,"&")
   gunzip.comm
 }
 
@@ -204,25 +204,25 @@ unzip.gz.files <- function(fqFile.zip){
 ############# NAMING
 first.read.name <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  first.read.filename <- paste(fqFile, ".1.fq", sep="")
+  first.read.filename <- paste(fqFile,".1.fq", sep=".")
   first.read.filename
 }
 
 second.read.name <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  second.read.filename <- paste(fqFile, ".2.fq", sep="")
+  second.read.filename <- paste(fqFile,".2.fq", sep=".")
   second.read.filename
 }
 
 left.dirty.name <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  leftDirtyFname <-  paste("dirty.", fqFile, ".1.fq", sep="")
+  leftDirtyFname <-  paste(fqFile,"dirty.1.fq", sep=".")
   leftDirtyFname
 }
 
 right.dirty.name <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  rightDirtyFname <-  paste("dirty.", fqFile, ".2.fq", sep="")
+  rightDirtyFname <-  paste(fqFile,"dirty.2.fq", sep=".")
   rightDirtyFname
 }
 
@@ -237,16 +237,16 @@ trimAssemble.PE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq
   fqFile <- get.file.base(fqFile)
   first.read.file <- first.read.name(fqFile)
   second.read.file <- second.read.name(fqFile)
-  
+
   dashqScore <- paste("-", qScore, sep="")
   #
   logName <- paste(first.read.file,"pairedtrim.log", sep=".")
   #
-  pairedTrimmed.1 <- paste("p", first.read.file, sep=".")
-  unpairedTrimmed.1 <- paste("u",  first.read.file, sep=".")
+  pairedTrimmed.1 <- paste(first.read.file,"p.fq", sep=".")
+  unpairedTrimmed.1 <- paste(first.read.file,"u.fq", sep=".")
   #
-  pairedTrimmed.2 <- paste("p",  second.read.file, sep=".")
-  unpairedTrimmed.2 <- paste("u", second.read.file, sep=".") 
+  pairedTrimmed.2 <- paste(second.read.file,"p.fq", sep=".")
+  unpairedTrimmed.2 <- paste(second.read.file,"u.fq", sep=".")
   #
   trimParam <- paste("ILLUMINACLIP:", artificial.fq, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
   tcomm <- paste("java -jar", trimPath, "PE -threads 20", dashqScore, "-trimlog", logName, first.read.file, second.read.file, pairedTrimmed.1, unpairedTrimmed.1, pairedTrimmed.2, unpairedTrimmed.2, trimParam)
@@ -262,8 +262,8 @@ file.shuffle.PE <- function(fqFile){
   second.read.filename <- second.read.name(fqFile)
   leftDirtyFname <- left.dirty.name(fqFile)
   rightDirtyFname <- right.dirty.name(fqFile)
-  pairedTrimmed.1 <-  paste("p.", fqFile, ".1.fq", sep="")
-  pairedTrimmed.2 <- paste("p.", fqFile, ".2.fq", sep="")
+  pairedTrimmed.1 <-  paste(fqFile,".p.1.fq", sep="")
+  pairedTrimmed.2 <- paste(fqFile,".p.2.fq", sep="")
   #
   fileShuffle <- paste("mv", first.read.filename, leftDirtyFname, "&&", "mv", second.read.filename, rightDirtyFname, "&&", "mv", pairedTrimmed.1, first.read.filename, "&&", "mv", pairedTrimmed.2, second.read.filename)
   #
@@ -313,8 +313,8 @@ remove.unneeded.files <- function(fqFile){
   second.read.file <- second.read.name(fqFile)
   leftDirtyFname <- left.dirty.name(fqFile)
   rightDirtyFname <- right.dirty.name(fqFile)
-  unpairedTrimmed.1 <- paste("u",  first.read.file, sep=".")
-  unpairedTrimmed.2 <- paste("u", second.read.file, sep=".") 
+  unpairedTrimmed.1 <- paste(first.read.file,"u.fq",sep=".")
+  unpairedTrimmed.2 <- paste(second.read.file,"u.fq",sep=".")
   #
   remove.command <- paste("rm",leftDirtyFname,"; rm",rightDirtyFname,"; rm",unpairedTrimmed.1,"; rm",unpairedTrimmed.2)
   remove.command
@@ -339,7 +339,7 @@ move.paired.files.PE <- function(fqFile,qcFolder){
 ############# NAMING
 dirty.name.SE <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  dirty.name <-  paste("dirty.", fqFile, ".fq", sep="")
+  dirty.name <-  paste(fqFile,"dirty.fq",sep=".")
   dirty.name
 }
 
@@ -359,19 +359,21 @@ trimAssemble.SE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq
   fqFile.base <- get.file.base(fqFile)
   dashqScore <- paste("-", qScore, sep="")
   logName <- paste(fqFile, "pairedtrim.log", sep=".")
-  pairedTrimmed.1 <- paste("p", fqFile.base, "fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
+  pairedTrimmed.1 <- paste(fqFile.base, "p.fq", sep=".") # '.fq' is added here for single end libraries (it is added at the splitting stage for the paired-end)
   trimParam <- paste("ILLUMINACLIP:", artificial.fq, ":2:30:10", " HEADCROP:", headcrop, " SLIDINGWINDOW:3:30 MINLEN:", trimMin, sep="")
   tcomm <- paste("java -jar", trimPath, "SE -threads 20", dashqScore, "-trimlog", logName, fqFile,  pairedTrimmed.1, trimParam)
   tcomm
 }
-# Renames it so that the final resulting file has the same name as the original. 
+# Renames it so that the final resulting file has the same name as the original.
 file.shuffle.SE <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
   fqFile <- get.file.base(fqFile)
   dirty.name <- dirty.name.SE(fqFile)
   final.name <- final.name.SE(fqFile)
-  trimmed.name <- paste("p.",final.name,sep="")
+  trimmed.name <- paste(fqFile,".p.fq",sep="")
   #
+  # Move the original file and call it the dirty file
+  # Also move the trimmed file and then call it the original final name so that it is the cleanest
   fileShuffle <- paste("mv", final.name, dirty.name, " && ",  "mv", trimmed.name, final.name)
   #
   fileShuffle
@@ -408,4 +410,13 @@ move.paired.files.SE <- function(fqFile,qcFolder){
   logName <- paste(fqFile, "pairedtrim.log", sep=".")
   command <- paste("mv",logName,qcFolder)
   command
+}
+
+convert.to.absolute.paths <- function(dest.dir,fqFiles){
+  if (is.null(fqFiles) || is.null(dest.dir)) stop("Arguments should not be NULL")
+  dest.dir <- trailDirCheck(dest.dir)
+  for (i in 1:length(fqFiles)){
+      fqFiles[i] <- paste(dest.dir,fqFiles[i],sep="")
+  }
+  fqFiles
 }

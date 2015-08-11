@@ -35,9 +35,11 @@ def writeConvertedFile(file_name,header,dna_sequence):
 
 directory = sys.argv[1]
 raw_file_name = sys.argv[2]
+destination_directory = sys.argv[3]
 
 directory = checkTrail(directory)
-
+destination_directory = checkTrail(destination_directory)
+# Takes off the last directory
 command_arg = ""
 count = 0
 file = directory + raw_file_name
@@ -68,7 +70,7 @@ if (dna_sequence != ""):
     writeConvertedFile(new_file_name,header,dna_sequence)
     count = count + 1
 os.remove(file)
-create_formatted_file = "echo " + command_arg + " > referenceGenomes"
+create_formatted_file = "echo " + command_arg + " > " + destination_directory +"referenceGenomes"
 Popen(create_formatted_file,shell=True)
 print("Converted input fastq file into " + str(count) + " fna files.")
 sys.exit(0)
