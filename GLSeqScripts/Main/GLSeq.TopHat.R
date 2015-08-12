@@ -37,7 +37,7 @@ if (paired.end){
         file.name.change <- paste(file.name.change,"&& mv",paste(dest.dir,fqfiles.table[i,1],sep=""))
       }
       fqfiles.table[i,1] <- sub(".1.fq","_1.fq",fqfiles.table[i,1])
-      file.name.change <- paste(file.name.change,paste(dest.dir,fqfiles.table[i,1]))
+      file.name.change <- paste(file.name.change,paste(dest.dir,fqfiles.table[i,1],sep=""))
       file.name.change <- paste(file.name.change,"&& mv",paste(dest.dir,fqfiles.table[i,2],sep=""))
       fqfiles.table[i,2] <- sub(".2.fq","_2.fq",fqfiles.table[i,2])
       file.name.change <- paste(file.name.change,paste(dest.dir,fqfiles.table[i,2],sep=""))
@@ -73,8 +73,8 @@ for (zz in 1:nStreams) {
     # the main folder for further processing/display, but retain some of TopHat's excellent post-run notes
     #
     tophat.output.dir <- paste(this.resName,"TopHat.Alignment",sep=".")
-    alignmentOptions <- paste("-o",tophat.output.dir)
-    align <- paste(TopHat.path,alignmentOptions,paste(dest.dir,rGenome),fq.left)
+    alignmentOptions <- paste("-p 8","-o",tophat.output.dir)
+    align <- paste(TopHat.path,alignmentOptions,paste(dest.dir,rGenome,sep=""),fq.left)
     if (paired.end){
       align <- paste(align,fq.right)
     }

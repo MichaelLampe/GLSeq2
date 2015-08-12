@@ -273,7 +273,7 @@ copy.preprocessed.files <- function(readyData.dir,dest.dir,Condor=FALSE) {
 # The downstream program to either pair files correctly or to
 # Use readyData.dir if we are dealing with nodataprep
 # Use fqFiles if we are dealign with data prep
-convert.file.list.to.table <- function(paired.end,readyData.dir=NULL,fqfiles=NULL) {
+convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
   if (is.null(paired.end)) stop("Arguments should not be NULL")
   # Paired End
   if (paired.end) {
@@ -284,7 +284,7 @@ convert.file.list.to.table <- function(paired.end,readyData.dir=NULL,fqfiles=NUL
     for (num in 1:length(fqfiles)){
       # Remove 8 if a fastq file
       if (grepl(".fastq$",fqfiles[num])){
-        fqfiles[num] <- substr(fqfiles.base[num],1,nchar(fqfiles[num]-8))
+        fqfiles[num] <- substr(fqfiles[num],1,nchar(fqfiles[num]) - 8)
       # Remove 5 if a fq file
       } else{
         fqfiles[num] <- substr(fqfiles[num], 1,nchar(fqfiles[num]) - 5)
@@ -441,6 +441,7 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor=
   if (is.null(destDirLog) || is.null(text.add) || is.null(attrPath) || is.null(dest.dir)) stop("Arguments should not be NULL")
   destDirLog <- trailDirCheck(destDirLog)
   dest.dir <- trailDirCheck(dest.dir)
+  setwd(base.dir)
   source("GLSeq.dataprep.R")
   #Sys.sleep(10)
   # <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")

@@ -32,12 +32,16 @@ class CommandFile:
                 command.write(self.command_bundle[x].lstrip())
                 command.write("\n")
                 # Mkdir can sometimes cause errors if the user already had a directory made.
+                # There is a case where try to copy both fastq and fq files, so let's ignore that here.
                 # This will alleviate that.
-                mkdir = re.compile("mkdir(.*?)",re.IGNORECASE)
-                result = re.search(mkdir,self.command_bundle[x])
+                noerrors = re.compile("mkdir (.*?)|cp (.*?)",re.IGNORECASE)
+                result = re.search(noerrors,self.command_bundle[x])
                 if (result==None):
                     command.write(self.error_checking(x,self.command_bundle[x]))
+            # If completes, exit with a good code
+            command.write("\nexit 0")
         # Makes the newly created file an executable
+
         Popen(self.create_executable(file))
         return self.file_name
 

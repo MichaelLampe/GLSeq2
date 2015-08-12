@@ -71,6 +71,9 @@ class Command():
             x = search(pattern,command)
             return x!=None
 
+        # These defaults were initially used until I got a better handle on the memory requirements of each of the
+        # individual protocols
+
         # Scarce resource is 256 mb and 1 cpu and 0 gpus
         scarce_resource = [
             "256", # Memory
@@ -133,31 +136,38 @@ class Command():
         # This is often the slowest step, so lets give it a lot of RAM to work with
         samtools_sort = compile("samtools sort",re.IGNORECASE)
         if found_match(samtools_sort,command):
-            return high_ram[0],high_ram[1],high_ram[2]
+            return "18G","6","0"
+        rsem_expression = compile("^(.*?)rsem-calculate-expression(?=[ ])",re.IGNORECASE)
+        # RSEM uses sort and also takes a long time.
+        # I've seen it range from 3GB up to 17GB on pretty much the same files.
+        # We'll set it to 32 to be pretty safe when given even larger files.
+        if found_match(rsem_expression,command):
+            return "18G","8","0"
+        # We can give low memory to other RSEM tools that we use.
         rsem = compile("^(.*?)rsem(?=[ ])",re.IGNORECASE)
         # RSEM uses sort and also takes a long time.
         if found_match(rsem,command):
-            return high_ram[0],high_ram[1],high_ram[2]
+            return "1G","1","0"
         # High Resource
         cushaw = compile("^(.*?)cushaw(?=[ ])",re.IGNORECASE)
         if found_match(cushaw,command):
-            return high_resource[0],high_resource[1],high_resource[2]
+            return "400M","8","0"
         bwa = compile("^(.*?)bwa(?=[ ])",re.IGNORECASE)
         if found_match(bwa,command):
-            return high_resource[0],high_resource[1],high_resource[2]
+            return "1G","8","0"
         bowtie = compile("^(.*?)bowtie(?=[ ])",re.IGNORECASE)
         if found_match(bowtie,command):
-            return high_resource[0],high_resource[1],high_resource[2]
+            return "1G","4","0"
         tophat = compile("^(.*?)tophat(?=[ ])",re.IGNORECASE)
         if found_match(tophat,command):
-            return high_resource[0],high_resource[1],high_resource[2]
+            return "4G","8","0"
         cufflinks = compile("^(.*?)cufflinks(?=[ ])",re.IGNORECASE)
         if found_match(cufflinks,command):
             return high_resource[0],high_resource[1],high_resource[2]
         # Medium Resources
         fastqc = compile("^(.*?)fastqc(?=[ ])",re.IGNORECASE)
         if found_match(fastqc,command):
-            return medium_resource[0],medium_resource[1],medium_resource[2]
+            return "200M","1","0"
         bam2wig = compile("^(.*?)bam2wig(?=[ ])",re.IGNORECASE)
         if found_match(bam2wig,command):
             return medium_resource[0],medium_resource[1],medium_resource[2]
@@ -166,10 +176,10 @@ class Command():
             return medium_resource[0],medium_resource[1],medium_resource[2]
         trim = compile("^(.*?)trimmomatic(?=[ ])",re.IGNORECASE)
         if found_match(trim,command):
-            return medium_resource[0],medium_resource[1],medium_resource[2]
+            return "12G","20","0"
         rockhopper = compile("^(.*?)rockhopper(?=[ ])",re.IGNORECASE)
         if found_match(rockhopper,command):
-            return medium_resource[0],medium_resource[1],medium_resource[2]
+            return "4G","1","0"
         # bifxapps isn't an app, but is our app folder.
         # This should catch any absolute path someone introduces to try and assign it
         #  to a "medium resources" setting (Assuming the app is in bifxapps)
@@ -179,14 +189,20 @@ class Command():
         # Low Resource
         samtools = compile("^(.*?)samtools(?=[ ])",re.IGNORECASE)
         if found_match(samtools,command):
-            return low_resource[0],low_resource[1],low_resource[2]
+            return "100M","1","0"
         # Scarce Resource
         htseq = compile("^(.*?)HTSeq(?=[ ])",re.IGNORECASE)
         if found_match(htseq,command):
-            return scarce_resource[0],scarce_resource[1],scarce_resource[2]
+            return "75M","1","0"
         featureCounts = compile("^(.*?)featurecounts(?=[ ])",re.IGNORECASE)
         if found_match(featureCounts,command):
             return scarce_resource[0],scarce_resource[1],scarce_resource[2]
+        mkorcopy= re.compile("mkdir (.*?)|cp (.*?)",re.IGNORECASE)
+        if found_match(mkorcopy,command):
+            return "5M","1","0"
+        gunzip= re.compile("gunzip (.*?)",re.IGNORECASE)
+        if found_match(gunzip,command):
+            return "100M","1","0"
         # If nothing else has returned by now, return whatever was set as the defautl value.
         return default
 # Statics

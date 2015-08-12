@@ -25,7 +25,7 @@ try:output.kill()
 except:pass
 # Uses that output in addition to the Rscripts message to generate a command
 rock_options = " -o " + unique_output_directory + " -e false -SAM -TIME"
-rock_align = "java -Xmx1200m -cp " + rock_path + " Rockhopper "+ "-g " + directories + rock_options + " \"" + rockhopper_files + "\""
+rock_align = "java -Xmx4096m -cp " + rock_path + " Rockhopper "+ "-g " + directories + rock_options + " \"" + rockhopper_files + "\""
 print(rock_align)
 process = Popen(rock_align,shell=True)
 out,err = process.communicate()

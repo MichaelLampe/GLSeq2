@@ -204,13 +204,13 @@ unzip.gz.files <- function(fqFile.zip){
 ############# NAMING
 first.read.name <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  first.read.filename <- paste(fqFile,".1.fq", sep=".")
+  first.read.filename <- paste(fqFile,"1.fq", sep=".")
   first.read.filename
 }
 
 second.read.name <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
-  second.read.filename <- paste(fqFile,".2.fq", sep=".")
+  second.read.filename <- paste(fqFile,"2.fq", sep=".")
   second.read.filename
 }
 
@@ -272,14 +272,14 @@ file.shuffle.PE <- function(fqFile){
 }
 
 # Calls a bit of ruby code that splits an unsplit file into two files, file.1.fq and file.2.fq
-split.unsplit.files.PE <- function(dest.dir,fqFile){
+split.unsplit.files.PE <- function(base.dir,fqFile){
   if (is.null(dest.dir) || is.null(fqFile)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
   fqFile.base <- get.file.base(fqFile)
   first.read.filename <- first.read.name(fqFile.base)
   second.read.filename <- second.read.name(fqFile.base)
-  # (The ruby code incorporated into the line above was adapted from SeqAnsweres forum (seqanswers.com))
-  split.comm <- paste("cat ", dest.dir, fqFile, " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[1234]/; @i = 0 if @i == 8' > ", first.read.filename, " && cat ",   dest.dir, fqFile, " | ruby -ne 'BEGIN{@i=0} ; @i+=1; puts $_  if @i.to_s =~ /[5678]/; @i = 0 if @i == 8' > ", second.read.filename, sep="")
+  # Shell script incorporates ruby code to split files.  Ruby code was found at Seqanswers.com
+  split.comm <- paste("bash",paste(base.dir,"DataPrepFileSplit.sh",sep=""),fqFile,first.read.filename,second.read.filename)
   split.comm
 }
 

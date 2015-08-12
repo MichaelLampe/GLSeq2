@@ -19,8 +19,9 @@ prepareReference <- paste("rsem-prepare-reference",paste(dest.dir,refFASTAname,s
 #
 countFile <- paste(this.resName,"RSEM","counts",sep=".")
 if (Condor){
-  # Condor normally allocates 32GB for RSEM, RSEM recommends leaving 2GB free for other uses.
-  rsemOptions <- paste("--calc-pme","--calc-ci","-p",6,"--samtools-sort-mem 32G")
+  # While we set samtools to having a lot of memory to use, it will rarely use that much.
+  # Because of how flexible condor is, we can set it to only 6GB and then it will scale up if needed
+  rsemOptions <- paste("--calc-pme","--calc-ci","-p",8,"--samtools-sort-mem 32G")
 } else{
   rsemOptions <- paste("--calc-pme","--calc-ci","-p",nCores)
 }

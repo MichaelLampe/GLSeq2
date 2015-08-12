@@ -151,7 +151,7 @@ for (zz in 1:nStreams) {
     unclean.sam <- paste(this.resName,"unclean.sam",sep=".")
     if(paired.end) {
       convert.to.sam <- paste ("samtools view -h",sorted.bam,">",unclean.sam)
-      filter.sam <- paste("bash",paste(base.dir,"CushawCorrection.sh"),unclean.sam,countable.sam)
+      filter.sam <- paste("bash",paste(base.dir,"CushawCorrection.sh",sep=""),unclean.sam,countable.sam)
     }
     if (!paired.end) convert.to.sam <- paste("samtools view",sorted.bam,"-h -o ",countable.sam)
     ###################

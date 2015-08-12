@@ -22,7 +22,7 @@ if(Condor){
 if (!is.na(countable.sam)){
   individual.run.dir <- paste(fqfiles.table[i,1],"IndividualCountData",sep=".")
   cufflinks.dest <- paste(destDirCufflinksCount,individual.run.dir,sep="")
-  cufflinks.sorted.name <- paste("cufflinks.ready",countable.sam,sep=".")
+  cufflinks.sorted.name <- paste(countable.sam,"cufflinks.ready",sep=".")
   #
   create.run.dir <- paste("mkdir",cufflinks.dest)
   cufflinks.unsorted.name <- paste(countable.sam,"cufflinks.unsorted.sam",sep=".")
@@ -35,7 +35,6 @@ if (!is.na(countable.sam)){
   }
   # This will end up being a BAM file due to how Samtools sorts things.
   cufflinks.ready.countable <- paste(cufflinks.sorted.name,"bam",sep=".")
-  cufflinks.ready.countable <- paste(dest.dir,cufflinks.ready.countable,sep="")
   #
   # No progress bar makes everything feel better.
   cufflinks.options <- paste("--quiet","-p",nCores,"--output-dir",cufflinks.dest)

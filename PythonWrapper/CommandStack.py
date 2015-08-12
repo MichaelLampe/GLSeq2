@@ -44,7 +44,8 @@ class Stack:
             'date ',
             'rm ',
             'echo ',
-            'wait'
+            'wait',
+            'gunzip'
         ]
 
     def plot_graph(self,run_name):
@@ -61,8 +62,7 @@ class Stack:
         if(len(self.command_list) > 0):
             for z in range(len(self.command_list)-1,0,-1):
                 # Parallel command
-                if len(self.command_list[z]) <= 0:
-                    self.concatenate_commands(self.command_list,z)
+                self.concatenate_commands(self.command_list,z)
             # Reassess the size here in case it changed by too much
             for z in range(len(self.command_list) - 1,-1,-1):
             # Parallel command
@@ -84,12 +84,13 @@ class Stack:
             if (word in command[current_index][0][0]):
                 if (current_index != 0):
                     # Adds the previous command to the one ahead of it if it is in the list
-                    command[current_index -1][0] += command[current_index][0]
+                    command[current_index -1][0] = command[current_index-1][0] + command[current_index][0]
                     # Then removes the command just duplicated from its original location
                     command[current_index].pop(0)
                     # Checks if the location is now empty and removes it if it is
                     if(len(command[current_index]) < 1):
                         command.pop(current_index)
+                        break
 
     def concatenate_linked_commands(self,command,current_index):
         for word in self.group_keywords:

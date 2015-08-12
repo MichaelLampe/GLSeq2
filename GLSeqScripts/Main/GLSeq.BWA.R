@@ -34,7 +34,8 @@ for (zz in 1:nStreams) {
     # Alignment Commands
     # Two alignments happen no matter what, after the SAI file is made we can combine paired files into one SAM
     # file using some BWA tools.
-    aln.left <- paste(bwaPath, "aln", paste(dest.dir,refFASTAname,sep=""), fq.left, ">", sainame.left)
+    align.options <- paste("-t 8")
+    aln.left <- paste(bwaPath, "aln",align.options,paste(dest.dir,refFASTAname,sep=""), fq.left, ">", sainame.left)
     if (paired.end) aln.right <- paste(bwaPath, "aln", paste(dest.dir,refFASTAname,sep=""), fq.right, ">", sainame.right)
     # Sam File Creation
     # Sampe/Samse transforms a .sai file into a SAM file.
@@ -46,10 +47,9 @@ for (zz in 1:nStreams) {
     ###################
     # Just some name things to get us through the Samtools sort.
     sorted.arg <- paste(this.resName, "sorted", sep=".")
-    unsorted.bam <- paste(this.resName,"unsorted.bam")
+    unsorted.bam <- paste(this.resName,"unsorted.bam",sep=".")
     # -u = Uncompressed BAM file output, better for the pipe
     # -S = Input is a SAM File
-    # -t = TAB-delimited file
     # I'm not sure if we need to first pipe it from into the sorted.arg format and index or if we could just sort
     # This is something I will test in the future to possibly speed up the protocol a bit.
     bam.create <- paste("samtools view -uS", unsorted.sam,"-o",unsorted.bam)
@@ -61,14 +61,15 @@ for (zz in 1:nStreams) {
     # For consistency as we move towards a counting protocol
     countable.sam <- countable.sam.name(this.resName)
     sorted.bam <- paste(this.resName, "sorted.bam", sep=".")
+    sorted.args <- paste(this.resName,"sorted",sep=".")
     # let's avoid pipe here to save RAM
     # Directly write the samtools output to a new countable file after sorting
     # -n in the samtools sort indicates that the document will be sorted by read name rather than chromosome
     # -h in the samtools view indicates a header will be printed
     if (Condor) {
-      sort.bam <- paste("samtools sort -@ 6 -m 32G -n", unsorted.bam, sorted.bam)
+      sort.bam <- paste("samtools sort -@ 6 -m 32G -n", unsorted.bam, sorted.args)
     } else{
-      sort.bam <- paste("samtools sort -n", unsorted.bam, sorted.bam)
+      sort.bam <- paste("samtools sort -n", unsorted.bam, sorted.args)
     }
     index.bam <- paste("samtools index", sorted.bam)
     # Covnert back to SAM format
