@@ -44,7 +44,7 @@ for (zz in 1:nStreams) {
     ###################
     if (aAlgor == "Bowtie"){
       if (Condor){
-        BowtieOptions <- paste("-S","-p 8","-t","-q","--chunkmbs","512")
+        BowtieOptions <- paste("-S","-p 4","-t","-q","--chunkmbs","512")
       } else{
         BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
       }
@@ -62,8 +62,11 @@ for (zz in 1:nStreams) {
       # Might be worth moving off the RSEM counting protocol if we believe Bowtie will better serve us with the current
       # counting protocols.
       if (Condor){
-        # I've set Bowtie to have 8 CPUS when using condor, so let's exploit that.
-        Bowtie2Options <- paste("-t","-p 8","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
+        # I've set Bowtie to have 4 CPUS when using condor, so let's exploit that.
+        # This is under the assumption that any leftover cores would be able to be used by other processes while running in parallel.
+        # Thus, we'll be able to fill up the servers as efficiently as posible with the LCD, which is 4.
+        # Based on https://www.biostars.org/p/92366/ as well showing a non-linear speedup of runs. (4 -> 8 is not half time)
+        Bowtie2Options <- paste("-t","-p 4","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
       } else{
         Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
       }

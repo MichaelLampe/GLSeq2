@@ -91,7 +91,7 @@ if os.path.isdir(attribute_file_path):
                 # Creates the dag workflow requested
                 command_stack.create_dag_workflow(run_name)
                 # Submits the workflow to condor.
-                command_stack.submit()
+                #command_stack.submit()
                 command_stack.plot_graph(run_name)
                 clear_classes()
             except:

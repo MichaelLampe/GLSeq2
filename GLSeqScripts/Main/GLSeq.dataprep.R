@@ -81,7 +81,7 @@ for (zz in 1:nStreamsDataPrep) {
       if (!presplit){
         # Add to command pool
         if (is.null(comm.pools)){
-          comm.pools <- paste(split.unsplit.files.PE(dest.dir,fqFiles[j]))
+          comm.pools <- paste(split.unsplit.files.PE(base.dir,fqFiles[j]))
         }else{
           comm.pools <- paste(comm.pools,"&&",split.unsplit.files.PE(dest.dir,fqFiles[j]))
         }
