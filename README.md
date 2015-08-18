@@ -109,7 +109,10 @@ To run the pipeline, you need to;
 1. Have the software listed in the "Prerequisites" installed;   
 2. Have your FASTQ files in either compressed / unprocessed or pre-processed form;   
 3. Have created the base directory for the run (on a fast drive, preferably); 
-4. Create the run attribute file on the basis of GLSeq2.attr.R 
+4. Create the run attribute file
+   Option 1: Generate an attribute file using the GLSeq2 User Interface jar file and start the run from there
+   Option 2: Manually generate an attribute file based on the example attribute file.
+5. If running manually, run either the GLSeq.top.R script (Directly to command line) or PyGLSeqWrapper.py (HT Condor).
 
 #### Data and environment 
 
@@ -125,9 +128,7 @@ Names of the input FASTQ files need to have the same length. If this is not the 
 
 You will need to change the values in the ```GLSeq2.attr.R``` file before the run. Locations of all the relevant directories, processing methods and their parameters are located there. The file is extensively commented and self-descriptive. 
 
-The "GLSeq2_UI.jar" file is able to construct the attribute file as well.  The user interface also gives the benefit of being able to launch and monitor the actual script run based on the input settings.  A picture of the interface is shown below.
-
-![User Interface](User_Interface.png)
+The "GLSeq2_UI.jar" file is able to construct the attribute file as well. 
 
 #### Quick start: "1 click mode" of pipeline execution 
 
@@ -184,21 +185,13 @@ Sometimes you may want to sacrifice the convenience of the one-click running mod
 2. You want to re-run a different alignment / counting method with your pre-processed data (use nodataprep + exprcalc + collect);    
 3. You want to explicitly collect the results after expression calculation stage when a one-click run is crashed for some unforeseen reason (use nodataprep + noexprcalc + collect).    
 
-#### Structure of the results 
+### Python Wrapper
 
-Depending on the processing route chosen, the contents of the following directories may differ by file naming patterns and content but the files they contain will always be (generally) of the same type.   
+We have also developed a Python wrapper that allows for the user to easily run GLSeq2 through HTCondor without any additional work.  The user simply submits the same commands as before, except now instead of running "RScript GLSeq.top.R" the user runs "python PyGLSeqWrapper.py".  Everything else is handled on our end.  
 
-**RUN_ID.counts subfolder**  
+The wrapper will dynamically construct your job as a directed, acylcic graph, assign proper resource allocations (Memory, CPUs, and GPUs), and submit the job to your configured HT Condor platform.  
 
-Contains summarized (run-wide, for all libraries side-by-side) count values, including separate csv files for unnormalized and normalized (FPKM, TPM) counts.
-
-**RUN_ID.viz subfolder**    
-
-Visualization files, including bam (with their indices), wiggle and BigWig files. Wherever appropriate (strandExtract == TRUE in the attribute file), starnd-specific .bam, .wig and .bw files will be also saved there (splitting the files by strand is done to reflect the strand coverage of the original mRNA in the sample rather than in a naive way by keeping reads mapped to that particular strand). 
-
-**RUN_ID.stat subfolder**   
-
-This folder contain run log files and other info you would normally not look at, plus library-specific count files generated before the collection step. 
-
+An example of a pipeline that process three raw,zipped PE data files is shown below.  The files were first unzipped, split, and trimmed during the "dataprep" step.  Then, the Rockhopper aligner quickly aligned the reads and generated a SAM file that could be counted by FeatureCounts and HTSeq.  Results are neatly placed within data folders for organizational purposes.
+![](CondorWorkflow.png)
 ### Getting help
 Please subscribe to our [low-volume mailing list managed by Google groups](https://groups.google.com/forum/?hl=en#!forum/GLSeq2-users)
