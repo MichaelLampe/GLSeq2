@@ -9,16 +9,15 @@ class CommandFile:
     # Have access to a normal user environment (pretty much)
     # Putting this up here means we only hit the system with 4 echo calls instead of a bunch
 
-    def __init__(self,run_name,command_bundle,parent):
+    def __init__(self,run_name,node):
         # Keep track of how many command files we have
         CommandFile.file_count = CommandFile.file_count + 1
         # Just make the files based on the number of their command and the run name because it is easy.
         self.run_name = run_name
-        self.file_name = run_name + "_" + str(CommandFile.file_count) + ".sh"
+        self.file_name = run_name + "_Node" + str(node.number) + ".sh"
         # Should be a list of commands that the class command has prepared.
         # They will be strings that are just a single command
-        self.command_bundle = command_bundle.split(" && ")
-        self.parent = parent
+        self.command_bundle = node.command.split(" && ")
 
     def generate_bash_file(self):
         file = self.run_name + "/" + self.file_name
@@ -41,7 +40,6 @@ class CommandFile:
             # If completes, exit with a good code
             command.write("\nexit 0")
         # Makes the newly created file an executable
-
         Popen(self.create_executable(file))
         return self.file_name
 

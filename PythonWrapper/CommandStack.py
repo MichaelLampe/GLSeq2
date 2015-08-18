@@ -3,10 +3,12 @@ __author__ = 'mlampe'
 import Command
 # Pydagman can be found at https://github.com/brandentimm/pydagman
 from pydagman.dagfile import Dagfile
+from pydagman.job import Job
 from subprocess import Popen
 from subprocess import PIPE
-from CondorGrapher import Graph
-
+from CommandFile import CommandFile
+import networkx as nx
+import os
 def get_paths(command):
     # Grap the output of the echo $PATH command
     output = Popen(command,shell=True,stdout=PIPE)
@@ -29,97 +31,64 @@ def get_environment():
 
 
 class Stack:
-    # This will take all the commands together and organize them into a command stack composed of command objects.
-    def __init__(self,command_list):
-        self.command_list = command_list
-        self.command_stack = list()
-        self.graph = Graph()
-        self.group_keywords = [
-            # The space is important for keeping them as just the linux commands
-            'date ',
-            'mkdir ',
-            'cd ',
-            'mv ',
-            'cp ',
-            'date ',
-            'rm ',
-            'echo ',
-            'wait',
-            'gunzip'
-        ]
+    def __init__(self,graph):
+        # Graph containing all the commands after they have been organized
+        self.graph = graph
+        # Keeps track of the shell files created
+        self.associated_bash_files = dict()
+        # Keeps track of the dog jobs
+        self.dag_jobs = dict()
 
     def plot_graph(self,run_name):
         self.graph.plot_graph(run_name)
 
     def create_stack(self,run_name):
-        # Connects steps that have a key word
-        # The last step is always either the end of this parallel command
-        # Or a larger step that is not a keyword in hopes of creating "larger" chunked steps.
-        #
-        # The format of the command_list is as follows:
-        # [All individual commands received][Commands executed in parallel][The linked commands within each of those]
-        # Individual Commands
-        if(len(self.command_list) > 0):
-            for z in range(len(self.command_list)-1,0,-1):
-                # Parallel command
-                self.concatenate_commands(self.command_list,z)
-            # Reassess the size here in case it changed by too much
-            for z in range(len(self.command_list) - 1,-1,-1):
-            # Parallel command
-                for y in range (len(self.command_list[z]) -1,-1,-1):
-                    # Commands linked together
-                    for x in range (len(self.command_list[z][y]) - 1 ,-1,-1):
-                        self.concatenate_linked_commands(self.command_list[z][y],x)
-        for parent in range (0, len(self.command_list)):
-            for step in self.command_list[parent]:
-                command = Command.Command(step,parent)
-                self.command_stack.append(command)
-        for command in self.command_stack:
-            command.create_bash_files(run_name)
-            self.create_submit_file(run_name)
-            command.create_dag_jobs(run_name,self.graph,self)
+        self._create_bash_files(run_name)
+        self.create_dag_jobs(run_name)
+        for node in self.graph.nodes():
+            parents = self.graph.get_parents(node)
+            for parent in parents:
+                self.dag_jobs[node].add_parent(self.dag_jobs[parent])
+        self.create_dag_workflow(run_name)
+        self.create_submit_file(run_name)
 
-    def concatenate_commands(self,command,current_index):
-        for word in self.group_keywords:
-            if (word in command[current_index][0][0]):
-                if (current_index != 0):
-                    # Adds the previous command to the one ahead of it if it is in the list
-                    command[current_index -1][0] = command[current_index-1][0] + command[current_index][0]
-                    # Then removes the command just duplicated from its original location
-                    command[current_index].pop(0)
-                    # Checks if the location is now empty and removes it if it is
-                    if(len(command[current_index]) < 1):
-                        command.pop(current_index)
-                        break
+    def _create_bash_files(self,run_name):
+        # Generates an individual BASH file.  This can be a group of commands or just one.
+        # Each loop here is an individual parallel job at this step
+        file_number = 1
+        for node in nx.topological_sort(self.graph.G):
+            new_command = CommandFile(run_name,node)
+            bash_file = new_command.generate_bash_file()
+            self.associated_bash_files[node] = (file_number,bash_file)
+            file_number = file_number + 1
 
-    def concatenate_linked_commands(self,command,current_index):
-        for word in self.group_keywords:
-            if (word in command[current_index - 1]):
-                if (current_index != 0):
-                    # This links members of the same step/not commands printed individually
-                    command[current_index - 1] = command[current_index-1] + " && " + command[current_index]
-                    command.pop(current_index)
-                    # Exit after you find one because that's all good
-                    break
+
+    def create_dag_jobs(self,run_name):
+        # Creates the directories on the file system if they are not already created
+        log_file_dir,out_file_dir, err_file_dir = create_condor_directories(run_name)
+        for node in nx.topological_sort(self.graph.G):
+            output_file_name = str(run_name) + "_JOB" + str(self.associated_bash_files[node][0])
+            if (int(self.graph.G.node[node]['gpus']) >= 1):
+                current_job = Job((run_name + "/" + run_name +".gpu.submit"),"JOB" + str(self.associated_bash_files[node][0]))
+            else:
+                current_job = Job((run_name + "/" + run_name +".submit"),"JOB" + str(self.associated_bash_files[node][0]))
+            current_job.add_var("log",log_file_dir + output_file_name + "_LogFile.txt")
+            current_job.add_var("output",out_file_dir + output_file_name  + "_OutputFile.txt")
+            current_job.add_var("error",err_file_dir + output_file_name + "_ErrorFile.txt")
+            # Creates a new node for visualization
+            current_job.add_var("mem",self.graph.G.node[node]['mem'])
+            current_job.add_var("cpus",self.graph.G.node[node]['cpus'])
+            current_job.add_var("gpus",self.graph.G.node[node]['gpus'])
+            current_job.add_var("execute","./" + run_name + "/" + self.associated_bash_files[node][1])
+            current_job.retry(1)
+            current_job.pre_skip("1")
+            # Still need to add parent interactions, which is done in the comm stack
+            self.dag_jobs[node] = current_job
 
     def create_dag_workflow(self,run_name):
         mydag = Dagfile()
-        # Takes care of parallelizing parent child relationships on the graph
-        for x in range(0,len(Command.Command.parallel_track)):
-            if (x != 0):
-                # Add all the previous jobs that are parents
-                for y in range(0,len(Command.Command.parallel_track[x-1])):
-                    # Add all the children
-                    for z in range(0,len(Command.Command.parallel_track[x])):
-                        child_job = Command.Command.parallel_track[x][z].dag_jobs[0]
-                        parent_job = Command.Command.parallel_track[x-1][y].dag_jobs[len(Command.Command.parallel_track[x-1][y].dag_jobs)-1]
-                        # Add to graph
-                        self.graph.add_edge(parent_job.name,child_job.name)
-                        child_job.add_parent(parent_job)
-        # Put everything together in the Dagfile workflow
-        for command in self.command_stack:
-            for job in command.dag_jobs:
-                mydag.add_job(job)
+        for node in self.graph.nodes():
+                mydag.add_job(self.dag_jobs[node])
         self.dag_file = run_name + "/my_workflow.dag"
         mydag.save(self.dag_file)
 
@@ -152,6 +121,7 @@ class Stack:
             submit_file.write("request_memory = $(mem)\n")
             submit_file.write("request_cpus = $(cpus)\n")
             submit_file.write("request_GPUs = $(gpus)\n")
+            submit_file.write("Requirements = TARGET.FileSystemDomain == \"glbrc.org\"\n")
             submit_file.write("environment = " + environment + "\n")
             submit_file.write("queue\n")
         self.submit_file = submit_file_name
@@ -162,3 +132,18 @@ class Stack:
         submit_command.append(self.dag_file)
         # Runs but doesn't wait for a connection so we can keep iterating.
         Popen(submit_command,stdin=None,stdout=None,stderr=None,close_fds=True)
+
+def create_condor_directories(run_name):
+    # The names of all the directories
+    log_file_dir =str(run_name) + "/" + "LogFile/"
+    out_file_dir=str(run_name) + "/" + "OutputFile/"
+    err_file_dir = str(run_name) + "/" + "ErrorFile/"
+    # Makes sure that they are already made
+    if not os.path.exists(os.path.dirname(log_file_dir)):
+        os.makedirs(os.path.dirname(log_file_dir))
+    if not os.path.exists(os.path.dirname(out_file_dir)):
+        os.makedirs(os.path.dirname(out_file_dir))
+    if not os.path.exists(os.path.dirname(err_file_dir)):
+        os.makedirs(os.path.dirname(err_file_dir))
+    # Returns all of their paths
+    return log_file_dir,out_file_dir,err_file_dir

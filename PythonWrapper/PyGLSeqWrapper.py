@@ -3,7 +3,7 @@ __author__ = 'mlampe'
 import sys
 import os
 from Wrapper import GlSeqRun
-from CommandsProcessor import CommandsProcessor
+from CommandAssembler import CommandProcessor
 from CommandStack import Stack
 from Command import Command
 from CommandFile import CommandFile
@@ -29,7 +29,6 @@ def trail_check(directory):
 def clear_classes():
     Command.parallel_track = list()
     Command.job_count = 1
-    CommandsProcessor.file_count = 0
     CommandFile.file_count = 0
 
 if len(sys.argv) < 1:
@@ -81,18 +80,16 @@ if os.path.isdir(attribute_file_path):
                 commands = current_run.run()
                 # Creates the directory for the Dagman shell scripts and log files
                 # Trims and groups commands
-                processor = CommandsProcessor(commands)
-                # This will break apart the commands in groups that can be parallelized while still being ordered.
-                ordered_commands = processor.handle()
+                processor = CommandProcessor(commands)
+                # Puts the commands into an organized graph structure
+                graph = processor.create_graph()
                 # Starts a command stack which will do the processing moving forward
-                command_stack = Stack(ordered_commands)
+                command_stack = Stack(graph)
+                command_stack.plot_graph(run_name)
                 # Creates a new stack by a run name
                 command_stack.create_stack(run_name)
-                # Creates the dag workflow requested
-                command_stack.create_dag_workflow(run_name)
                 # Submits the workflow to condor.
                 #command_stack.submit()
-                command_stack.plot_graph(run_name)
                 clear_classes()
             except:
                 import traceback
@@ -107,17 +104,17 @@ else:
     current_run = GlSeqRun(glseq_path,update_database, prepare, align, count, collect, run_name, protocol_id, attribute_file_path,"TRUE")
     # # Initiates a run through the wrapper, and takes in all the output which is the various commands that would be run
     commands = current_run.run()
+    # Creates the directory for the Dagman shell scripts and log files
     # Trims and groups commands
-    processor = CommandsProcessor(commands)
-    # This will break apart the commands in groups that can be parallelized while still being ordered.
-    ordered_commands = processor.handle()
+    processor = CommandProcessor(commands)
+    # Puts the commands into an organized graph structure
+    graph = processor.create_graph()
     # Starts a command stack which will do the processing moving forward
-    command_stack = Stack(ordered_commands)
+    command_stack = Stack(graph)
     # Creates a new stack by a run name
     command_stack.create_stack(run_name)
-    # Creates the dag workflow requested
-    command_stack.create_dag_workflow(run_name)
     # Submits the workflow to condor.
     command_stack.submit()
-# It seems to have worked
+    command_stack.plot_graph(run_name)
+    clear_classes()
 exit(0)
