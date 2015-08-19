@@ -50,6 +50,13 @@ if (aAlgor == "Rockhopper"){
   occured <- TRUE
   source ("GLSeq.Rockhopper.R")
 }
+################################################
+# STAR Alignment Protocol
+################################################
+if (aAlgor == "STAR"){
+  occured <- TRUE
+  source("GLSeq.STAR.R")
+}
 if (!occured){
   warning("No alignment protocol was initiated.  Please make sure you have supplied a supported alignment setting")
 }

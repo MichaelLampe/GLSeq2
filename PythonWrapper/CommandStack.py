@@ -1,6 +1,5 @@
 __author__ = 'mlampe'
 
-import Command
 # Pydagman can be found at https://github.com/brandentimm/pydagman
 from pydagman.dagfile import Dagfile
 from pydagman.job import Job
@@ -65,30 +64,63 @@ class Stack:
 
     def create_dag_jobs(self,run_name):
         # Creates the directories on the file system if they are not already created
-        log_file_dir,out_file_dir, err_file_dir = create_condor_directories(run_name)
+        self.log_file_dir,self.out_file_dir, self.err_file_dir = create_condor_directories(run_name)
         for node in nx.topological_sort(self.graph.G):
             output_file_name = str(run_name) + "_JOB" + str(self.associated_bash_files[node][0])
             if (int(self.graph.G.node[node]['gpus']) >= 1):
                 current_job = Job((run_name + "/" + run_name +".gpu.submit"),"JOB" + str(self.associated_bash_files[node][0]))
             else:
                 current_job = Job((run_name + "/" + run_name +".submit"),"JOB" + str(self.associated_bash_files[node][0]))
-            current_job.add_var("log",log_file_dir + output_file_name + "_LogFile.txt")
-            current_job.add_var("output",out_file_dir + output_file_name  + "_OutputFile.txt")
-            current_job.add_var("error",err_file_dir + output_file_name + "_ErrorFile.txt")
-            # Creates a new node for visualization
+            self.static_job_values(current_job,output_file_name)
+            current_job.add_var("args","")
             current_job.add_var("mem",self.graph.G.node[node]['mem'])
             current_job.add_var("cpus",self.graph.G.node[node]['cpus'])
-            current_job.add_var("gpus",self.graph.G.node[node]['gpus'])
+            if (int(self.graph.G.node[node]['gpus']) >= 1):
+                current_job.add_var("gpus",self.graph.G.node[node]['gpus'])
             current_job.add_var("execute","./" + run_name + "/" + self.associated_bash_files[node][1])
-            current_job.retry(1)
-            current_job.pre_skip("1")
             # Still need to add parent interactions, which is done in the comm stack
             self.dag_jobs[node] = current_job
 
+    # These are custom scripts that should run at the end of the workflow.
+    def summary_scripts(self,run_name):
+        summary_jobs = list()
+        childless_nodes = list()
+        for node in self.graph.G:
+            if len(self.graph.get_children(node)) == 0:
+                childless_nodes.append(node)
+
+        # Summary script 1
+        # Arg1 = Log directory
+        # Arg2 = Run Name
+        summary_script_args = self.log_file_dir + " " + run_name
+        job_number = str(CommandFile.file_count + 1)
+        output_file_name = str(run_name) + "_JOB" + job_number
+        summary_job_1 = Job((run_name + "/" + run_name + ".submit"),"JOB" + job_number)
+        self.static_job_values(summary_job_1,output_file_name)
+        summary_job_1.add_var("execute","python EfficiencyAnalyzer.py")
+        summary_job_1.add_var("args",summary_script_args)
+        summary_job_1.add_var("mem","25M")
+        summary_job_1.add_var("cpus","1")
+        for parent in childless_nodes:
+            summary_job_1.add_parent(self.dag_jobs[parent])
+        summary_jobs.append(summary_job_1)
+
+        return summary_jobs
+
+    def static_job_values(self,job,file_name):
+        job.add_var("log",self.log_file_dir + file_name + "_LogFile.txt")
+        job.add_var("output",self.out_file_dir + file_name  + "_OutputFile.txt")
+        job.add_var("error",self.err_file_dir + file_name + "_ErrorFile.txt")
+        job.retry(1)
+        job.pre_skip("1")
+
     def create_dag_workflow(self,run_name):
         mydag = Dagfile()
-        for node in self.graph.nodes():
+        for node in nx.topological_sort(self.graph.G):
                 mydag.add_job(self.dag_jobs[node])
+        summary_jobs = self.summary_scripts(run_name)
+        for job in summary_jobs:
+            mydag.add_job(job)
         self.dag_file = run_name + "/my_workflow.dag"
         mydag.save(self.dag_file)
 
@@ -98,7 +130,7 @@ class Stack:
         with open(str(submit_file_name),'w') as submit_file:
             submit_file.write("universe = vanilla\n")
             submit_file.write("executable = $(execute)\n")
-            #submit_file.write("arguments = $(args)\n")
+            submit_file.write("arguments = $(args)\n")
             submit_file.write("log = $(log)\n")
             submit_file.write("out = $(output)\n")
             submit_file.write("err = $(error)\n")
@@ -114,7 +146,7 @@ class Stack:
         with open(str(submit_file_name),'w') as submit_file:
             submit_file.write("universe = vanilla\n")
             submit_file.write("executable = $(execute)\n")
-            #submit_file.write("arguments = $(args)\n")
+            submit_file.write("arguments = $(args)\n")
             submit_file.write("log = $(log)\n")
             submit_file.write("out = $(output)\n")
             submit_file.write("err = $(error)\n")

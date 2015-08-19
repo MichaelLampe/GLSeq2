@@ -104,8 +104,6 @@ for (zz in 1:nStreamsDataPrep) {
         # Quality control check via Fastqc of dirty file
         preQC <- preQualityCheck.PE(fastqcPath,fqFiles[j],qcFolder)
         comm.pools <- paste(comm.pools,"&&",preQC)
-        remove.command <- remove.unneeded.files(fqFiles[j])
-        comm.pools <- paste(comm.pools,"&&",remove.command)
         move.file.log <- move.paired.files.PE((fqFiles[j]),qcFolder)
         comm.pools <- paste(comm.pools,"&&",move.file.log)
       }

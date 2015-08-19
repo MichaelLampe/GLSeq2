@@ -282,12 +282,23 @@ convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
     }
     fqfiles <- fqfiles[grep(".fq$|.fastq$", fqfiles)]
     for (num in 1:length(fqfiles)){
-      # Remove 8 if a fastq file
+      # Fastq is longer than fq
+      # presplit files have numbering already added so need more characters
+      # Chopped off to get the base
       if (grepl(".fastq$",fqfiles[num])){
-        fqfiles[num] <- substr(fqfiles[num],1,nchar(fqfiles[num]) - 8)
-      # Remove 5 if a fq file
+        char.to.remove <- 0
+        if (presplit){
+          char.to.remove <- 8
+        } else{
+          char.to.remove <- 6
+        }
       } else{
-        fqfiles[num] <- substr(fqfiles[num], 1,nchar(fqfiles[num]) - 5)
+        if (presplit){
+          char.to.remove <- 5
+        } else{
+          char.to.remove <- 3
+        }
+        fqfiles[num] <- substr(fqfiles[num], 1,nchar(fqfiles[num]) - char.to.remove)
       }
     }
     # Only take the unique ones (This should reduce the number in half)

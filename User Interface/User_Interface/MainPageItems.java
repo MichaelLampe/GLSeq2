@@ -128,7 +128,9 @@ class MainPageItems {
   protected CheckBox counting_check;
   @FXML
   protected CheckBox collect_check;
-
+  @FXML
+  protected CheckBox htcondor_check;
+  
   @FXML
   protected CheckBox RSEM;
   @FXML
@@ -159,7 +161,7 @@ class MainPageItems {
   @FXML
   protected TabPane tab_check;
   @FXML
-  protected ProgressBar footer_progress;
+  protected ProgressBar footer_progress; 
   
   @FXML
   protected TableView<RunTableEntry> table_runs;

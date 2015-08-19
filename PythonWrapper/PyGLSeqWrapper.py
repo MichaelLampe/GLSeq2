@@ -5,7 +5,6 @@ import os
 from Wrapper import GlSeqRun
 from CommandAssembler import CommandProcessor
 from CommandStack import Stack
-from Command import Command
 from CommandFile import CommandFile
 # Command line args incoming~
 def print_message():
@@ -27,8 +26,6 @@ def trail_check(directory):
         return directory
 
 def clear_classes():
-    Command.parallel_track = list()
-    Command.job_count = 1
     CommandFile.file_count = 0
 
 if len(sys.argv) < 1:
@@ -74,7 +71,6 @@ if os.path.isdir(attribute_file_path):
                 # Creates a GLSeq wrapper run which will print out all the commands to be taken in by the python wrapper
                 if not os.path.exists(os.path.dirname(run_name + "/")):
                     os.makedirs(os.path.dirname(run_name + "/"))
-                #
                 current_run = GlSeqRun(glseq_path,update_database, prepare, align, count, collect, run_name, protocol_id, current_att_file,"TRUE")
                 # # Initiates a run through the wrapper, and takes in all the output which is the various commands that would be run
                 commands = current_run.run()
@@ -89,7 +85,7 @@ if os.path.isdir(attribute_file_path):
                 # Creates a new stack by a run name
                 command_stack.create_stack(run_name)
                 # Submits the workflow to condor.
-                #command_stack.submit()
+                command_stack.submit()
                 clear_classes()
             except:
                 import traceback

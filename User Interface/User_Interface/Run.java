@@ -32,34 +32,45 @@ public class Run {
     return active_run;
   }
 
-  public List<String> constructArgs() {
+  public List<String> constructArgs(boolean Condor,String attribute_file) {
     List<String> args = new ArrayList<String>();
-    args.add("Rscript");
-    args.add("GLSeq.top.R");
+    // Condor Wrapper to run via Condor
+    if (Condor){
+      args.add("python");
+      args.add("PyGLSeqWrapper.py");
+    // RScript
+    } else{
+      args.add("Rscript");
+      args.add("GLSeq.top.R");
+    }
+    // Where update was, might add to here later
     args.add("Placeholder");
-    if (dataprep) {
-      args.add("dataprep");
-    } else {
-      args.add("nodataprep");
-    }
-    if (alignment) {
-      args.add("alignment");
-    } else {
-      args.add("noalignment");
-    }
-    if (counting) {
-
-      args.add("counting");
-    } else {
-      args.add("nocounting");
-    }
-    if (collect) {
-      args.add("collect");
-    } else {
-      args.add("nocollect");
-    }
-    args.add(run_name);
+    
+    // Dataprep
+    if (dataprep) args.add("dataprep");
+    else args.add("nodataprep");
+    
+    // Alignment
+    if (alignment) args.add("alignment");
+    else args.add("noalignment");
+    
+    // Counting
+    if (counting) args.add("counting");
+    else args.add("nocounting");
+    
+    // Collect
+    if (collect) args.add("collect");
+    else args.add("nocollect");
+    
+    // This means it is a directory, so we don't assign a name
+    if (!attribute_file.endsWith("/")) args.add(run_name);
+    
+    // Protocol ID
     args.add("0");
+    
+    // Attribute File
+    args.add(attribute_file);
+    
     return args;
   }
 }

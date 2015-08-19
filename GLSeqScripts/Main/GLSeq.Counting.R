@@ -2,7 +2,8 @@ source ("GLSeq.Util.R")
 # Allows us to give a warning if no counting protocol ended up being run.
 occured <- FALSE
 # Clears count.comm
-count.comm <- ""
+# We'll enclose the counting in paren and then background each counting process to parallelize them
+count.comm <- "("
 ################################################
 #RSEM Counting Protocol
 ################################################
@@ -24,12 +25,14 @@ if ("RSEM" %in% cAlgor){
       occured <- TRUE
       setwd(base.dir)
       source ("GLSeq.RsemCount.R")
+      count.comm <- paste(count.comm,"&")
     }
   } else{
     # In case the user is just counting
     occured <- TRUE
     setwd(base.dir)
     source ("GLSeq.RsemCount.R")
+    count.comm <- paste(count.comm,"&")
   }
 }
 ################################################
@@ -48,6 +51,7 @@ if ("HTSeq" %in% cAlgor){
   occured <- TRUE
   setwd(base.dir)
   source ("GLSeq.HTSeq.R")
+  count.comm <- paste(count.comm,"&")
 }
 ################################################
 #Cufflinks Counting Protocol
@@ -62,6 +66,7 @@ if ("Cufflinks" %in% cAlgor){
   occured <- TRUE
   setwd(base.dir)
   source ("GLSeq.Cufflinks.R")
+  count.comm <- paste(count.comm,"&")
 }
 ################################################
 #FeatureCounts Counting Protocol
@@ -96,9 +101,11 @@ if ("FeatureCounts" %in% cAlgor){
   move.command <- paste(move.command,"&& mv",counts.stats,destDirFeatureCountsCount)
   move.command <- paste(move.command,"&& mv",counts.annotation,destDirFeatureCountsCount)
   if (count.comm != "") count.comm <- paste(count.comm,"&&",script,"&&",move.command)
-  if (count.comm == "") count.comm <- paste(script,"&&",move.command)
+  if (count.comm == "(") count.comm <- paste(script,"&&",move.command)
+  count.comm <- paste(count.comm,"&")
 }
-
+# Close paren
+count.comm <- paste(count.comm,")")
 if (!occured){
   warning("No counting protocol was initiated even though you indicated counting should occur. Please make sure you have supplied a supported counting protocol.")
 }

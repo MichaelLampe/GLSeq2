@@ -258,14 +258,14 @@ trimAssemble.PE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq
 file.shuffle.PE <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
   fqFile <- get.file.base(fqFile)
-  first.read.filename <- first.read.name(fqFile)
-  second.read.filename <- second.read.name(fqFile)
+  first.read.file <- first.read.name(fqFile)
+  second.read.file <- second.read.name(fqFile)
   leftDirtyFname <- left.dirty.name(fqFile)
   rightDirtyFname <- right.dirty.name(fqFile)
-  pairedTrimmed.1 <-  paste(fqFile,".p.1.fq", sep="")
-  pairedTrimmed.2 <- paste(fqFile,".p.2.fq", sep="")
+  pairedTrimmed.1 <-  paste(fqFile,".1.fq.p.fq", sep="")
+  pairedTrimmed.2 <- paste(fqFile,".2.fq.p.fq", sep="")
   #
-  fileShuffle <- paste("mv", first.read.filename, leftDirtyFname, "&&", "mv", second.read.filename, rightDirtyFname, "&&", "mv", pairedTrimmed.1, first.read.filename, "&&", "mv", pairedTrimmed.2, second.read.filename)
+  fileShuffle <- paste("mv", first.read.file, leftDirtyFname, "&&", "mv", second.read.file, rightDirtyFname, "&&", "mv", pairedTrimmed.1, first.read.file, "&&", "mv", pairedTrimmed.2, second.read.file)
   #
   #
   fileShuffle
@@ -327,8 +327,8 @@ move.paired.files.PE <- function(fqFile,qcFolder){
   first.read.file <- first.read.name(fqFile)
   second.read.file <- second.read.name(fqFile)
   logName.first <- paste(first.read.file, "pairedtrim.log", sep=".")
-  logName.second <- paste(second.read.file, "pairedtrim.log", sep=".")
-  command <- paste("mv",logName.first,qcFolder,"&&","mv",logName.second,qcFolder)
+  #logName.second <- paste(second.read.file, "pairedtrim.log", sep=".")
+  command <- paste("mv",logName.first,qcFolder)
   command
 }
 

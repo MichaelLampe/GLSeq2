@@ -25,6 +25,7 @@ public class Main extends Application {
       // Update attributes from previous save
       att.setAttributes();
     } catch (Exception e) {
+      e.printStackTrace();
       // ok
     }
   }

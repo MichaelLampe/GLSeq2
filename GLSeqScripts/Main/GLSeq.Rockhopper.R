@@ -62,14 +62,25 @@ for (zz in 1:nStreams) {
       # Nonpaired files are just run as normal.
       rockhopper.files <- paste(dest.dir,fq.left,sep="")
     }
-    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,paste(this.resName,"RockhopperResults",sep="."))
-    # We currently have no use for the SAM file generated (I can't figure out how to count it..., so I'll just leave that stuff aside.)
+    rockhopper.output.folder <- paste(this.resName,"RockhopperResults/",sep=".")
+    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,rockhopper.output.folder)
+    countable.sam <- countable.sam.name(this.resName)
+    create.countable <- paste("mv",paste(rockhopper.output.folder,"dirty.sam",sep=""),countable.sam)
+
+    count.comm <- ""
+    if (counting == "counting"){
+      setwd(base.dir)
+      source("GLSeq.Counting.R")
+    }
 
     # If the comm stack is null,just add rockhopper, otherwise add to the list via &&
     if (is.null(comm.stack.pool)){
-      comm.stack.pool <- rockhopper.align
+      comm.stack.pool <- paste(rockhopper.align,"&&",create.countable)
     } else{
-      comm.stack.pool <- paste(comm.stack.pool,"&&",rockhopper.align)
+      comm.stack.pool <- paste(comm.stack.pool,"&&",rockhopper.align,"&&",create.countable)
+    }
+    if (count.comm != ""){
+      comm.stack.pool <- paste(comm.stack.pool,"&&",count.comm)
     }
   }
   # Add it to a unique background pool

@@ -264,7 +264,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="tab_pane">
                      <children>
-                        <Button fx:id="start_run" layoutX="14.0" layoutY="567.0" mnemonicParsing="false" prefHeight="95.0" prefWidth="846.0" text="Start Run">
+                        <Button fx:id="start_run" layoutX="14.0" layoutY="567.0" mnemonicParsing="false" prefHeight="95.0" prefWidth="555.0" text="Start Run">
                            <font>
                               <Font size="36.0" />
                            </font>
@@ -295,23 +295,12 @@
                            </font>
                         </Label>
                         <TextArea fx:id="run_name" layoutX="13.0" layoutY="485.0" prefHeight="32.0" prefWidth="848.0" promptText="What do you want to call the run name?" />
+                        <CheckBox fx:id="htcondor_check" layoutX="590.0" layoutY="567.0" mnemonicParsing="false" prefHeight="99.0" prefWidth="271.0" text="Use HTCondor" textFill="WHITE">
+                           <font>
+                              <Font size="27.0" />
+                           </font>
+                        </CheckBox>
                      </children></AnchorPane>
-               </content>
-            </Tab>
-            <Tab text="Runs in Progress">
-               <content>
-                  <TableView fx:id="table_runs" prefHeight="200.0" prefWidth="200.0">
-                    <columns>
-                      <TableColumn fx:id="column_run_name" prefWidth="454.0" text="Run Name" />
-                      <TableColumn fx:id="column_status" prefWidth="118.0" text="Status" />
-                        <TableColumn fx:id="column_start" prefWidth="90.0" text="Start Time" />
-                        <TableColumn fx:id="column_end" prefWidth="104.0" text="End Time" />
-                        <TableColumn fx:id="column_duration" prefWidth="107.0" text="Run Duration" />
-                    </columns>
-                     <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                     </columnResizePolicy>
-                  </TableView>
                </content>
             </Tab>
         </tabs>

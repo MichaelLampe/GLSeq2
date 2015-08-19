@@ -457,7 +457,7 @@ class CommandProcessor:
     def merge_trivial_commands(self, node):
         # Breadth first search to find as many mergers as possible while best retaining order
         def bfs(node):
-            queue , merge_nodes, new_command = [node] , [node] , node.command
+            queue , merge_nodes, new_command = [node] , [node] , ""
             while queue:
                 # Remove the first node and look at that
                 current_node = queue.pop(0)
@@ -473,17 +473,19 @@ class CommandProcessor:
                         if word in current_node.command:
                             merge_nodes.append(current_node)
                             # We'll do this here to keep our graph class more general
-                            new_command = new_command + " && " + current_node.command
+                            if new_command is "":
+                                new_command = current_node.command
+                            else:
+                                new_command = new_command + " && " + current_node.command
                             queue = queue + self.graph.get_children(current_node)
                             break
             return merge_nodes , new_command
         for word in CommandProcessor.group_keywords:
             if word in node.command:
                 merge_nodes , new_command = bfs(node)
-                if new_command != node.command:
+                if new_command is not "":
                     self.graph.merge_nodes(merge_nodes,new_command)
                 break
-
 
     def split_linked(self, node):
         split_linked = re.compile("&&|;")
@@ -499,7 +501,6 @@ class CommandProcessor:
             return x != None
         # These defaults were initially used until I got a better handle on the memory requirements of each of the
         # individual protocols
-
         # Scarce resource is 256 mb and 1 cpu and 0 gpus
         scarce_resource = [
             "256",  # Memory
@@ -548,7 +549,6 @@ class CommandProcessor:
             "1"
             # return gpu_needed[0],gpu_needed[1],gpu_needed[2]
         ]
-
         # Default
         default = medium_resource[0], medium_resource[1], medium_resource[2]
         trim = re.compile("trimmomatic(.*?).jar", re.IGNORECASE)

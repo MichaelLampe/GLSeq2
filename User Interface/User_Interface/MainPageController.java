@@ -13,6 +13,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -31,7 +32,6 @@ public final class MainPageController extends MainPageItems implements Initializ
     group = radioButtonGroup();
     progressBarListener();
     runBindings();
-    setupRunTable();
   }
 
   /*
@@ -197,9 +197,10 @@ public final class MainPageController extends MainPageItems implements Initializ
         // Creates a run instance
         Run currentRun = constructRun();
         // Grabs the args from that instance
-        List<String> args = currentRun.constructArgs();
+        // If true, run on HTcondor, else do not
+        List<String> args = currentRun.constructArgs(htcondor_check.isSelected(),
+            attributeFileLocation);
         if (args != null) {
-          args.add(attributeFileLocation);
           // Might add some logic in the future that starts an SSH on
           // windows/mac
           Task<Object> task = new RunWorker(args, currentRun.getActiveRun());
@@ -210,17 +211,6 @@ public final class MainPageController extends MainPageItems implements Initializ
         }
       }
     });
-  }
-
-  private void setupRunTable() {
-    table_runs.setItems(RunTableEntry.getTableEntries());
-    column_run_name.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("runName"));
-    column_start.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("startTime"));
-    column_status.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("status"));
-    column_end.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>("endTime"));
-    column_duration.setCellValueFactory(new PropertyValueFactory<RunTableEntry, String>(
-        "runDuration"));
-
   }
 
   public void runBindings() {

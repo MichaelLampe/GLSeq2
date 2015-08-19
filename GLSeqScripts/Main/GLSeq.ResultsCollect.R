@@ -7,6 +7,45 @@ setwd(dest.dir)
 #
 #
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #############################################################################################
 ###############################             HT SEQ            ###############################
 #############################################################################################
@@ -14,10 +53,10 @@ if ("HTSeq" %in% cAlgor){
   setwd(destDirHTSeqCount)
   #
   ###########################
-  # Generating normalized counts (FPKM) and saving the file to disk: 
-  # function to pull GeneID from the first record of a particular element of the long character string ("mess") in the column 9 of the gtf file: 
+  # Generating normalized counts (FPKM) and saving the file to disk:
+  # function to pull GeneID from the first record of a particular element of the long character string ("mess") in the column 9 of the gtf file:
   ###########################
-  genePull <- function(gtf.gene.record) { 
+  genePull <- function(gtf.gene.record) {
     geneID.record <- strsplit(gtf.gene.record, split=";")[[1]][1]
     geneID <- substr(geneID.record, 9, nchar(geneID.record))
     geneID
@@ -28,11 +67,11 @@ if ("HTSeq" %in% cAlgor){
   ##########################
   idPull <- function(annotColumn, ID2look) {
     annotColumn.split <- strsplit(annotColumn, split=";")
-    ID2look.positions <- lapply(annotColumn.split, grep, pattern=ID2look)  
+    ID2look.positions <- lapply(annotColumn.split, grep, pattern=ID2look)
     IDvec <- rep(NA, length(annotColumn.split))
     for (vv in 1:length(IDvec)) {
-      if (length(ID2look.positions[[vv]]) > 0) { 
-        IDcopyNum <- length(ID2look.positions[[vv]]) # the LAST copy of the same ID is actullay used in the count computation! 
+      if (length(ID2look.positions[[vv]]) > 0) {
+        IDcopyNum <- length(ID2look.positions[[vv]]) # the LAST copy of the same ID is actually used in the count computation!
         IDvec[vv] <- annotColumn.split[[vv]][ID2look.positions[[vv]]][IDcopyNum]
         IDvec[vv] <- substr(IDvec[vv], nchar(ID2look)+2, nchar(IDvec[vv]))
       }
@@ -51,7 +90,7 @@ if ("HTSeq" %in% cAlgor){
     data.i <- read.table(cfiles[i], row.names=1)
     colnames(data.i) <- substr(cfiles[i],1,libNchar)
     if (is.null(count.mtrx)) count.mtrx <- data.i
-    if (!(is.null(count.mtrx)) & i != 1) count.mtrx <- cbind(count.mtrx, data.i) 
+    if (!(is.null(count.mtrx)) & i != 1) count.mtrx <- cbind(count.mtrx, data.i)
   }
   ########################################
   # Generating file with report on all abnormal events during alignment:
@@ -90,7 +129,7 @@ if ("HTSeq" %in% cAlgor){
   lengthData <- cbind(lengthData, lengthData[,3] - lengthData[,2])
   colnames(lengthData)[5] <- "length"
   #
-  # Considering multiple exons per gene: 
+  # Considering multiple exons per gene:
   #
   duplicated.IDs.summary <- table(lengthData[,4])[table(lengthData[,4]) > 1]
   lengthData.singleExons <- lengthData[!(lengthData[,4] %in% names(duplicated.IDs.summary)),]
@@ -99,7 +138,7 @@ if ("HTSeq" %in% cAlgor){
   for (multiexon in 1:length(names(duplicated.IDs.summary))) {
     data.multiexon <- lengthData.multipleExons[lengthData.multipleExons[,4] == names(duplicated.IDs.summary)[multiexon],]
     #
-    # Recording the sum of all exon's lengths for a multi-exon gene in the first line of the length data for this gene: 
+    # Recording the sum of all exon's lengths for a multi-exon gene in the first line of the length data for this gene:
     #
     data.multiexon[1,5] <- sum(data.multiexon[,5])
     lengthData <- rbind(lengthData, data.multiexon[1,])
@@ -110,7 +149,7 @@ if ("HTSeq" %in% cAlgor){
   lengthData <- lengthData[lengthData[,4] %in% rownames(count.mtrx),] # avoiding trouble with occasional NAs in the column 4 of the lengthData
   rownames(lengthData) <- lengthData[,4]
   #
-  # Sorting / restricting the count matrix based on the non-redundant ID vector: 
+  # Sorting / restricting the count matrix based on the non-redundant ID vector:
   #
   lengthData <- lengthData[rownames(count.mtrx),]
   #
@@ -133,7 +172,7 @@ if ("HTSeq" %in% cAlgor){
   bai.files.thisRun.genome <- bam.files.thisRun.genome[bai.ind]
   #
   #
-  if(!(strandExtract)) { 
+  if(!(strandExtract)) {
     vizfiles.base <- substr(bam.files.thisRun.genome, 1, nchar(bam.files.thisRun.genome)-4)
     wigfiles <- paste(vizfiles.base, "wig", sep=".")
     bamMove <- paste("mv *.bam*", destDirBam)
@@ -143,7 +182,7 @@ if ("HTSeq" %in% cAlgor){
       if (ii == 1) wigGen <- wigGen.ii
       if (ii != 1) wigGen <- paste(wigGen, "&", wigGen.ii)
     } # for bamfiles
-    try(system(bamMove)) 
+    try(system(bamMove))
     Sys.sleep(5)
     setwd(destDirBam)
     system(paste(wigGen, "&"))
@@ -169,6 +208,35 @@ if ("HTSeq" %in% cAlgor){
 }
 #
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #############################################################################################
 ###############################         FEATURE COUNTS        ###############################
 #############################################################################################
@@ -176,10 +244,10 @@ if ("FeatureCounts" %in% cAlgor){
   setwd(destDirFeatureCountsCount)
   #
   ###########################
-  # Generating normalized counts (FPKM) and saving the file to disk: 
-  # function to pull GeneID from the first record of a particular element of the long character string ("mess") in the column 9 of the gtf file: 
+  # Generating normalized counts (FPKM) and saving the file to disk:
+  # function to pull GeneID from the first record of a particular element of the long character string ("mess") in the column 9 of the gtf file:
   ###########################
-  genePull <- function(gtf.gene.record) { 
+  genePull <- function(gtf.gene.record) {
     geneID.record <- strsplit(gtf.gene.record, split=";")[[1]][1]
     geneID <- substr(geneID.record, 9, nchar(geneID.record))
     geneID
@@ -190,11 +258,11 @@ if ("FeatureCounts" %in% cAlgor){
   ##########################
   idPull <- function(annotColumn, ID2look) {
     annotColumn.split <- strsplit(annotColumn, split=";")
-    ID2look.positions <- lapply(annotColumn.split, grep, pattern=ID2look)  
+    ID2look.positions <- lapply(annotColumn.split, grep, pattern=ID2look)
     IDvec <- rep(NA, length(annotColumn.split))
     for (vv in 1:length(IDvec)) {
-      if (length(ID2look.positions[[vv]]) > 0) { 
-        IDcopyNum <- length(ID2look.positions[[vv]]) # the LAST copy of the same ID is actullay used in the count computation! 
+      if (length(ID2look.positions[[vv]]) > 0) {
+        IDcopyNum <- length(ID2look.positions[[vv]]) # the LAST copy of the same ID is actullay used in the count computation!
         IDvec[vv] <- annotColumn.split[[vv]][ID2look.positions[[vv]]][IDcopyNum]
         IDvec[vv] <- substr(IDvec[vv], nchar(ID2look)+2, nchar(IDvec[vv]))
       }
@@ -208,7 +276,7 @@ if ("FeatureCounts" %in% cAlgor){
   cfiles <- cfiles[cfiles != countDirName]
   count.mtrx <- NULL
   #
-  # 
+  #
   # Need to fix the formatting of the file because FeatureCounts has a bunch of useless/artistic outputs that clutter the file.
   #
   correctedNames <- c()
@@ -223,7 +291,7 @@ if ("FeatureCounts" %in% cAlgor){
         i <- i + 2
         setwd(collectDir)
         while (!(grepl("$annotation",document[i],fixed=TRUE))){
-          write(document[i],file=correctedName,append=TRUE) 
+          write(document[i],file=correctedName,append=TRUE)
           i <- i + 1
         }
         currentLine <- readLines(openFile)
@@ -236,8 +304,8 @@ if ("FeatureCounts" %in% cAlgor){
     data.i <- read.table(cfiles[i], row.names=1)
     colnames(data.i) <- substr(cfiles[i],1,libNchar)
     if (is.null(count.mtrx)) count.mtrx <- data.i
-    if (!(is.null(count.mtrx)) & i != 1) count.mtrx <- cbind(count.mtrx, data.i) 
-  } 
+    if (!(is.null(count.mtrx)) & i != 1) count.mtrx <- cbind(count.mtrx, data.i)
+  }
   #
   featureCounts.counts.fName <-  paste(collectDir, text.add, ".FeatureCounts.counts.csv", sep="")
   write.csv(count.mtrx, file=featureCounts.counts.fName)
@@ -256,7 +324,7 @@ if ("FeatureCounts" %in% cAlgor){
   lengthData <- cbind(lengthData, lengthData[,3] - lengthData[,2])
   colnames(lengthData)[5] <- "length"
   #
-  # Considering multiple exons per gene: 
+  # Considering multiple exons per gene:
   #
   duplicated.IDs.summary <- table(lengthData[,4])[table(lengthData[,4]) > 1]
   lengthData.singleExons <- lengthData[!(lengthData[,4] %in% names(duplicated.IDs.summary)),]
@@ -264,7 +332,7 @@ if ("FeatureCounts" %in% cAlgor){
   lengthData <- lengthData.singleExons # will be extended to summarized exon length below
   for (multiexon in 1:length(names(duplicated.IDs.summary))) {
     data.multiexon <- lengthData.multipleExons[lengthData.multipleExons[,4] == names(duplicated.IDs.summary)[multiexon],]
-    # recording the sum of all exon's lengths for a multi-exon gene in the first line of the length data for this gene: 
+    # recording the sum of all exon's lengths for a multi-exon gene in the first line of the length data for this gene:
     data.multiexon[1,5] <- sum(data.multiexon[,5])
     lengthData <- rbind(lengthData, data.multiexon[1,])
   } # for multiexon
@@ -273,7 +341,7 @@ if ("FeatureCounts" %in% cAlgor){
   #
   lengthData <- lengthData[lengthData[,4] %in% rownames(count.mtrx),] # avoiding trouble with occasional NAs in the column 4 of the lengthData
   rownames(lengthData) <- lengthData[,4]
-  # Sorting / restricting the count matrix based on the non-redundant ID vector: 
+  # Sorting / restricting the count matrix based on the non-redundant ID vector:
   lengthData <- lengthData[rownames(count.mtrx),]
   for (normCol in 1:ncol(count.mtrx)) {
     mil.mappedR <- sum(count.mtrx[,normCol]) / 1000000
@@ -290,7 +358,7 @@ if ("FeatureCounts" %in% cAlgor){
   bai.files.thisRun.genome <- bam.files.thisRun.genome[bai.ind]
   #
   #
-  if(!(strandExtract)) { 
+  if(!(strandExtract)) {
     vizfiles.base <- substr(bam.files.thisRun.genome, 1, nchar(bam.files.thisRun.genome)-4)
     wigfiles <- paste(vizfiles.base, "wig", sep=".")
     bamMove <- paste("mv *.bam*", destDirBam)
@@ -300,7 +368,7 @@ if ("FeatureCounts" %in% cAlgor){
       if (ii == 1) wigGen <- wigGen.ii
       if (ii != 1) wigGen <- paste(wigGen, "&", wigGen.ii)
     } # for bamfiles
-    try(system(bamMove)) 
+    try(system(bamMove))
     Sys.sleep(5)
     setwd(destDirBam)
     system(paste(wigGen, "&"))
@@ -327,6 +395,54 @@ if ("FeatureCounts" %in% cAlgor){
 #
 #
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #############################################################################################
 ###############################            RSEM               ###############################
 #############################################################################################
@@ -338,13 +454,13 @@ if ("RSEM" %in% cAlgor){
     # just in case, let's restrict the list to the files with the current "text.add" mark:
     bai.files.thisRun <- bai.files[grep(text.add, bai.files)]
     # those are mix of transcript- and genome-level bai files;
-    # restricting to genome-level files: 
+    # restricting to genome-level files:
     bai.files.thisRun.genome <- bai.files.thisRun[grep("genome.sorted.bam.bai", bai.files.thisRun)]
     # if genome bam file is not requested, then transcriptome bai (the only indexed bam's captured by bai.pull() )is being used instead:
     if (!(genobam)) bai.files.thisRun.genome <- bai.files
     bai.files.thisRun.genome
   }
-  # 
+  #
   ############################
   # generating matrices of computation results
   # for all the libraries in the run
@@ -358,7 +474,7 @@ if ("RSEM" %in% cAlgor){
   print(result.fnames)
   print(length(result.fnames))
   # library name + text add:
-  result.names <- substr(result.fnames, 1, nchar(result.fnames)-14)  
+  result.names <- substr(result.fnames, 1, nchar(result.fnames)-14)
   # just library names, in the respective order:
   lib.names <- substr(result.names, 1,libNchar)
   # collecting expected count and other processed data:
@@ -389,7 +505,7 @@ if ("RSEM" %in% cAlgor){
   } # for i
   #
   colnames(counts) <- result.names
-  colnames(counts_pme) <- result.names 
+  colnames(counts_pme) <- result.names
   colnames(FPKM) <- result.names
   colnames(FPKM_pme) <- result.names
   colnames(FPKM_lower) <- result.names
@@ -442,27 +558,27 @@ if ("RSEM" %in% cAlgor){
   # to a chosen folder (destDirBam)
   ############################
   # if genome file is not requested (genobam == FALSE), then all the files below will indeed represent reanscriptome visualization files
-  # because bai.files.thisRun.genome will actually contain transcriptome bam's (see bai.pull function for details) 
+  # because bai.files.thisRun.genome will actually contain transcriptome bam's (see bai.pull function for details)
   bai.files.thisRun.genome <- bai.pull(dest.dir, text.add)
-  # respective names of the bam and wig files: 
+  # respective names of the bam and wig files:
   bam.files.thisRun.genome <- substr(bai.files.thisRun.genome, 1, nchar(bai.files.thisRun.genome)-4)
   wig.files.thisRun.genome <- paste(substr(bam.files.thisRun.genome, 1, nchar(bam.files.thisRun.genome)-4),"wig", sep=".")
-  # 
+  #
   # The case for generating wigle files without explicit separating forward- and reverse-strand reads
   # (implies using of a standard gtf file without addition of reverse-strand features):
-  if(!(strandExtract)) { 
-    # Generating .wig files: 
+  if(!(strandExtract)) {
+    # Generating .wig files:
     for (bam in 1:length(bam.files.thisRun.genome)) {
       current.bam <- bam.files.thisRun.genome[bam]
       current.bai <- bai.files.thisRun.genome[bam]
-      # name of the wig file to generate: 
+      # name of the wig file to generate:
       current.wig <- wig.files.thisRun.genome[bam]
-      # base name (before ".genome.sorted.bam"): 
+      # base name (before ".genome.sorted.bam"):
       current.base <- substr(current.bam, 1, nchar(current.bam)-18)
       wig.command <- paste("rsem-bam2wig ", current.bam, current.wig, current.base, sep=" ")
-      system(wig.command) 
+      system(wig.command)
     }
-    cat(timestamp(), " Wiggle files are generatd!", "\n") 
+    cat(timestamp(), " Wiggle files are generated!", "\n")
   } # if not strandExtract
   #
   ######################################################
