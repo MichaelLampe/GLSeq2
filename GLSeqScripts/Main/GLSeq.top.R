@@ -182,3 +182,53 @@ if (alignment == "noalignment") {
 if (!is.null(comm.stack.pool)){
   execute.comm.stack(comm.stack.pool,Condor)
 }
+
+# Collect results.  We can't really source this, as that doesn't match our data state.
+# We have to know what to collect before we have it to collect or we can just call the function
+# At the time when it is ready with the correct variables by saving the current environment
+if (resCollect == "collect"){
+  data.file <- paste(dest.dir,"collect.run.status.RData",sep="")
+  save.image(file=data.file)
+  collect.command <- ""
+  #
+  #############################################################################################
+  ###############################          HTSeq             #################################
+  #############################################################################################
+  if ("HTSeq" %in% cAlgor){
+    collect.script <- paste(base.dir,"GLSeq.ResultsCollectHTSeq.R",sep="")
+    collect.script.args <- paste(data.file)
+    collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
+  }
+  #
+  #############################################################################################
+  ###############################         Feature Counts      #################################
+  #############################################################################################
+  if ("FeatureCounts" %in% cAlgor){
+    collect.script <- paste(base.dir,"GLSeq.ResultsCollectFeatureCounts.R",sep="")
+    collect.script.args <- paste(data.file)
+    collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
+  }
+  #
+  #############################################################################################
+  ###############################            RSEM             #################################
+  #############################################################################################
+  if ("RSEM" %in% cAlgor){
+    collect.script <- paste(base.dir,"GLSeq.ResultsCollectRSEM.R",sep="")
+    collect.script.args <- paste(data.file)
+    collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
+  }
+  #
+  #############################################################################################
+  ###############################          Cufflinks         #################################
+  #############################################################################################
+  if ("Cufflinks" %in% cAlgor){
+    collect.script <- paste(base.dir,"GLSeq.ResultsCollectCufflinks.R",sep="")
+    collect.script.args <- paste(data.file)
+    # Currently disabled
+    #collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
+  }
+  if (collect.command != "") printOrExecute(collect.command,Condor)
+} else{
+  data.file <- paste(dest.dir,"ScriptEndStatus.RData",sep="")
+  save.image(file=data.file)
+}

@@ -33,6 +33,6 @@ organize.files <- paste(organize.files,"&&","mv",paste(this.resName,"*.index.*",
 
 if (!is.na(countable.sam)){
   calculateExpression <- paste("rsem-calculate-expression",rsemOptions,countable.sam,refName,countFile)
-  if (count.comm != "") count.comm <- paste(count.comm,"&&",check.file,"&&", prepareReference, "&&",calculateExpression,"&&",organize.files)
+  if (count.comm != "") count.comm <- paste(count.comm,check.file,"&&", prepareReference, "&&",calculateExpression,"&&",organize.files)
   if (count.comm == "") count.comm <- paste(header.file,"&&",check.file,"&&",prepareReference, "&&", calculateExpression,"&&",organize.files)
 }

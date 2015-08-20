@@ -57,6 +57,14 @@ if (aAlgor == "STAR"){
   occured <- TRUE
   source("GLSeq.STAR.R")
 }
+################################################
+# HISAT Alignment Protocol
+################################################
+if (aAlgor == "HISAT"){
+  occured <- TRUE
+  source("GLSeq.HISAT.R")
+}
+
 if (!occured){
   warning("No alignment protocol was initiated.  Please make sure you have supplied a supported alignment setting")
 }

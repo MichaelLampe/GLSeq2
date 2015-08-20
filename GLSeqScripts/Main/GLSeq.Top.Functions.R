@@ -90,7 +90,11 @@ create.run.directory <- function(dest.dir,Condor=FALSE) {
   dest.dir <- trailDirCheck(dest.dir)
   # Creates a new directory with the mkdir command
   destDir.create <- paste("mkdir ", dest.dir, sep="")
-  printOrExecute(destDir.create,Condor)
+  # This is the only command we will not run on Condor
+  # As if we need to save R data we should be saving it
+  # In the destination folder not the base directory
+  # Where it may end up being non read/write
+  system(destDir.create)
   # Returns command for unit tests
   #destDir.create
 }

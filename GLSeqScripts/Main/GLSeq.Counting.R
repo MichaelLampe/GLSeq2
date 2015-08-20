@@ -20,20 +20,10 @@ if ("RSEM" %in% cAlgor){
     refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
     printOrExecute(refCopy,Condor)
   }
-  if (alignment == "alignment"){
-    if (aAlgor == "Bowtie" || aAlgor == "Bowtie2"){
-      occured <- TRUE
-      setwd(base.dir)
-      source ("GLSeq.RsemCount.R")
-      count.comm <- paste(count.comm,"&")
-    }
-  } else{
-    # In case the user is just counting
     occured <- TRUE
     setwd(base.dir)
     source ("GLSeq.RsemCount.R")
     count.comm <- paste(count.comm,"&")
-  }
 }
 ################################################
 #HTSeq Counting Protocol
@@ -100,7 +90,7 @@ if ("FeatureCounts" %in% cAlgor){
   move.command <- paste(move.command,"&& mv",counts.data,destDirFeatureCountsCount)
   move.command <- paste(move.command,"&& mv",counts.stats,destDirFeatureCountsCount)
   move.command <- paste(move.command,"&& mv",counts.annotation,destDirFeatureCountsCount)
-  if (count.comm != "") count.comm <- paste(count.comm,"&&",script,"&&",move.command)
+  if (count.comm != "") count.comm <- paste(count.comm,script,"&&",move.command)
   if (count.comm == "(") count.comm <- paste(script,"&&",move.command)
   count.comm <- paste(count.comm,"&")
 }

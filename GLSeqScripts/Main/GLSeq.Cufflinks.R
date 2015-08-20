@@ -40,6 +40,6 @@ if (!is.na(countable.sam)){
   cufflinks.options <- paste("--quiet","-p",nCores,"--output-dir",cufflinks.dest)
   cufflinks.run <- paste("cufflinks",cufflinks.options,cufflinks.ready.countable)
   #
-  if (count.comm != "") count.comm <- paste(count.comm,"&&",create.run.dir,"&&",cufflinks.ready.create,"&&",cufflinks.ready.sort,"&&",cufflinks.run)
+  if (count.comm != "") count.comm <- paste(count.comm,create.run.dir,"&&",cufflinks.ready.create,"&&",cufflinks.ready.sort,"&&",cufflinks.run)
   if (count.comm == "") count.comm <- paste(create.run.dir,"&&",cufflinks.ready.create,"&&",cufflinks.ready.sort,"&&",cufflinks.run)
 }

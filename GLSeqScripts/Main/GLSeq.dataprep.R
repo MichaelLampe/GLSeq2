@@ -69,6 +69,10 @@ if (presplit){
 if (!presplit){
   rangelist.Dataprep <- chunk.data.files.unsplit(fqFiles,nStreamsDataPrep)
 }
+# Copy the artificial.fq file in
+if (readTrim){
+  copy.artificial.fq(base.dir,artificial.fq,dest.dir,Condor)
+}
 # Construct command to be run.
 comm.pool <- NULL
 for (zz in 1:nStreamsDataPrep) {
@@ -87,10 +91,6 @@ for (zz in 1:nStreamsDataPrep) {
         }
         }
       if (readTrim){
-        # Copy the artificial.fq file in
-        if (j==1){
-        copy.artificial.fq(base.dir,artificial.fq,dest.dir)
-        }
         # The trim command
         trimCommand <- trimAssemble.PE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
         if (is.null(comm.pools)){
@@ -118,10 +118,6 @@ for (zz in 1:nStreamsDataPrep) {
     #
     if (!paired.end){
       if (readTrim){
-        # Copy the artificial.fq file in
-        if (j==1){
-          copy.artificial.fq(base.dir,artificial.fq,dest.dir)
-        }
         # The trim command
         trimCommand <- trimAssemble.SE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
         if (is.null(comm.pools)){
@@ -156,12 +152,6 @@ for (zz in 1:nStreamsDataPrep) {
     comm.pool <- paste(comm.pool,comm.pools,"&")
   }
 }
-if (Condor){
-  store.artificial <- store.artificial.seqs.file(paste(dest.dir,artificial.fq,sep=""),qcFolder)
-  printOrExecute(comm.pool,Condor)
-  printOrExecute(store.artificial,Condor)
-} else{
-store.artificial <- store.artificial.seqs.file(paste(dest.dir,artificial.fq),qcFolder)
+store.artificial <- store.artificial.seqs.file(paste(dest.dir,artificial.fq,sep=""),qcFolder)
 comm.pool <- paste(comm.pool,"wait","&&", store.artificial)
 printOrExecute(comm.pool,Condor)
-}
