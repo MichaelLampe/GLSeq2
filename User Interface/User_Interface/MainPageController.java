@@ -7,6 +7,7 @@ import java.util.ResourceBundle;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -17,6 +18,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -190,6 +192,7 @@ public final class MainPageController extends MainPageItems implements Initializ
           } else {
             attributeFileLocation = action.writeAttributesFile(run_name.getText(), null);
           }
+          System.out.println(attributeFileLocation);
           action.saveConfigFile("AttributesConfig.txt");
         } catch (IOException e) {
           e.printStackTrace();
@@ -263,8 +266,46 @@ public final class MainPageController extends MainPageItems implements Initializ
     Cushaw_Gpu.setToggleGroup(group);
     TopHat.setToggleGroup(group);
     Rockhopper.setToggleGroup(group);
+    star.setToggleGroup(group);
+    hisat.setToggleGroup(group);
     BWA.setSelected(true);
+    toggleCountingDep(group);
     return group;
+  }
+
+  private void toggleCountingDep(ToggleGroup group) {
+    RSEM.disableProperty().bind(
+        Bindings.when(Bowtie.selectedProperty().or(Bowtie2.selectedProperty())).then(false)
+            .otherwise(true));
+    group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+      @Override
+      public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue,
+          Toggle newValue) {
+        if (!Bowtie.isSelected() && !Bowtie2.isSelected()) {
+          RSEM.setSelected(false);
+        }
+      }
+    });
+
+    start_run.disableProperty().bind(
+        Bindings
+            .when(
+            // Requires a run name
+                run_name
+                    .textProperty()
+                    // There is some text
+                    .isNotEqualTo("")
+                    .and(
+                    // 45 char names max
+                    // Just makes the table easier to handle.
+                        textCountLimit(run_name, 45))
+                    .and(
+                    // One of the boxes must be check to do something.
+                        alignment_check.selectedProperty().or(
+                            data_prep_check.selectedProperty()
+                                .or(counting_check.selectedProperty())
+                                .or(collect_check.selectedProperty())))).then(false)
+            .otherwise(true));
   }
 
   /*

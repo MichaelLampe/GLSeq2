@@ -3,6 +3,9 @@ package application;
 // This contains the name (Enum name), default values, possible values, and tool tips.
 public enum AttributesJSON {
   dataDirectory("data.directory",Category.DATA.name, "The location containing the data files."),
+  
+  storageDestination("storage.destination",Category.DATA.name, "The place where the files will be finally stored"),
+  
   unzipped("unzipped",Category.DATA.name, "\"TRUE\",\"FALSE\"", "TRUE",
       "If the unprocessed data files are zipped (.gz) or not (.fq or .fastq)"), 
   strain("strain",
@@ -57,6 +60,12 @@ public enum AttributesJSON {
       "Select to run the RSEM counting protocol. This protocol does not work with gapped aligners."), 
   HTseq("HTSeq",
       Category.RUN.name, "\"HTseq\",\"\"", "", "Select to run the HTSeq counting protocol"), 
+      
+      
+  rockhopperCount("Rockhopper",
+      Category.RUN.name, "\"Rockhopper\",\"\"", "", "Select to run the Rockhopper counting protocol"), 
+      
+      
   Cufflinks("Cufflinks",
       Category.RUN.name, "\"Cufflinks\",\"\"", "", "Select to run the Cufflinks counting protocol"), 
   aAlgor("aAlgor",
@@ -87,15 +96,15 @@ public enum AttributesJSON {
 
   scriptDirectory("base.dir",Category.ENVIRONMENT.name, "The location of the R Script Files. (GLSeq.Top.R)"), 
   trimPath("trimPath",
-      Category.ENVIRONMENT.name, "Path to the Trimmomatic"), 
+      Category.ENVIRONMENT.name,"/opt/bifxapps/Trimmomatic-0.30/trimmomatic-0.30.jar", "Path to the Trimmomatic"), 
   picardToolsPath("picardToolsPath",
-      Category.ENVIRONMENT.name, "Path to the PIcardTools jar directory"), 
+      Category.ENVIRONMENT.name,"/opt/bifxapps/picard-tools/","Path to the PIcardTools jar directory"), 
   fastqcPath("fastqcPath",
-      Category.ENVIRONMENT.name, "Path to the FastQc"), 
+      Category.ENVIRONMENT.name,"/opt/bifxapps/bin/fastqc","Path to the FastQc"), 
   bwaPath("bwaPath",Category.ENVIRONMENT.name,
       "/opt/bifxapps/bin/bwa", "Path to BWA Aligner"), 
   bam2wigPath("bam2wigPath",
-      Category.ENVIRONMENT.name,
+      Category.ENVIRONMENT.name,"/home/GLBRCORG/omoskvin/run/bam2wig.sh",
       "Path to the shell script that converts Bam to Wig"), 
   cushawPath("CUSHAW.path",
       Category.ENVIRONMENT.name,
@@ -107,12 +116,18 @@ public enum AttributesJSON {
       Category.ENVIRONMENT.name,
       "/opt/bifxapps/cushaw2-v2.1.11/cushaw2_index/cushaw2_index", "Path to the CUSHAW Indexer"),
   topHatPath("TopHat.path",
-      Category.ENVIRONMENT.name, "Path to the Tophat Aligner"),
+      Category.ENVIRONMENT.name,"/opt/bifxapps/tophat-2.0.11.Linux_x86_64/tophat2", "Path to the Tophat Aligner"),
   rockhopperPath("Rockhopper.path",
           Category.ENVIRONMENT.name, "Path to the Rockhopper Aligner"),
   destDirTest("destDirTest",
       Category.ENVIRONMENT.name,
       "Path to a logging file.  This will create general logs and put them in this directory."),
+  starPath("star.path",
+      Category.ENVIRONMENT.name,
+      "Path to a logging file.  This will create general logs and put them in this directory."),
+  hisatPath("hisat.path",Category.ENVIRONMENT.name,
+      "Path to the folder containing the hisat-build and hisat files."),    
+      
   uiDivider("uiDivider",
           Category.SCRIPT.name,
           "Divider for Glow"),

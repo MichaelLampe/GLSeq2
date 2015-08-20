@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox minHeight="-Infinity" prefHeight="786.0" prefWidth="873.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainPageController">
+<VBox minHeight="-Infinity" prefHeight="786.0" prefWidth="873.0" stylesheets="@MainPage.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainPageController">
    <children>
       <MenuBar>
         <menus>
@@ -31,20 +31,21 @@
               <AnchorPane fx:id="locations_pane" minHeight="700.0" minWidth="0.0" prefHeight="700.0" prefWidth="873.0" styleClass="tab_pane">
                      <children>
                         <TextArea fx:id="dataDirectory" layoutX="13.0" layoutY="94.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the directory of your data files? (Example: /home/data/myfiles/&quot;)" wrapText="true" />
-                        <TextArea fx:id="destinationDirectory" layoutX="13.0" layoutY="169.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we put the results? (Example: /home/runs/)" wrapText="true" />
-                        <TextArea fx:id="countableSamDir" layoutX="13.0" layoutY="334.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory are your countable.sam files?" wrapText="true" />
+                        <TextArea fx:id="destinationDirectory" layoutX="13.0" layoutY="169.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we prepare the results? (Example: /home/runs/)" wrapText="true" />
+                        <TextArea fx:id="countableSamDir" layoutX="13.0" layoutY="368.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory are your countable.sam files?" wrapText="true" />
                         <Label layoutX="14.0" layoutY="30.0" text="Create a new run" textFill="WHITE">
                            <font>
                               <Font size="37.0" />
                            </font>
                         </Label>
-                        <Label layoutX="14.0" layoutY="260.0" text="Analyze a previous run" textFill="WHITE">
+                        <Label layoutX="14.0" layoutY="294.0" text="Analyze a previous run" textFill="WHITE">
                            <font>
                               <Font size="37.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="prevRunDirectory" layoutX="13.0" layoutY="383.0" prefHeight="32.0" prefWidth="848.0" promptText="What was the directory of your previous run?" wrapText="true" />
-                        <TextArea fx:id="prevRunName" layoutX="13.0" layoutY="433.0" prefHeight="32.0" prefWidth="848.0" promptText="And what did you name that run?" wrapText="true" />
+                        <TextArea fx:id="prevRunDirectory" layoutX="13.0" layoutY="417.0" prefHeight="32.0" prefWidth="848.0" promptText="What was the directory of your previous run?" wrapText="true" />
+                        <TextArea fx:id="prevRunName" layoutX="13.0" layoutY="467.0" prefHeight="32.0" prefWidth="848.0" promptText="And what did you name that run?" wrapText="true" />
+                        <TextArea fx:id="storageDestination" layoutX="13.0" layoutY="244.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we store results in the end? (Example: /bigdata/mypersonalfolder/)" wrapText="true" />
                      </children>
                   </AnchorPane>
             </content>
@@ -179,6 +180,21 @@
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
+                        <RadioButton fx:id="hisat" layoutX="14.0" layoutY="210.0" mnemonicParsing="false" text="HISAT" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </RadioButton>
+                        <RadioButton fx:id="star" layoutX="181.0" layoutY="170.0" mnemonicParsing="false" text="STAR" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </RadioButton>
+                        <CheckBox fx:id="rockhopperCount" layoutX="650.0" layoutY="65.0" mnemonicParsing="false" text="Rockhopper" textFill="WHITE">
+                           <font>
+                              <Font size="27.0" />
+                           </font>
+                        </CheckBox>
                      </children>
                   </AnchorPane>
                </content>
@@ -246,17 +262,19 @@
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="tab_pane">
                      <children>
                         <TextArea fx:id="scriptDirectory" layoutX="14.0" layoutY="10.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the directory that the GLSeq R scripts are located in?" />
-                        <TextArea fx:id="trimPath" layoutX="14.0" layoutY="60.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the location of the Trimmomatic jar file?" />
-                        <TextArea fx:id="fastqcPath" layoutX="14.0" layoutY="160.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to the FastQC program?" />
-                        <TextArea fx:id="picardToolsPath" layoutX="14.0" layoutY="110.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the directory that stores your PicardTools jars?" />
-                        <TextArea fx:id="bwaPath" layoutX="14.0" layoutY="210.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to your BWA aligner?" />
-                        <TextArea fx:id="bam2wigPath" layoutX="14.0" layoutY="260.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to the Bam2Wig shell script?" />
-                        <TextArea fx:id="rockhopperPath" layoutX="14.0" layoutY="510.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your Rockhopper aligner?" />
-                        <TextArea fx:id="cushawGpuPath" layoutX="14.0" layoutY="410.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your CUSHAW-GPU aligner?" />
-                        <TextArea fx:id="topHatPath" layoutX="14.0" layoutY="460.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your TopHat aligner?" />
-                        <TextArea fx:id="cushawPath" layoutX="14.0" layoutY="360.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your CUSHAW aligner?" />
-                        <TextArea fx:id="cushawIndexPath" layoutX="14.0" layoutY="310.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your CUSHAW indexer?" />
-                        <TextArea fx:id="destDirTest" layoutX="14.0" layoutY="560.0" prefHeight="32.0" prefWidth="848.0" promptText="Where should we put our log files?" />
+                        <TextArea fx:id="trimPath" layoutX="14.0" layoutY="50.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the location of the Trimmomatic jar file?" />
+                        <TextArea fx:id="fastqcPath" layoutX="14.0" layoutY="130.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to the FastQC program?" />
+                        <TextArea fx:id="picardToolsPath" layoutX="14.0" layoutY="90.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the directory that stores your PicardTools jars?" />
+                        <TextArea fx:id="bwaPath" layoutX="14.0" layoutY="170.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to your BWA aligner?" />
+                        <TextArea fx:id="bam2wigPath" layoutX="14.0" layoutY="210.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to the Bam2Wig shell script?" />
+                        <TextArea fx:id="rockhopperPath" layoutX="14.0" layoutY="410.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your Rockhopper aligner?" />
+                        <TextArea fx:id="cushawGpuPath" layoutX="14.0" layoutY="330.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your CUSHAW-GPU aligner?" />
+                        <TextArea fx:id="topHatPath" layoutX="14.0" layoutY="370.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your TopHat aligner?" />
+                        <TextArea fx:id="cushawPath" layoutX="14.0" layoutY="290.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your CUSHAW aligner?" />
+                        <TextArea fx:id="cushawIndexPath" layoutX="14.0" layoutY="250.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the path to your CUSHAW indexer?" />
+                        <TextArea fx:id="destDirTest" layoutX="14.0" layoutY="530.0" prefHeight="32.0" prefWidth="848.0" promptText="Where should we put our log files?" />
+                        <TextArea fx:id="hisatPath" layoutX="13.0" layoutY="490.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the folder containing your HISAT-builder and HISAT files?" />
+                        <TextArea fx:id="starPath" layoutX="13.0" layoutY="450.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the path to your STAR aligner?" />
                      </children></AnchorPane>
                </content>
             </Tab>

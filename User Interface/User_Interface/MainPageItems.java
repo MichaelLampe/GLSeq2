@@ -118,6 +118,12 @@ class MainPageItems {
   @FXML
   protected TextArea destDirTest;
   @FXML
+  protected TextArea hisatPath;
+  @FXML
+  protected TextArea starPath;
+  @FXML
+  protected TextArea storageDestination;
+  @FXML
   protected TextArea run_name;
 
   @FXML
@@ -139,7 +145,9 @@ class MainPageItems {
   protected CheckBox FeatureCounts;
   @FXML
   protected CheckBox Cufflinks;
-
+  @FXML 
+  protected CheckBox rockhopperCount;
+  
   @FXML
   protected Button start_run;
 
@@ -157,7 +165,12 @@ class MainPageItems {
   protected RadioButton TopHat;
   @FXML
   protected RadioButton Rockhopper;
-
+  @FXML
+  protected RadioButton star;
+  @FXML
+  protected RadioButton hisat;
+  
+  
   @FXML
   protected TabPane tab_check;
   @FXML
