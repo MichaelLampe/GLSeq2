@@ -34,32 +34,53 @@ The pipeline is written by biologist for biologists, using R language. Unlike us
 - Python [Python Language](https://www.python.org/)
 
 ## Citing GLSeq
-If you use the GLSeq package, please cite:
 
+If you use the GLSeq package, please cite:
 - Moskvin O.V., McIlwain S., Ong I.M. (2015) Making sense of RNA-Seq data: from low-level processing to functional analysis. *Systems Biomedicine (Special CAMDA-2014 Issue)* [Online version is here](http://www.tandfonline.com/doi/full/10.1080/21628130.2015.1010923). Preprint (October 17, 2014) doi: [10.1101/010488](http://dx.doi.org/10.1101/010488)
 
-If you use Bowtie-RSEM as part of your customized pipeline, please also cite:
-
+If you use Bowtie please cite:
 - Langmead B, Trapnell C, Pop M, Salzberg SL. (2009) Ultrafast and memory-efficient alignment of short DNA sequences to the human genome. *Genome biology* 10:R25
-- Li B, Dewey CN. (2011) RSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome. *BMC bioinformatics* 12:323
 
-If you use BWA-HTSeq as part of the pipeline, please also cite:
+If you use Bowtie2 please cite:
 
+If you use BWA please cite:
 - Li H, Durbin R. (2009) Fast and accurate short read alignment with Burrows-Wheeler transform. Bioinformatics 25:1754-1760
-- Anders SP, P.T.; Huber, W. HTSeq - A Python framework to work with high-throughput sequencing data. doi: [10.1101/002824](http://dx.doi.org/10.1101/002824)
-- Picard project [Picard Tools](http://broadinstitute.github.io/picard/)
-
-If you use FeatureCounts option, please also cite:
-
-- Liao Y., Smyth G.K., Shi W. (2014) featureCounts: an efficient general purpose program for assigning sequence reads to genomic features. *Bioinformatics* 30(7): 923-930
 
 If you use CUSHAW with optional GPU acceleration as aligner, please also cite: 
-
 - Liu Y., Schmidt B., and Maskell D.L. (2012) CUSHAW: a CUDA compatible short read aligner to large genomes based on the Burrows-Wheeler transform. *Bioinformatics* 28(14): 1830-1837
 
-If you use Trimmomatic, please cite: 
+If you use Rockhopper please cite:
+- De novo assembly of bacterial transcriptomes from RNA-seq data. Brian Tjaden. Genome Biology, 16:1, 2015.
+- Computational analysis of bacterial RNA-seq data. Ryan McClure, Divya Balasubramanian, Yan Sun, Maksym Bobrovskyy, Paul Sumby, Caroline A. Genco, Carin K. Vanderpool, and Brian Tjaden. Nucleic Acids Research, 41(14):e140, 2013.
 
+If you use HISAT please cite:
+- Kim D, Langmead B and Salzberg SL. HISAT: a fast spliced aligner with low memory requirements. Nature Methods 2015
+
+If you use STAR please cite:
+- A. Dobin et al, Bioinformatics 2012; doi: 10.1093/bioinformatics/bts635
+
+If you use TopHat2 please cite:
+- Kim D, Pertea G, Trapnell C, Pimentel H, Kelley R, Salzberg SL. TopHat2: accurate alignment of transcriptomes in the presence of insertions, deletions and gene fusions. . Genome Biology 2013, 14:R36
+
+
+
+
+If you use HTSeq please cite:
+- Anders SP, P.T.; Huber, W. HTSeq - A Python framework to work with high-throughput sequencing data. doi: [10.1101/002824](http://dx.doi.org/10.1101/002824)
+
+If you use FeatureCounts option, please also cite:
+- Liao Y., Smyth G.K., Shi W. (2014) featureCounts: an efficient general purpose program for assigning sequence reads to genomic features. *Bioinformatics* 30(7): 923-930
+
+If you use RSEM please cite:
+- Li B, Dewey CN. (2011) RSEM: accurate transcript quantification from RNA-Seq data with or without a reference genome. *BMC bioinformatics* 12:323 
+
+If you use Cufflinks please cite:
+- Cole Trapnell,Brian A Williams,Geo Pertea,	Ali Mortazavi,	Gordon Kwan,Marijke J van Baren,	Steven L Salzberg,Barbara J Wold	& Lior Pachter (2010)  Transcript assembly and quantification by RNA-Seq reveals unannotated transcripts and isoform switching during cell differentiation. Nat Biotech 28(5): 511-515
+
+If you use Trimmomatic, please cite: 
 - Bolger AM, Lohse M, Usadel B. (2014) Trimmomatic: a flexible trimmer for Illumina sequence data. *Bioinformatics* 30:2114-2120
+
+- Picard project [Picard Tools](http://broadinstitute.github.io/picard/)
 
 
 
