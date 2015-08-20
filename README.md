@@ -189,6 +189,14 @@ Sometimes you may want to sacrifice the convenience of the one-click running mod
 ![](CondorWrapperDiagram.png)
 We have also developed a Python wrapper that allows for the user to easily run GLSeq2 through HTCondor without any additional work.  The user simply submits the same commands as before, except now instead of running "RScript GLSeq.top.R" the user runs "python PyGLSeqWrapper.py".  Everything else is handled on our end.  
 
+Running the Python Wrapper from command line:
+```
+python PyGLSeqWrapper.py GLSeq.top.R [pre-defined sequence of parameters] 
+
+Note: "GLSeq.top.R" should normally be provided as an absolute file path.
+```
+
+
 The wrapper will dynamically construct your job as a directed, acylcic graph, assign proper resource allocations (Memory, CPUs, and GPUs), and submit the job to your configured HT Condor platform.  
 
 An example of a pipeline that process three raw,zipped PE data files is shown below.  The files were first unzipped, split, and trimmed during the "dataprep" step.  Then, the Rockhopper aligner quickly aligned the reads and generated a SAM file that could be counted by FeatureCounts and HTSeq.  Results are neatly placed within data folders for organizational purposes.
