@@ -192,9 +192,8 @@ We have also developed a Python wrapper that allows for the user to easily run G
 Running the Python Wrapper from command line:
 ```
 python PyGLSeqWrapper.py GLSeq.top.R [pre-defined sequence of parameters] 
-
-Note: "GLSeq.top.R" should normally be provided as an absolute file path.
 ```
+Note: "GLSeq.top.R" should normally be provided as an absolute file path.
 
 
 The wrapper will dynamically construct your job as a directed, acylcic graph, assign proper resource allocations (Memory, CPUs, and GPUs), and submit the job to your configured HT Condor platform.  
