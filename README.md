@@ -186,7 +186,7 @@ Sometimes you may want to sacrifice the convenience of the one-click running mod
 3. You want to explicitly collect the results after expression calculation stage when a one-click run is crashed for some unforeseen reason (use nodataprep + noexprcalc + collect).    
 
 ### Python Wrapper
-
+![](CondorWrapperDiagram.png)
 We have also developed a Python wrapper that allows for the user to easily run GLSeq2 through HTCondor without any additional work.  The user simply submits the same commands as before, except now instead of running "RScript GLSeq.top.R" the user runs "python PyGLSeqWrapper.py".  Everything else is handled on our end.  
 
 The wrapper will dynamically construct your job as a directed, acylcic graph, assign proper resource allocations (Memory, CPUs, and GPUs), and submit the job to your configured HT Condor platform.  
