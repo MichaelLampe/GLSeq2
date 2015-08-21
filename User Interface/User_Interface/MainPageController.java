@@ -1,19 +1,23 @@
 package application;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
@@ -21,6 +25,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 public final class MainPageController extends MainPageItems implements Initializable {
 
@@ -34,6 +40,7 @@ public final class MainPageController extends MainPageItems implements Initializ
     group = radioButtonGroup();
     progressBarListener();
     runBindings();
+    menuListeners();
   }
 
   /*
@@ -319,8 +326,67 @@ public final class MainPageController extends MainPageItems implements Initializ
     current_tab.selectedIndexProperty().addListener(new ChangeListener<Number>() {
       @Override
       public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
-        double currentPercent = ((current_tab.getSelectedIndex() + 1) * percent_per_index) / 100;
+        double currentPercent = ((current_tab.getSelectedIndex() + 2) * percent_per_index) / 100;
         footer_progress.setProgress(currentPercent);
+      }
+    });
+  }
+
+  private void menuListeners() {
+    toggle_advanced.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        adv_opts.setDisable(!adv_opts.isDisabled());
+      }
+    });
+
+    close_program.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        Platform.exit();
+        System.exit(0);
+      }
+    });
+
+    open_att.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Open attribute file");
+        File att_file = fc.showOpenDialog(Main.stage);
+        if (att_file != null) {
+          AttributeActions action = new AttributeActions();
+          action.setAttributes(att_file);
+        }
+      }
+    });
+
+    show_hide.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        ObservableList<Tab> tabs = tab_check.getTabs();
+        if (tabs.contains(adv_opts)) {
+          tabs.remove(adv_opts);
+        } else {
+          tabs.add(adv_opts);
+        }
+      }
+    });
+
+    save_curr.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+       DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle("Save attribute file");
+        File directory = dc.showDialog(Main.stage);
+        if (directory != null) {
+          AttributeActions action = new AttributeActions();
+          try {
+            action.writeAttributesFile(null, directory.getAbsolutePath());
+          } catch (IOException e) {
+              // Should be fine with selector
+          }
+        }
       }
     });
   }

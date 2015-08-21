@@ -6,13 +6,15 @@ class Attribute implements Attributable{
   private final String uiname;
   private final String toolTip;
   private final String category;
+  private final String defaultValue;
   private String value; 
   
-  Attribute(String name,String uiname, String toolTip,String category){
+  Attribute(String name,String uiname, String toolTip,String category,String defaultValue){
     this.uiname = uiname;
     this.name = name;
     this.toolTip = toolTip;
     this.category = category;
+    this.defaultValue = defaultValue;
   }
   public String getCategory(){
     return category;
@@ -32,6 +34,9 @@ class Attribute implements Attributable{
   @Override
   public void setValue(String propertyUpdate) {
     this.value = propertyUpdate;
+  }
+  public String getDefault(){
+    return defaultValue;
   }
   public String getUiName(){
     return uiname;

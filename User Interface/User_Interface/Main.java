@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
   public static Scene scene;
+  public static Stage stage;
   private static final AttributeActions att = new AttributeActions();
 
   @Override
@@ -21,6 +22,7 @@ public class Main extends Application {
       primaryStage.setResizable(false);
       primaryStage.setScene(scene);
       primaryStage.setTitle("GLSeq2 User Interface");
+      stage = primaryStage;
       primaryStage.show();
       // Update attributes from previous save
       att.setAttributes();

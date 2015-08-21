@@ -5,13 +5,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 
 class MainPageItems {
   @FXML
@@ -188,4 +191,19 @@ class MainPageItems {
   protected TableColumn<RunTableEntry, String> column_end;
   @FXML
   protected TableColumn<RunTableEntry, String> column_duration;
+
+  @FXML
+  protected MenuItem toggle_advanced;
+  @FXML
+  protected MenuItem close_program;
+  @FXML
+  protected MenuItem open_att;
+  @FXML
+  protected MenuItem save_curr;
+  @FXML
+  protected MenuItem show_hide;
+  
+  @FXML
+  protected Tab adv_opts;
 }
+  

@@ -62,7 +62,7 @@ public enum AttributesJSON {
       Category.RUN.name, "\"HTseq\",\"\"", "", "Select to run the HTSeq counting protocol"), 
       
       
-  rockhopperCount("Rockhopper",
+  rockhopperCount("rockhopperCount",
       Category.RUN.name, "\"Rockhopper\",\"\"", "", "Select to run the Rockhopper counting protocol"), 
       
       

@@ -24,7 +24,7 @@ public class Attributes {
    */
   private void setupFields(){
     for (AttributesJSON field : AttributesJSON.values()){
-      Attribute currentAttribute = new Attribute(field.field_name,field.name(),field.description,field.category);
+      Attribute currentAttribute = new Attribute(field.field_name,field.name(),field.description,field.category,field.defaultVal);
       currentAttribute.setValue(field.defaultVal);
       attributesCollection.put(currentAttribute.getName(), currentAttribute);
     }

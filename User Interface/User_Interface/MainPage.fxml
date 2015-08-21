@@ -14,14 +14,17 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
+                  <MenuItem fx:id="open_att" mnemonicParsing="false" text="Load Attribute File" />
+                  <MenuItem fx:id="save_curr" mnemonicParsing="false" text="Save Current Data as Attribute File" />
+              <MenuItem fx:id="close_program" mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
+            <Menu mnemonicParsing="false" text="Advanced Options">
+              <items>
+                  <MenuItem fx:id="show_hide" mnemonicParsing="false" text="Show/Hide Advanced Options" />
+                <MenuItem fx:id="toggle_advanced" mnemonicParsing="false" text="Toggle Advanced Options" />
+              </items>
+            </Menu>
         </menus>
       </MenuBar>
       <TabPane fx:id="tab_check" minHeight="700.0" prefHeight="700.0" prefWidth="855.0" tabClosingPolicy="UNAVAILABLE">
@@ -30,9 +33,19 @@
             <content>
               <AnchorPane fx:id="locations_pane" minHeight="700.0" minWidth="0.0" prefHeight="700.0" prefWidth="873.0" styleClass="tab_pane">
                      <children>
-                        <TextArea fx:id="dataDirectory" layoutX="13.0" layoutY="94.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the directory of your data files? (Example: /home/data/myfiles/&quot;)" wrapText="true" />
-                        <TextArea fx:id="destinationDirectory" layoutX="13.0" layoutY="169.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we prepare the results? (Example: /home/runs/)" wrapText="true" />
-                        <TextArea fx:id="countableSamDir" layoutX="13.0" layoutY="368.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory are your countable.sam files?" wrapText="true" />
+                        <TextArea fx:id="dataDirectory" layoutX="13.0" layoutY="94.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the directory of your data files? (Example: /home/data/myfiles/&quot;)" wrapText="true">
+                           <tooltip>
+                              <Tooltip fx:id="dataTip" text="This is the file containing all of your data.  Currently, data that is prepared by us needs to be in a .fq or .fastq format and can also be .gz zipped.  Preprocessed data should be unzipped in a .fq or .fastq format (Mixed files is also fine)" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS" wrapText="true">
+                              </Tooltip>
+                           </tooltip></TextArea>
+                        <TextArea fx:id="destinationDirectory" layoutX="13.0" layoutY="169.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we prepare the results? (Example: /home/runs/)" wrapText="true">
+                           <tooltip>
+                              <Tooltip text="This is the directory where your files will be prepared.  This directory should be located on a fast drive." />
+                           </tooltip></TextArea>
+                        <TextArea fx:id="countableSamDir" layoutX="13.0" layoutY="368.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory are your countable.sam files?" wrapText="true">
+                           <tooltip>
+                              <Tooltip text="Location of previously prepared countable.sam files.  To make sure that everything will work, please use SAM files prepared by the GLSeq2 program." />
+                           </tooltip></TextArea>
                         <Label layoutX="14.0" layoutY="30.0" text="Create a new run" textFill="WHITE">
                            <font>
                               <Font size="37.0" />
@@ -43,9 +56,18 @@
                               <Font size="37.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="prevRunDirectory" layoutX="13.0" layoutY="417.0" prefHeight="32.0" prefWidth="848.0" promptText="What was the directory of your previous run?" wrapText="true" />
-                        <TextArea fx:id="prevRunName" layoutX="13.0" layoutY="467.0" prefHeight="32.0" prefWidth="848.0" promptText="And what did you name that run?" wrapText="true" />
-                        <TextArea fx:id="storageDestination" layoutX="13.0" layoutY="244.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we store results in the end? (Example: /bigdata/mypersonalfolder/)" wrapText="true" />
+                        <TextArea fx:id="prevRunDirectory" layoutX="13.0" layoutY="417.0" prefHeight="32.0" prefWidth="848.0" promptText="What was the directory of your previous run?" wrapText="true">
+                           <tooltip>
+                              <Tooltip text="The preparation directory of the previous run" />
+                           </tooltip></TextArea>
+                        <TextArea fx:id="prevRunName" layoutX="13.0" layoutY="467.0" prefHeight="32.0" prefWidth="848.0" promptText="And what did you name that run?" wrapText="true">
+                           <tooltip>
+                              <Tooltip text="The name of your previous run" />
+                           </tooltip></TextArea>
+                        <TextArea fx:id="storageDestination" layoutX="13.0" layoutY="244.0" prefHeight="32.0" prefWidth="848.0" promptText="In what directory should we store results in the end? (Example: /bigdata/mypersonalfolder/)" wrapText="true">
+                           <tooltip>
+                              <Tooltip text="The final directory where your data should be stored long term. " />
+                           </tooltip></TextArea>
                      </children>
                   </AnchorPane>
             </content>
@@ -54,13 +76,35 @@
                <content>
                   <AnchorPane minHeight="700.0" prefHeight="200.0" prefWidth="200.0" styleClass="tab_pane">
                      <children>
-                        <TextArea fx:id="strain" layoutX="13.0" layoutY="38.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the strain of your data?" />
-                        <ComboBox fx:id="libStrands" layoutX="14.0" layoutY="140.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the strandedness of your library?" />
-                        <ComboBox fx:id="seqPlatform" layoutX="14.0" layoutY="340.0" prefHeight="25.0" prefWidth="363.0" promptText="What sequencing platform did you use to gather this data?" />
-                        <ComboBox fx:id="qualityScores" layoutX="14.0" layoutY="240.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the quality score format of your library?" />
-                        <ComboBox fx:id="unzipped" layoutX="456.0" layoutY="140.0" prefHeight="25.0" prefWidth="363.0" promptText="Is your data zipped or unzipped format?" />
-                        <ComboBox fx:id="pairedEnd" layoutX="456.0" layoutY="240.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it paired ended or single ended?" />
-                        <ComboBox fx:id="presplit" layoutX="456.0" layoutY="340.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it presplit or unsplit?" />
+                        <TextArea fx:id="strain" layoutX="13.0" layoutY="38.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the strain of your data?">
+                           <tooltip>
+                              <Tooltip text="The strain of your data" />
+                           </tooltip></TextArea>
+                        <ComboBox fx:id="libStrands" layoutX="14.0" layoutY="140.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the strandedness of your library?">
+                           <tooltip>
+                              <Tooltip text="If your data was prepared in a stranded matter, indicate that." />
+                           </tooltip></ComboBox>
+                        <ComboBox fx:id="seqPlatform" layoutX="14.0" layoutY="340.0" prefHeight="25.0" prefWidth="363.0" promptText="What sequencing platform did you use to gather this data?">
+                           <tooltip>
+                              <Tooltip text="List of GLSeq2's supported sequencing platforms." />
+                           </tooltip></ComboBox>
+                        <ComboBox fx:id="qualityScores" layoutX="14.0" layoutY="240.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the quality score format of your library?">
+                           <tooltip>
+                              <Tooltip text="Phred quality formats of your data." />
+                           </tooltip></ComboBox>
+                        <ComboBox fx:id="unzipped" layoutX="456.0" layoutY="140.0" prefHeight="25.0" prefWidth="363.0" promptText="Is your data zipped or unzipped format?">
+                           <tooltip>
+                              <Tooltip text="Indicate if your data is zipped in a .gz format. " />
+                           </tooltip></ComboBox>
+                        <ComboBox fx:id="pairedEnd" layoutX="456.0" layoutY="240.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it paired ended or single ended?">
+                           <tooltip>
+                              <Tooltip text="If the data was prepared to be single or paired ended." />
+                           </tooltip></ComboBox>
+                        <ComboBox fx:id="presplit" layoutX="456.0" layoutY="340.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it presplit or unsplit?">
+                           <tooltip>
+                              <Tooltip text="For paired ended files, indicate if they are already split into two distinct files, or if they are currently in one big file." />
+                           </tooltip>
+                        </ComboBox>
                         <Label layoutX="14.0" layoutY="100.0" text="Library Strandedness" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
@@ -104,22 +148,22 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="referenceGenome" layoutX="14.0" layoutY="300.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the name of your reference genome? (Example: &quot;Y22.3.A144&quot;)" />
-                        <TextArea fx:id="referenceFasta" layoutX="13.0" layoutY="340.0" prefHeight="32.0" prefWidth="848.0" promptText="How about the name of your reference FASTA file? (Example: &quot;Y22-3.assembly.fasta&quot;)&quot;)" />
-                        <TextArea fx:id="referenceGff" layoutX="14.0" layoutY="380.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the name of your reference genomic features file (GTF)? (Example: &quot;Y22-3.A144c.gtf&quot;)" />
-                        <TextArea fx:id="idAttr" layoutX="13.0" layoutY="420.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the reference Feature ID for that GTF file? (Example: &quot;gene_id&quot;)" />
-                        <Label fx:id="gtf_column_label" layoutX="14.0" layoutY="474.0" text="Your GTF file has 9 columns" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
-                        <Slider fx:id="gtfFeatureColumn" layoutX="14.0" layoutY="519.0" majorTickUnit="1.0" max="20.0" minorTickCount="0" prefHeight="14.0" prefWidth="846.0" showTickMarks="true" value="9.0" />
-                        <Slider fx:id="fragMaxLength" layoutX="14.0" layoutY="599.0" majorTickUnit="100.0" max="5000.0" minorTickCount="0" prefHeight="14.0" prefWidth="846.0" showTickMarks="true" value="1000.0" />
-                        <Label fx:id="max_fragment_length_label" layoutX="14.0" layoutY="554.0" text="The maximal fragment length is 1000" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
+                        <TextArea fx:id="referenceGenome" layoutX="14.0" layoutY="300.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the name of your reference genome? (Example: &quot;Y22.3.A144&quot;)">
+                           <tooltip>
+                              <Tooltip text="This is the folder containing the reference genome.  This path is relative to the script directory." />
+                           </tooltip></TextArea>
+                        <TextArea fx:id="referenceFasta" layoutX="13.0" layoutY="340.0" prefHeight="32.0" prefWidth="848.0" promptText="How about the name of your reference FASTA file? (Example: &quot;Y22-3.assembly.fasta&quot;)&quot;)">
+                           <tooltip>
+                              <Tooltip text="The name of the reference FASTA file that you'd like to use.  Should be located in the reference genome directory." />
+                           </tooltip></TextArea>
+                        <TextArea fx:id="referenceGff" layoutX="14.0" layoutY="380.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the name of your reference genomic features file (GTF)? (Example: &quot;Y22-3.A144c.gtf&quot;)">
+                           <tooltip>
+                              <Tooltip text="The name of the GTF file used for counting.  Should be located within the reference genome directory." />
+                           </tooltip></TextArea>
+                        <TextArea fx:id="idAttr" layoutX="13.0" layoutY="420.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the reference Feature ID for that GTF file? (Example: &quot;gene_id&quot;)">
+                           <tooltip>
+                              <Tooltip text="The type of feature that the GTF file contains." />
+                           </tooltip></TextArea>
                         <Label layoutX="13.0" layoutY="17.0" text="Alignment Algorithm" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
@@ -221,12 +265,6 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label fx:id="max_buffer_label" layoutX="14.0" layoutY="263.0" text="Maximum auxiliary buffer when computing CIs is 4096" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
-                        <Slider fx:id="ciMem" blockIncrement="1028.0" layoutX="14.0" layoutY="308.0" majorTickUnit="1028.0" max="12288.0" minorTickCount="0" prefHeight="14.0" prefWidth="838.0" showTickMarks="true" value="4096.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -235,20 +273,14 @@
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="tab_pane">
                      <children>
-                        <ComboBox fx:id="readTrim" layoutX="15.0" layoutY="60.0" prefHeight="25.0" prefWidth="261.0" promptText="Would you like to trim your raw reads?" />
-                        <Slider fx:id="trimHead" layoutX="15.0" layoutY="215.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="14.0" prefWidth="838.0" showTickMarks="true" value="12.0" />
-                        <Slider fx:id="minTrim" layoutX="15.0" layoutY="295.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefWidth="838.0" showTickMarks="true" value="36.0" />
-                        <Label fx:id="trim_head_label" layoutX="15.0" layoutY="170.0" text="We are currently trimming 12 bases from the head" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="min_read_length_label" layoutX="15.0" layoutY="250.0" text="Reads under 36 bases will be discarded" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </Label>
-                        <TextArea fx:id="artificialFasta" layoutX="14.0" layoutY="110.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the name of your FASTA file that contains your artificial sequences? (Example: &quot;JGI.clean2.fa&quot;)" />
+                        <ComboBox fx:id="readTrim" layoutX="15.0" layoutY="60.0" prefHeight="25.0" prefWidth="261.0" promptText="Would you like to trim your raw reads?">
+                           <tooltip>
+                              <Tooltip text="Trimming will remove some sections of the reads (As indicated by you) during the data preparation stage." />
+                           </tooltip></ComboBox>
+                        <TextArea fx:id="artificialFasta" layoutX="14.0" layoutY="110.0" prefHeight="32.0" prefWidth="848.0" promptText="What's the name of your FASTA file that contains your artificial sequences? (Example: &quot;JGI.clean2.fa&quot;)">
+                           <tooltip>
+                              <Tooltip text="A FASTA file containign artificial sequences.  These will be trimmed from the reads by the Trimmomatic program." />
+                           </tooltip></TextArea>
                         <Label layoutX="15.0" layoutY="24.0" text="Reads should be Trimmed" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
@@ -291,16 +323,25 @@
                            <font>
                               <Font size="27.0" />
                            </font>
+                           <tooltip>
+                              <Tooltip text="Prepare data by unzipping, splitting, trimming, and/or quality checking the raw files." />
+                           </tooltip>
                         </CheckBox>
                         <CheckBox fx:id="alignment_check" layoutX="14.0" layoutY="211.0" mnemonicParsing="false" prefHeight="67.0" prefWidth="377.0" text="Alignment" textFill="WHITE">
                            <font>
                               <Font size="27.0" />
                            </font>
+                           <tooltip>
+                              <Tooltip text="The selected alignment method will align the reads." />
+                           </tooltip>
                         </CheckBox>
                         <CheckBox fx:id="counting_check" layoutX="14.0" layoutY="295.0" mnemonicParsing="false" prefHeight="67.0" prefWidth="377.0" text="Counting" textFill="WHITE">
                            <font>
                               <Font size="27.0" />
                            </font>
+                           <tooltip>
+                              <Tooltip text="Count the aligned reads with any of the selected counting methods." />
+                           </tooltip>
                         </CheckBox>
                         <CheckBox fx:id="collect_check" layoutX="14.0" layoutY="379.0" mnemonicParsing="false" prefHeight="67.0" prefWidth="377.0" text="Collect" textFill="WHITE">
                            <font>
@@ -317,8 +358,49 @@
                            <font>
                               <Font size="27.0" />
                            </font>
+                           <tooltip>
+                              <Tooltip text="HTCondor runs GLSeq2 as a DAG file.  " />
+                           </tooltip>
                         </CheckBox>
                      </children></AnchorPane>
+               </content>
+            </Tab>
+            <Tab fx:id="adv_opts" text="Advanced Options">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="tab_pane">
+                     <children>
+                        <Slider fx:id="gtfFeatureColumn" layoutX="14.0" layoutY="70.0" majorTickUnit="1.0" max="20.0" minorTickCount="0" prefHeight="14.0" prefWidth="846.0" showTickMarks="true" value="9.0" />
+                        <Label fx:id="gtf_column_label" layoutX="14.0" layoutY="30.0" text="Your GTF file has 9 columns" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="max_fragment_length_label" layoutX="14.0" layoutY="100.0" text="The maximal fragment length is 1000" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="fragMaxLength" layoutX="14.0" layoutY="140.0" majorTickUnit="100.0" max="5000.0" minorTickCount="0" prefHeight="14.0" prefWidth="846.0" showTickMarks="true" value="1000.0" />
+                        <Slider fx:id="ciMem" blockIncrement="1028.0" layoutX="14.0" layoutY="210.0" majorTickUnit="1028.0" max="12288.0" minorTickCount="0" prefHeight="14.0" prefWidth="838.0" showTickMarks="true" value="4096.0" />
+                        <Label fx:id="max_buffer_label" layoutX="14.0" layoutY="170.0" text="Maximum auxiliary buffer when computing CIs is 4096" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="trim_head_label" layoutX="14.0" layoutY="240.0" text="We are currently trimming 12 bases from the head" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="trimHead" layoutX="14.0" layoutY="280.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="14.0" prefWidth="838.0" showTickMarks="true" value="12.0" />
+                        <Label fx:id="min_read_length_label" layoutX="14.0" layoutY="309.0" text="Reads under 36 bases will be discarded" textFill="WHITE">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="minTrim" layoutX="14.0" layoutY="350.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefWidth="838.0" showTickMarks="true" value="36.0" />
+                     </children>
+                  </AnchorPane>
                </content>
             </Tab>
         </tabs>

@@ -60,6 +60,7 @@ public final class AttributeActions {
    *
    */
   public void setAttributes(File attributeFile) {
+    ArrayList<Attribute> matchedAttributes = new ArrayList<Attribute>();
     Scanner scnr = null;
     try {
       scnr = new Scanner(attributeFile);
@@ -70,7 +71,10 @@ public final class AttributeActions {
         if (temp.contains("<-")) {
           String[] tempArray = temp.split(" <- ");
           try {
+            tempArray[1] = tempArray[1].replace("\"","");
+            tempArray[1] = tempArray[1].replace("\'","");
             Attributes.getInstance().attributesCollection.get(tempArray[0]).setValue(tempArray[1]);
+            matchedAttributes.add(Attributes.getInstance().attributesCollection.get(tempArray[0]));
           } catch (Exception e) {
             // if doesn't map
           }
@@ -79,6 +83,13 @@ public final class AttributeActions {
     } catch (Exception e) {
       System.out.println("Attribute file not found");
     } finally {
+      ArrayList<Attribute> attributeArray = new ArrayList<Attribute>(
+          Attributes.getInstance().attributesCollection.values());
+      for (Attribute attribute : attributeArray) {
+        if (!matchedAttributes.contains(attribute)){
+          attribute.setValue(attribute.getDefault());
+        }
+      }
       // Makes sure to close the scanner
       scnr.close();
       UpdateUI.getInstance().updateDefaults();
@@ -251,7 +262,7 @@ public final class AttributeActions {
     // Special code to make the R script's life easier.
     // Add anything to further process the data here.
     String footer = "# Collect all the counting algos together \n";
-    footer += "cAlgor <- c(HTSeq,RSEM,FeatureCounts,Cufflinks)\n";
+    footer += "cAlgor <- c(HTSeq,RSEM,FeatureCounts,Cufflinks,rockhopperCount)\n";
     footer += "raw.dir <- data.directory\n";
     footer += "readyData.dir <- data.directory\n";
     writer.write(footer);
