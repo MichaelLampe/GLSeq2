@@ -94,6 +94,23 @@ if ("FeatureCounts" %in% cAlgor){
   if (count.comm == "(") count.comm <- paste(script,"&&",move.command)
   count.comm <- paste(count.comm,"&")
 }
+################################################
+#Rockhopper Counting Protocol
+################################################
+if (aAlgor != "Rockhopper"){
+  if ("Rockhopper" %in% cAlgor){
+    if (!occured) {
+      ref.dir <- paste(base.dir, rGenome, sep="")
+      ref.dir <- trailDirCheck(ref.dir)
+      refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
+      printOrExecute(refCopy,Condor)
+    }
+    occured <- TRUE
+    setwd(base.dir)
+    source ("GLSeq.RockhopperCount.R")
+    count.comm <- paste(count.comm,"&")
+  }
+}
 # Close paren
 count.comm <- paste(count.comm,")")
 if (!occured){

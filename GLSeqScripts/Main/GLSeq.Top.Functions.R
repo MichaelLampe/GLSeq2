@@ -240,7 +240,7 @@ rename.preprocessed.files <- function(data.dir,readyData.dir,Condor=FALSE){
 }
 
 # Copying the ready-to-process fastq files to the destination directory:
-copy.preprocessed.files <- function(readyData.dir,dest.dir,Condor=FALSE) {
+copy.preprocessed.files.dir <- function(readyData.dir,dest.dir,Condor=FALSE) {
   if (is.null(readyData.dir) || is.null(dest.dir)) stop("Arguments should not be NULL")
   readyData.dir <- trailDirCheck(readyData.dir)
   dest.dir <- trailDirCheck(dest.dir)
@@ -271,6 +271,25 @@ copy.preprocessed.files <- function(readyData.dir,dest.dir,Condor=FALSE) {
   }
   # Returns command for unit tests
   readyDataCopy
+}
+
+copy.preprocessed.files.list <- function(libList,dest.dir,Condor=FALSE) {
+  fastq.files <- FALSE
+  copy.command <- ""
+  for (i in 1:length(libList)){
+    copy.fastq <- paste("cp",liblist[i],dest.dir)
+    copy.command <- paste(copy.command,copy.fastq,"&")
+    if (grepl(".fastq$",libList[i])){
+      fastq.files <- TRUE
+    }
+  }
+  printOrExecute(copy.command,Condor)
+  # If there are fastq files we will need to rename them
+  if (fastq.files){
+    rename.preprocessed.files(dest.dir,Condor)
+  }
+  # Returns command for unit tests
+  copy.command
 }
 
 # Converts the input list of files into a table that can then be understood by
@@ -324,7 +343,7 @@ convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
       if (grepl(".fastq$",fqfiles[num])){
         # Remove astq
         # Adds a q back to make it a fastq file
-        fq[num] <- substr(fqfiles[num],1,nchar(fqfiles[num]-5))
+        fqfiles[num] <- substr(fqfiles[num],1,nchar(fqfiles[num])-5)
         # Only need to add the q if we take off asta, but this
         # is a more robust solution if we change it to encompass
         # more file types in the future
@@ -338,7 +357,7 @@ convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
 
 # If the data needs to be processed all the way
 # from the compressed archives in the raw directory
-find.files.for.dataprep <- function(raw.dir,unzipped){
+find.files.for.dataprep <- function(raw.dir,unzipped,libList){
   if (is.null(raw.dir) || is.null(unzipped)) stop("Arguments should not be NULL")
   ##############
   # Paired End
@@ -348,16 +367,21 @@ find.files.for.dataprep <- function(raw.dir,unzipped){
     ############ NO UPDATE #################
     ########################################
     # Raw Directory of files supplied
-    gzfiles <- dir(raw.dir)
-    fqfiles <- dir(raw.dir)
+    if(is.null(libList)) {
+      gzfiles <- dir(raw.dir)
+      fqfiles <- dir(raw.dir)
+    } else{
+      gzfiles <- libList
+      fqfiles <- libList
+    }
     if (!unzipped) {
-      gzfiles <- gzfiles[grep(".gz", gzfiles)]
+      gzfiles <- gzfiles[grep(".gz$", gzfiles)]
       if(!presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
       if (presplit) fqfiles.base <- substr(gzfiles, 1,nchar(gzfiles) - 3)
       fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
     }
     if (unzipped) {
-      fqfiles <- fqfiles[grep(".fq|.fastq",fqfiles)]
+      fqfiles <- fqfiles[grep(".fq$|.fastq$",fqfiles)]
       if(!presplit) fqfiles.base <- substr(fqfiles, 1,nchar(fqfiles) - 0)
       if (presplit) fqfiles.base <- substr(fqfiles, 1,nchar(fqfiles) - 0)
       fqfiles.table <- fqfiles.table.pe.assemble(fqfiles.base)
@@ -368,17 +392,20 @@ find.files.for.dataprep <- function(raw.dir,unzipped){
   # Single End
   ##############
   if (!(paired.end))  {
-    gzfiles <- dir(raw.dir)
-    fqfiles <- dir(raw.dir)
-    if (!unzipped){
+    if(is.null(libList)) {
       gzfiles <- dir(raw.dir)
-      gzfiles <- gzfiles[grep(".gz", gzfiles)] # just in case raw.dir has somethig else besides .gz files
+      fqfiles <- dir(raw.dir)
+    } else{
+      gzfiles <- libList
+      fqfiles <- libList
+    }
+    if (!unzipped){
+      gzfiles <- gzfiles[grep(".gz$", gzfiles)] # just in case raw.dir has somethig else besides .gz files
       fqfiles <- substr(gzfiles, 1, nchar(gzfiles)-3)
       fqfiles.table <- cbind(NULL, fqfiles)
     }
     if (unzipped){
-      fqfiles <- dir(raw.dir)
-      fqfiles <- fqfiles[grep(".fq|.fastq", fqfiles)] # just in case raw.dir has somethig else besides .fq or .fastq files
+      fqfiles <- fqfiles[grep(".fq$|.fastq$", fqfiles)] # just in case raw.dir has somethig else besides .fq or .fastq files
       fqfiles <- substr(fqfiles, 1, nchar(fqfiles)-0)
       fqfiles.table <- cbind(NULL, fqfiles)
     }

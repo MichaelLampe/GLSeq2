@@ -26,7 +26,7 @@ public class UpdateUI {
     return instance;
   }
 
-  private Node findById(String id) {
+  public Node findById(String id) {
     if (id == null)
       throw new NullPointerException();
     // CSS way of selecting

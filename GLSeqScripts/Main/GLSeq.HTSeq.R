@@ -20,8 +20,14 @@ countfile <- paste(destDirHTSeqCount,fqfiles.table[i,1],".HTSeq.counts",sep="")
 # initializing strandness option with a non-strand-specific value:
 countOpt <-  "--stranded=no"
 # overwriting countOpt with information on strand-specificity:
-if (libstrand == "R") countOpt <-  "--stranded=reverse"
-if (libstrand == "F") countOpt <-  "--stranded=yes"
+if (!is.null(libstrand)) {
+  if (libstrand == "R") {
+    countOpt <-  "--stranded=reverse"
+  }
+  if (libstrand == "F") {
+    countOpt <-  "--stranded=yes"
+  }
+}
 # selecting ID attribute for counts reporting:
 countOpt <- paste(countOpt, " --idattr=", idAttr, sep="")
 #

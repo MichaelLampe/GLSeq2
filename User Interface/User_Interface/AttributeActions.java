@@ -240,10 +240,10 @@ public final class AttributeActions {
     } else {
       // Custom file name set by the user.
       if (file_location == null) {
-        attributeFile = new File(file_name + date_time + ".R");
+        attributeFile = new File(file_name + ".R");
       } else {
         file_location = checkSlash(file_location);
-        attributeFile = new File(file_location + file_name + date_time + ".R");
+        attributeFile = new File(file_location + file_name + ".R");
       }
     }
     attributeFile.createNewFile();
@@ -285,6 +285,10 @@ public final class AttributeActions {
   }
 
   private String checkValue(String value) {
+    // if list don't add the quotes
+    if (value.startsWith("c(")){
+      return value;
+    }
     switch (value) {
       case "TRUE":
       return value;

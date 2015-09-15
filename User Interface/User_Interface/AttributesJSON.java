@@ -2,10 +2,10 @@ package application;
 
 // This contains the name (Enum name), default values, possible values, and tool tips.
 public enum AttributesJSON {
-  dataDirectory("data.directory",Category.DATA.name, "The location containing the data files."),
+  dataDirectory("data.directory",Category.DATA.name, "The directory containing FASTQ files (either compressed or uncompressed; please select the compression options in the \"Algorithms > Pre-processing\" accordingly)"),
   
-  storageDestination("storage.destination",Category.DATA.name, "The place where the files will be finally stored"),
-  
+  storageDestination("storage.destination",Category.DATA.name, "This should be a parent directory to store the final result long-term (i.e. project folder on a bigdata volume); the actual directory will be a subfolder named after the run ID"),
+  libList("libList",Category.DATA.name,"A list of absolute file paths to run.","NULL"),
   unzipped("unzipped",Category.DATA.name, "\"TRUE\",\"FALSE\"", "TRUE",
       "If the unprocessed data files are zipped (.gz) or not (.fq or .fastq)"), 
   strain("strain",
@@ -16,7 +16,7 @@ public enum AttributesJSON {
       "\"illumina\",\"capillary\", \"ls454\", \"solid\", \"helicos\", \"iontorrent\",\"pacbio\"",
       "illumina", "The sequencing machine that was used"), 
   qualityScores("qScores",Category.DATA.name,
-      "\"phred33\",\"phred64\"", "phread33",
+      "\"phred33\",\"phred64\"", "phred33",
       "How the quality of base identification was calculated"), 
   libStrands("libstrand",Category.DATA.name,
       "\"NULL\",\"F\",\"R\"", "R", "The strandedness of the library"), 
@@ -51,7 +51,7 @@ public enum AttributesJSON {
 
   destinationDirectory("dest.dir.base",
       Category.RUN.name,
-      "The directory where a folder will be created that contains all of the results and materials used in this run."), 
+      "This should be a directory on a fast-access volume (Such as your home directory on the scarcity server system)"), 
   FeatureCounts("FeatureCounts",
       Category.RUN.name, "\"Feature Counts\",\"\"", "",
       "Select to run the Feature Counts counting protocol"), 
@@ -82,7 +82,7 @@ public enum AttributesJSON {
       "  reads during preprocessing. This removes some parts of the sequence prior to alignment."), 
   trimHead("trimhead",
       Category.PREPROCESS.name, "0", "Automatic headcrop for trimmomatic"), 
-  minTrim("minTrim",
+  minTrim("trimMin",
       Category.PREPROCESS.name, "0", "The minimum length of a trimmed read."), 
   artificialFasta("artificial.fq",
       Category.PREPROCESS.name,

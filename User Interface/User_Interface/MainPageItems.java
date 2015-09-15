@@ -15,6 +15,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeView;
 
 class MainPageItems {
   @FXML
@@ -78,6 +79,7 @@ class MainPageItems {
   protected TextArea dataDirectory;
   @FXML
   protected TextArea destinationDirectory;
+
   @FXML
   protected TextArea countableSamDir;
   @FXML
@@ -139,18 +141,18 @@ class MainPageItems {
   protected CheckBox collect_check;
   @FXML
   protected CheckBox htcondor_check;
-  
+
   @FXML
   protected CheckBox RSEM;
   @FXML
-  protected CheckBox HTSeq;
+  protected CheckBox HTseq;
   @FXML
   protected CheckBox FeatureCounts;
   @FXML
   protected CheckBox Cufflinks;
-  @FXML 
+  @FXML
   protected CheckBox rockhopperCount;
-  
+
   @FXML
   protected Button start_run;
 
@@ -172,13 +174,12 @@ class MainPageItems {
   protected RadioButton star;
   @FXML
   protected RadioButton hisat;
-  
-  
+
   @FXML
   protected TabPane tab_check;
   @FXML
-  protected ProgressBar footer_progress; 
-  
+  protected ProgressBar footer_progress;
+
   @FXML
   protected TableView<RunTableEntry> table_runs;
   @FXML
@@ -199,11 +200,49 @@ class MainPageItems {
   @FXML
   protected MenuItem open_att;
   @FXML
+  protected MenuItem template_att;
+  @FXML
   protected MenuItem save_curr;
   @FXML
   protected MenuItem show_hide;
-  
+
   @FXML
   protected Tab adv_opts;
+
+  @FXML
+  protected TextArea run_id;
+
+  @FXML
+  protected TreeView<String> alignmentOptions;
+  @FXML
+  protected TreeView<String> countingOptions;
+
+  @FXML
+  protected RadioButton from_glow;
+  @FXML
+  protected RadioButton indic_man;
+  @FXML
+  protected RadioButton de_novo;
+
+  @FXML
+  protected TextArea genom_ref_id;
+  @FXML
+  protected Button ref_request_glow;
+
+  @FXML
+  protected Button data_request_glow;
+  @FXML
+  protected RadioButton load_glow;
+  @FXML
+  protected RadioButton man_fastq;
+
+  @FXML
+  protected TextArea experiment_id;
+  @FXML
+  protected TreeView<String> selectedDataFiles;
+
+  @FXML
+  protected MenuItem login_menu;
+  @FXML
+  protected MenuItem logout_menu;
 }
-  

@@ -1,7 +1,10 @@
 source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
 # copy genome indices to the destimation dir:
-
+if (seqPlatform != "illumina"){
+  stop("Only illumina platform is supported for Rockhopper currently.")
+}
+#
 rGenome <- trailDirCheck(rGenome)
 ref.dir <- paste(base.dir, rGenome, sep="")
 rGenomeDestination <- paste(dest.dir,"ReferenceGenome",sep="")
@@ -11,6 +14,17 @@ printOrExecute(indCopy,Condor)
 # Small script I wrote that breaks fasta files into individual FNA files in the format that Rockhopper likes.
 convertReferenceGenome <- paste("python",paste(base.dir,"rhFnaConverter.py",sep=""),rGenomeDestination,refFASTAname,dest.dir)
 printOrExecute(convertReferenceGenome,Condor)
+# Creates ptt files from a single gtf file
+ref.dir <- paste(base.dir, rGenome, sep="")
+ref.dir <- trailDirCheck(ref.dir)
+refGtf <- paste(ref.dir,refGFFname,sep="")
+refCopy <- paste("cp ",refGtf," ",dest.dir, sep="")
+printOrExecute(refCopy,Condor)
+gtfToPtt <- paste("python",paste(base.dir,"GtfToPtt.py",sep=""),refGtf,rGenomeDestination)
+printOrExecute(gtfToPtt,Condor)
+# check the environment over.  If a GTF file has 0 transcripts for a certain FASTA sequence, rockhopper will crash if that folder remains.
+checkEnvironment <- paste("python checkRhEnvironment.py",rGenomeDestination)
+printOrExecute(checkEnvironment,Condor)
 # This needs to catch the output doesnt it
 #
 comm.stack.pool <- NULL #
@@ -63,7 +77,30 @@ for (zz in 1:nStreams) {
       rockhopper.files <- paste(dest.dir,fq.left,sep="")
     }
     rockhopper.output.folder <- paste(this.resName,"RockhopperResults/",sep=".")
-    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,rockhopper.output.folder)
+
+    if (paired.end){
+      if (is.null(libstrand)) {
+        strand.command <- "-s false"
+      }
+      else if (libstrand == "F") {
+        strand.command <- "-fr -s true"
+      }
+      else if (libstrand == "R") {
+        strand.command <- "-rf -s true"
+      }
+    } else{
+      if (is.null(libstrand)) {
+        strand.command <- "-s false"
+      }
+      else if (libstrand == "F") {
+        strand.command <- "-c false"
+      }
+      else if (libstrand == "R") {
+        strand.command <- "-c true"
+      }
+    }
+
+    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,rockhopper.output.folder,strand.command)
     countable.sam <- countable.sam.name(this.resName)
     create.countable <- paste("mv",paste(rockhopper.output.folder,"dirty.sam",sep=""),countable.sam)
 

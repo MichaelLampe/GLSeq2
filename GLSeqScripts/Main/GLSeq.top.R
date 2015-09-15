@@ -146,15 +146,22 @@ create.run.logs(destDirLog,text.add)
 # Prepare raw data
 ###########
 if (dataPrepare == "dataprep") {
-  find.files.for.dataprep(raw.dir,unzipped)
+  find.files.for.dataprep(raw.dir,unzipped,libList)
   relative.fqFiles <- run.data.prep(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor)
 }
 
 # Construct alignment + counting comm stack
 if (alignment == "alignment") {
   if (dataPrepare == "nodataprep") {
-    copy.preprocessed.files(readyData.dir,dest.dir,Condor)
-    fqfiles.table <- convert.file.list.to.table(paired.end,readyData.dir,NULL)
+
+    if (is.null(libList)){
+      copy.preprocessed.files.dir(readyData.dir,dest.dir,Condor)
+      fqfiles.table <- convert.file.list.to.table.dir(paired.end,readyData.dir,NULL)
+    } else {
+      copy.preprocessed.files.list(libList,dest.dir,Condor)
+      fqfiles.table <- convert.file.list.to.table.dir(paired.end,NULL,libList)
+    }
+
   }
   if (dataPrepare == "dataprep"){
     fqfiles.table <- convert.file.list.to.table(paired.end,NULL,relative.fqFiles)
@@ -232,3 +239,6 @@ if (resCollect == "collect"){
   data.file <- paste(dest.dir,"ScriptEndStatus.RData",sep="")
   save.image(file=data.file)
 }
+# Creates a memory of a completed run so that the User Interface knows that this run has completed and should not allow any user to overwrite this run.
+run.id.run <- paste(base.dir,paste(expID,"RData",sep="."),sep="")
+save.image(file=run.id.run)

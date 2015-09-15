@@ -46,51 +46,77 @@ check.ifFiles <- function(fqFiles.zip,fqFiles.unzip){
 
 # Gets files that are unzipped.
 # These files have .fq or .fastq extensions
-get.files.unzipped <- function(raw.dir){
-  if (is.null(raw.dir)) stop("Arguments should not be NULL")
-  raw.dir <- trailDirCheck(raw.dir)
-  if (length(unique(raw.dir)) == 1){
-    # Takes either fasta or fq files
-    fqFiles.unzip <- dir(raw.dir[1])[grep(".fq$|.fastq$", dir(raw.dir[1]))]
-  }
+get.files.unzipped <- function(raw.dir,libList){
+  if (is.null(libList)){
+    raw.dir <- trailDirCheck(raw.dir)
+    if (length(unique(raw.dir)) == 1){
+      # Takes either fasta or fq files
+      fqFiles.unzip <- dir(raw.dir[1])[grep(".fq$|.fastq$", dir(raw.dir[1]))]
+    }
+  } else{
+      # Takes either fasta or fq files
+      fqFiles.unzip <- libList[grep(".fq$|.fastq$", libList)]
+    }
   fqFiles.unzip
 }
 
 # Copies all the unzipped files from the raw directory
 # that match the .fq or .fastq extension into the dest.dir folder.
-copy.files.to.dest.unzipped <- function(raw.dir,dest.dir){
-  if (is.null(raw.dir) || is.null(dest.dir)) stop("Arguments should not be NULL")
-  raw.dir <- trailDirCheck(raw.dir)
+copy.files.to.dest.unzipped <- function(raw.dir,dest.dir,libList){
+  if (is.null(dest.dir)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
-  # Copy all relevant file types into the folder.
-  fqFiles <- paste(raw.dir,"*.fq",sep="")
-  fastqFiles <- paste(raw.dir,"*.fastq",sep="")
-  copy <- paste("cp",fqFiles,dest.dir,"; cp",fastqFiles,dest.dir)
+
+  copy <- ""
+  if (is.null(libList)) {
+    raw.dir <- trailDirCheck(raw.dir)
+    # Copy all relevant file types into the folder.
+    fqFiles <- paste(raw.dir,"*.fq",sep="")
+    fastqFiles <- paste(raw.dir,"*.fastq",sep="")
+    copy <- paste("cp",fqFiles,dest.dir,"; cp",fastqFiles,dest.dir)
+  } else {
+    for (i in 1:length(libList)){
+        copy.fastq <- paste("cp",libList[i],dest.dir)
+        copy <- paste(copy,copy.fastq,"&")
+    }
+  }
   printOrExecute(copy,Condor)
   copy
 }
 
 # Copies all the zipped files from the raw directory
 # that match the .gz extension into the dest.dir folder
-copy.files.to.dest.zipped <- function(raw.dir,dest.dir){
-  if (is.null(raw.dir) || is.null(dest.dir)) stop("Arguments should not be NULL")
-  raw.dir <- trailDirCheck(raw.dir)
-  dest.dir <- trailDirCheck(dest.dir)
-  # Copy all relevant file types into the folder
-  gzFiles <- paste(raw.dir,"*.gz",sep="")
-  copy <- paste("cp",gzFiles,dest.dir)
+copy.files.to.dest.zipped <- function(raw.dir,dest.dir,libList){
+  if (is.null(dest.dir)) stop("Arguments should not be NULL")
+
+  copy <- ""
+  if (is.null(libList)){
+    raw.dir <- trailDirCheck(raw.dir)
+    dest.dir <- trailDirCheck(dest.dir)
+    # Copy all relevant file types into the folder
+    gzFiles <- paste(raw.dir,"*.gz",sep="")
+    copy <- paste("cp",gzFiles,dest.dir)
+  } else {
+    for (i in 1:length(libList)){
+      copy.fastq <- paste("cp",libList[i],dest.dir)
+      copy <- paste(copy,copy.fastq,"&")
+    }
+    copy <- paste(copy,"wait")
+  }
   printOrExecute(copy,Condor)
   copy
 }
 
 # Gets a list of all the zipped files
-get.files.zipped <- function(raw.dir){
-  if (is.null(raw.dir)) stop("Arguments should not be NULL")
-  raw.dir <- trailDirCheck(raw.dir)
-  # Gets the zipped files with the compressed extension .gz
-  if (length(unique(raw.dir)) == 1) {
-    fqFiles.zip <- dir(raw.dir[1])[grep(".fq.gz$|.fastq.gz$", dir(raw.dir[1]))]
-  }
+get.files.zipped <- function(raw.dir,libList){
+  if (is.null(libList)){
+    raw.dir <- trailDirCheck(raw.dir)
+    # Gets the zipped files with the compressed extension .gz
+    if (length(unique(raw.dir)) == 1) {
+      fqFiles.zip <- dir(raw.dir[1])[grep(".fq.gz$|.fastq.gz$", dir(raw.dir[1]))]
+    }
+  } else {
+      fqFiles.zip <- libList[grep(".fq.gz$|.fastq.gz$", libList)]
+    }
   fqFiles.zip
 }
 
@@ -110,6 +136,10 @@ prepare.unzipped.file.names <- function(fqFiles.unzip){
 # Removes the .gz extension from zipped files.
 prepare.zipped.file.names <- function(fqFiles.zip){
   if (is.null(fqFiles.zip))  stop("Arguments should not be NULL")
+  for (i in 1:length(fqFiles.zip)) {
+    # Remove any prior absolute file path.
+    fqFiles.zip[i] <- sub(".*/",'', fqFiles.zip[i])
+  }
   # Assumes file is in the format of {name}_#.fq.gz (Presplit) OR {name}.fq.gz (Unsplit)
   # Thus, the file example.1.fq.gz along with its pair of example.2.fq.gz
   # would become example.1.fq and example.2.fq

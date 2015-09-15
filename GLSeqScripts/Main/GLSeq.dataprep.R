@@ -29,22 +29,33 @@ fqFiles.unzip <- NULL
 qcFolder <-  create.QC.folder(dest.dir,text.add)
 
 if (unzipped){
-  fqFiles.unzip <- get.files.unzipped(raw.dir)
+  fqFiles.unzip <- get.files.unzipped(raw.dir,libList)
   fqFiles <- prepare.unzipped.file.names(fqFiles.unzip)
-  copy.files.to.dest.unzipped(raw.dir,dest.dir)
+  copy.files.to.dest.unzipped(raw.dir,dest.dir,fqFiles.unzip)
 }
 if (!unzipped){
-  fqFiles.zip <- get.files.zipped(raw.dir)
+  fqFiles.zip <- get.files.zipped(raw.dir,libList)
   fqFiles <- prepare.zipped.file.names(fqFiles.zip)
-  copy.files.to.dest.zipped(raw.dir,dest.dir)
-  unzip.comm <- NULL
-  for (i in 1:length(fqFiles.zip)){
-    if (is.null(unzip.comm)){
-    unzip.comm <- unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep=""))
-    } else{
-      unzip.comm <- paste(unzip.comm,unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep="")))
+  copy.files.to.dest.zipped(raw.dir,dest.dir,fqFiles.zip)
+  unzip.comm <- ""
+  for (i in 1:length(fqFiles.zip)) {
+    # Just have the file name
+    fqFiles.zip[i] <- sub(".*/",'', fqFiles.zip[i])
+    if (is.null(libList)){
+      if (is.null(unzip.comm)) {
+        unzip.comm <- unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep=""))
+      } else{
+        unzip.comm <- paste(unzip.comm,unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep="")))
+      }
+    } else {
+      if (unzip.comm == "") {
+        unzip.comm <- unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep=""))
+      } else {
+        unzip.comm <- paste(unzip.comm,unzip.gz.files(paste(dest.dir,fqFiles.zip[i],sep="")))
+      }
     }
   }
+  unzip.comm <- paste(unzip.comm,"wait")
   # Parallel Gunzip
   printOrExecute(unzip.comm,Condor)
 }

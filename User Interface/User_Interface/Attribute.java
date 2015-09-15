@@ -10,8 +10,8 @@ class Attribute implements Attributable{
   private String value; 
   
   Attribute(String name,String uiname, String toolTip,String category,String defaultValue){
-    this.uiname = uiname;
     this.name = name;
+    this.uiname = uiname;
     this.toolTip = toolTip;
     this.category = category;
     this.defaultValue = defaultValue;
