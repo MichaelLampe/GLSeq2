@@ -292,8 +292,8 @@ file.shuffle.PE <- function(fqFile){
   second.read.file <- second.read.name(fqFile)
   leftDirtyFname <- left.dirty.name(fqFile)
   rightDirtyFname <- right.dirty.name(fqFile)
-  pairedTrimmed.1 <-  paste(fqFile,".1.fq.p.fq", sep="")
-  pairedTrimmed.2 <- paste(fqFile,".2.fq.p.fq", sep="")
+  pairedTrimmed.1 <-  paste(fqFile,".1.p.fq", sep="")
+  pairedTrimmed.2 <- paste(fqFile,".2.p.fq", sep="")
   #
   fileShuffle <- paste("mv", first.read.file, leftDirtyFname, "&&", "mv", second.read.file, rightDirtyFname, "&&", "mv", pairedTrimmed.1, first.read.file, "&&", "mv", pairedTrimmed.2, second.read.file)
   #
@@ -314,23 +314,33 @@ split.unsplit.files.PE <- function(base.dir,fqFile){
 }
 
 # Calls the Fastqc quality check on the initial files.
-preQualityCheck.PE <- function(fastqcPath, fqFile,qcFolder){
+preQualityCheck.PE <- function(fastqcPath, fqFile,qcFolder,first){
   if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
   qcFolder <- trailDirCheck(qcFolder)
   fqFile <- get.file.base(fqFile)
   leftDirtyFname <- left.dirty.name(fqFile)
   rightDirtyFname <- right.dirty.name(fqFile)
+  # The first param was added as parallelizing the QC too much can cause crashes.
+  if (first){
   preQC <- paste(fastqcPath,"-o",qcFolder,leftDirtyFname, rightDirtyFname)
+  } else{
+    preQC <- paste(leftDirtyFname, rightDirtyFname)
+  }
   preQC
 }
 # Calls the Fastqc quality check on the produced files.
-postQualityCheck.PE <- function(fastqcPath,fqFile,qcFolder){
+postQualityCheck.PE <- function(fastqcPath,fqFile,qcFolder,first){
   if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
   qcFolder <- trailDirCheck(qcFolder)
   fqFile <- get.file.base(fqFile)
   first.read.filename <- first.read.name(fqFile)
   second.read.filename <- second.read.name(fqFile)
-  postQC <- paste(fastqcPath,"-o",qcFolder, first.read.filename, second.read.filename)
+  # The first param was added as parallelizing the QC too much can cause crashes.
+  if (first){
+    postQC <- paste(fastqcPath,"-o",qcFolder, first.read.filename, second.read.filename)
+  } else{
+    postQC <- paste(first.read.filename, second.read.filename)
+  }
   postQC
 }
 
@@ -397,33 +407,43 @@ trimAssemble.SE <- function(fqFile, trimPath, qScore, headcrop=12, artificial.fq
 # Renames it so that the final resulting file has the same name as the original.
 file.shuffle.SE <- function(fqFile){
   if (is.null(fqFile)) stop("Arguments should not be NULL")
+  initial.name <- fqFile
   fqFile <- get.file.base(fqFile)
-  dirty.name <- dirty.name.SE(fqFile)
   final.name <- final.name.SE(fqFile)
+  dirty.name <- dirty.name.SE(fqFile)
   trimmed.name <- paste(fqFile,".p.fq",sep="")
   #
   # Move the original file and call it the dirty file
   # Also move the trimmed file and then call it the original final name so that it is the cleanest
-  fileShuffle <- paste("mv", final.name, dirty.name, " && ",  "mv", trimmed.name, final.name)
+  fileShuffle <- paste("mv", initial.name , dirty.name, " && ",  "mv", trimmed.name, final.name)
   #
   fileShuffle
 }
+
 # Quality checks the initial file
-preQualityCheck.SE <- function(fastqcPath, fqFile,qcFolder){
+preQualityCheck.SE <- function(fastqcPath, fqFile,qcFolder,first){
   if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
   qcFolder <- trailDirCheck(qcFolder)
   fqFile <- get.file.base(fqFile)
   dirty.name <- dirty.name.SE(fqFile)
-  preQC <- paste(fastqcPath,"-o",qcFolder,dirty.name)
+  if (first){
+    preQC <- paste(fastqcPath,"-o",qcFolder,dirty.name)
+  } else{
+    preQC <- dirty.name
+  }
   preQC
 }
 # Quality checks the resulting file.
-postQualityCheck.SE <- function(fastqcPath,fqFile,qcFolder){
+postQualityCheck.SE <- function(fastqcPath,fqFile,qcFolder,first){
   if (is.null(fastqcPath) || is.null(fqFile) || is.null(qcFolder)) stop("Arguments should not be NULL")
   qcFolder <- trailDirCheck(qcFolder)
   fqFile <- get.file.base(fqFile)
   final.name <- final.name.SE(fqFile)
+  if (first){
   postQC <- paste(fastqcPath,"-o",qcFolder,final.name)
+  } else{
+    postQC <- final.name
+  }
   postQC
 }
 # Removes all the unneeded files.

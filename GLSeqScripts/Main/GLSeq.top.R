@@ -186,10 +186,6 @@ if (alignment == "noalignment") {
   }
 }
 
-if (!is.null(comm.stack.pool)){
-  execute.comm.stack(comm.stack.pool,Condor)
-}
-
 # Collect results.  We can't really source this, as that doesn't match our data state.
 # We have to know what to collect before we have it to collect or we can just call the function
 # At the time when it is ready with the correct variables by saving the current environment
@@ -234,10 +230,20 @@ if (resCollect == "collect"){
     # Currently disabled
     #collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
   }
-  if (collect.command != "") printOrExecute(collect.command,Condor)
+  if (collect.script != ""){
+    if (is.null(comm.stack.pool)){
+      comm.stack.pool <- paste(collect.command)
+    } else{
+      comm.stack.pool <- paste(comm.stack.pool,"&&",paste("(",collect.command,")",sep=""))
+    }
+  }
 } else{
   data.file <- paste(dest.dir,"ScriptEndStatus.RData",sep="")
   save.image(file=data.file)
+}
+
+if (!is.null(comm.stack.pool)){
+  execute.comm.stack(comm.stack.pool,Condor)
 }
 # Creates a memory of a completed run so that the User Interface knows that this run has completed and should not allow any user to overwrite this run.
 run.id.run <- paste(base.dir,paste(expID,"RData",sep="."),sep="")

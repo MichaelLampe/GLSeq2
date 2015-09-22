@@ -129,4 +129,4 @@ for (zz in 1:nStreams) {
     comm.stack.pool <- paste(comm.stack.pool,comm.stack.pools,"&")
   }
 }
-comm.stack.pool <- paste(comm.stack.pool,"wait")
+comm.stack.pool <- paste(comm.stack.pools,"wait")

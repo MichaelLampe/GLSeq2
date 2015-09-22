@@ -299,10 +299,10 @@ copy.preprocessed.files.list <- function(libList,dest.dir,Condor=FALSE) {
 convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
   if (is.null(paired.end)) stop("Arguments should not be NULL")
   # Paired End
+  if (!is.null(readyData.dir)){
+    fqfiles <- dir(readyData.dir)
+  }
   if (paired.end) {
-    if (!is.null(readyData.dir)){
-      fqfiles <- dir(readyData.dir)
-    }
     fqfiles <- fqfiles[grep(".fq$|.fastq$", fqfiles)]
     for (num in 1:length(fqfiles)){
       # Fastq is longer than fq
@@ -334,9 +334,6 @@ convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
   }
   # Single End
   if (!(paired.end)) {
-    if (!is.null(readyData.dir)){
-      fqfiles <- dir(readyData.dir)
-    }
     fqfiles <- fqfiles[grep(".fq$|.fastq$", fqfiles)]
     # Fixing the fastq files so they will match when it matters
     for (num in 1:length(fqfiles)){

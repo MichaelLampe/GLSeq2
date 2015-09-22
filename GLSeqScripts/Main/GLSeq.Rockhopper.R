@@ -5,6 +5,7 @@ if (seqPlatform != "illumina"){
   stop("Only illumina platform is supported for Rockhopper currently.")
 }
 #
+
 rGenome <- trailDirCheck(rGenome)
 ref.dir <- paste(base.dir, rGenome, sep="")
 rGenomeDestination <- paste(dest.dir,"ReferenceGenome",sep="")
@@ -35,6 +36,8 @@ for (zz in 1:nStreams) {
   comm.stack.pool <- NULL
   # assembly and runing the system command, one library at a time:
   for (i in rangelist[[zz]]) {
+    print("FQ FILES")
+    print(fqfiles.table[i,1])
     ###################
     # Alignment with SAM output
     ###################
@@ -129,4 +132,4 @@ for (zz in 1:nStreams) {
 }
 
 # This just retains the consistency of the program
-comm.stack.pool <- comm.stack.pools
+comm.stack.pool <- paste(comm.stack.pools,"wait")
