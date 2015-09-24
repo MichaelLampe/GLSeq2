@@ -2,7 +2,7 @@ package application;
 
 // This contains the name (Enum name), default values, possible values, and tool tips.
 public enum AttributesJSON {
-  dataDirectory("data.directory",Category.DATA.name, "The directory containing FASTQ files (either compressed or uncompressed; please select the compression options in the \"Algorithms > Pre-processing\" accordingly)"),
+  dataDirectory("data.directory",Category.DATA.name, "The directory containing FASTQ files (either compressed or uncompressed; please select the compression options in the \'Algorithms > Pre-processing\' accordingly)"),
   
   storageDestination("storage.destination",Category.DATA.name, "This should be a parent directory to store the final result long-term (i.e. project folder on a bigdata volume); the actual directory will be a subfolder named after the run ID"),
   libList("libList",Category.DATA.name,"A list of absolute file paths to run.","NULL"),
