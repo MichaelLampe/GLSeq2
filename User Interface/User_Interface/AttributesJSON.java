@@ -176,5 +176,6 @@ public enum AttributesJSON {
     this.options = options;
     this.defaultVal = defaultVal;
     this.description = description;
-  }
+  } 
+  
 }

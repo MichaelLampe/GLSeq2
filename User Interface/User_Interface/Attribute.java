@@ -8,14 +8,28 @@ class Attribute implements Attributable{
   private final String category;
   private final String defaultValue;
   private String value; 
+  private final String[] options;
   
-  Attribute(String name,String uiname, String toolTip,String category,String defaultValue){
+  Attribute(String name,String uiname, String toolTip,String category,String defaultValue, String options){
     this.name = name;
     this.uiname = uiname;
     this.toolTip = toolTip;
     this.category = category;
     this.defaultValue = defaultValue;
+    
+    // Parse options
+    if (options != null) {
+    	this.options = options.split(",");
+    } else{
+    	this.options = null;
+    }
+    
   }
+  
+  public String[] getOptions(){
+	  return options;
+  }
+  
   public String getCategory(){
     return category;
   }

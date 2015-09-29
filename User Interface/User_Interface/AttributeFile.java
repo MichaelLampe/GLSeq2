@@ -20,7 +20,7 @@ public class AttributeFile {
    * that field. Note: There is currently very little validation that goes on
    * here, as all the params are strings. May look into this in the future.
    */
-  private static void generateAttributeFile(String[] args) {
+  public static String generateAttributeFile(String[] args) {
     try {
       String file_name = null;
       String file_location = null;
@@ -41,9 +41,12 @@ public class AttributeFile {
       }
       System.out
           .println("ATTIRUBTE_FILE_PATH=" + att.writeAttributesFile(file_name, file_location));
+      
+      return file_location;
     } catch (IOException e) {
       System.out
           .println("Error constructing attribute file. Likely unable to create attribute file where the JAR file exists.");
     }
+    return null;
   }
 }
