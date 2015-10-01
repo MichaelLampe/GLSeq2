@@ -119,6 +119,8 @@ public class GlowRequest extends Task<Object> {
     return pingGlow();
   }
 
+  /*
+   * FUTURE
   private void upsertExperiment() {
     // TO DO
   }
@@ -126,6 +128,7 @@ public class GlowRequest extends Task<Object> {
   private void runCommand(String command) {
     // Process builder
   }
+  */
 
   public void logout() {
     removeCookie();

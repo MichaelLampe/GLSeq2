@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -23,10 +24,12 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -51,6 +54,7 @@ public final class MainPageController extends MainPageItems implements Initializ
 	public static final ToggleGroup group = new ToggleGroup();
 	private static final ToggleGroup referenceGroup = new ToggleGroup();
 	private static final ToggleGroup fastqFiles = new ToggleGroup();
+	private static final ToggleGroup samGroup = new ToggleGroup();
 
 	// The head tree items of both of alignment and counting for advanced
 	// options
@@ -75,6 +79,9 @@ public final class MainPageController extends MainPageItems implements Initializ
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 
+		addListeners();
+		constructRadioButtons();
+
 		setupComboBoxes();
 
 		setupStartRun();
@@ -84,8 +91,6 @@ public final class MainPageController extends MainPageItems implements Initializ
 		progressBarListener();
 
 		runBindings();
-		directoryWriteListener();
-		directoryExistsListener();
 		menuListeners();
 
 		appendTooltips();
@@ -93,269 +98,142 @@ public final class MainPageController extends MainPageItems implements Initializ
 		alignAndCountingOptions();
 
 		fileSelectTree();
-		// Radio button grouping
-		radioButtonGroup();
-		fastqOptions();
-		referenceOptions();
 	}
 
-	/*
-	 * Assigns a document write listener. This just checks if a given
-	 * destination is writable by the user.
-	 * 
-	 */
-	private void directoryWriteListener() {
-
-		isWritableDestination(storageDestination);
-		isWritableDestination(destinationDirectory);
-	}
-
-	/*
-	 * Checks if a given directory exists and changes the color with respect to
-	 * that.
-	 */
-	private void directoryExistsListener() {
-		doesLocationExist(scriptDirectory);
-		doesLocationExist(trimPath);
-		doesLocationExist(fastqcPath);
-		doesLocationExist(picardToolsPath);
-		doesLocationExist(bwaPath);
-		doesLocationExist(bam2wigPath);
-		doesLocationExist(rockhopperPath);
-		doesLocationExist(cushawGpuPath);
-		doesLocationExist(topHatPath);
-		doesLocationExist(cushawPath);
-		doesLocationExist(cushawIndexPath);
-		doesLocationExist(hisatPath);
-		doesLocationExist(starPath);
-	}
-
-	/*
-	 * Adds a listener that checks, when the text in the field changes, if it is
-	 * writable.
-	 */
-	private void isWritableDestination(TextArea destDir) {
-		destDir.textProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-				File dest = new File(destDir.getText());
-				// Red if it can't be written to.
-				String color = "red";
-				if (dest.canWrite()) {
-					// If you can write to, makes it green.
-					color = "green";
-				}
-
-				// Just a nice little border
-				destDir.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
-			}
+	private void constructRadioButtons() {
+		// Setup the alignment button group
+		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw, Cushaw_Gpu, TopHat, Rockhopper, star, hisat,
+				BWA };
+		List<RadioButton> alignmentGroup = Arrays.asList(tempAlignmentGroup);
+		alignmentGroup.forEach((radioButton) -> {
+			radioButton.setToggleGroup(group);
 		});
-	}
+		alignmentGroup.get(0).setSelected(true);
+		toggleCountingDep(group);
 
-	/*
-	 * Adds a listener that checks if the given file location actually exists.
-	 */
-	private void doesLocationExist(TextArea location) {
-		location.textProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-				File dest = new File(location.getText());
-				// Red if doesn't exist
-				String color = "red";
-				if (dest.exists()) {
-					// If exists, make it green
-					color = "green";
-				}
-
-				// This is just a nice little border.
-				location.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
-			}
+		// Setup the type of run button group
+		RadioButton[] tempTypeOfRun = { indic_man, from_glow, de_novo };
+		List<RadioButton> typeOfRun = Arrays.asList(tempTypeOfRun);
+		typeOfRun.forEach((radioButton) -> {
+			radioButton.setToggleGroup(referenceGroup);
 		});
-	}
+		typeOfRun.get(0).setSelected(true);
 
-	/*
-	 * Toggle group for the reference page loading from a reference id
-	 */
-	private void referenceOptions() {
-		// THe request is null when no one is logged into GLOW. Thus, we should
-		// ask the user to login to the button.
-		if (request == null)
-			ref_request_glow.setText(LOGIN_GLOW);
-		// Add each RadioButton to the group
-		from_glow.setToggleGroup(referenceGroup);
-		indic_man.setToggleGroup(referenceGroup);
-		de_novo.setToggleGroup(referenceGroup);
-		indic_man.setSelected(true);
+		// Sam File Choice
+		RadioButton[] tempSamSource = { man_sam, load_prev };
+		List<RadioButton> samSource = Arrays.asList(tempSamSource);
+		samSource.forEach((radioButton) -> {
+			radioButton.setToggleGroup(samGroup);
+		});
+		samSource.get(0).setSelected(true);
 
 		// Bind the GLOW button so that it is only enabled when GLOW is
 		// selected.
+		if (request == null) {
+			ref_request_glow.setText(LOGIN_GLOW);
+			data_request_glow.setText(LOGIN_GLOW);
+		}
+
 		ref_request_glow.disableProperty()
 				.bind(Bindings.when(from_glow.selectedProperty()).then(false).otherwise(true));
-
-		ref_request_glow.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				if (request == null) {
-					// Log the user in and change the button name
-					createLoginDialog();
-				} else {
-					Task<Object> refReq = new GlowReferenceRequest(request, genom_ref_id.getText());
-					// Run on a different thread so it doesn't lock up the UI.
-					new Thread(refReq).start();
-				}
-			}
-		});
-
-	}
-
-	/*
-	 * Toggle group for data page load data location from GLOW id
-	 */
-	private void fastqOptions() {
-		if (request == null)
-			data_request_glow.setText(LOGIN_GLOW);
-
-		// Add each Radiobutton to the group
-		load_glow.setToggleGroup(fastqFiles);
-		man_fastq.setToggleGroup(fastqFiles);
-		man_fastq.setSelected(true);
-
-		// Bind the GLOW button so that it is only enabled when GLOW is
-		// selected.
-		// Same with the experiment ID request
 		data_request_glow.disableProperty()
 				.bind(Bindings.when(load_glow.selectedProperty()).then(false).otherwise(true));
 		experiment_id.disableProperty().bind(Bindings.when(load_glow.selectedProperty()).then(false).otherwise(true));
-		/*
-		 * When the request button is selected we check if the user is logged in
-		 * (There is a request object).
-		 * 
-		 * If the user is logged in we process the request to GLOW
-		 * 
-		 * Otherwise we prompt the user to login and then process the request
-		 * after successful credential verification
-		 */
-		data_request_glow.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent arg0) {
-				if (request == null) {
-					// Log the user in and change the button name
-					createLoginDialog();
-				} else {
-					Task<Object> dataReq = new GlowDataRequest(request, experiment_id.getText());
-					// Run on a different thread so it doesn't lock up the UI.
-					new Thread(dataReq).start();
-				}
+
+		// Setup where to get the data from
+		RadioButton[] tempGlow = { man_fastq, load_glow };
+		List<RadioButton> glow = Arrays.asList(tempGlow);
+		glow.forEach((radioButton) -> {
+			radioButton.setToggleGroup(fastqFiles);
+		});
+		glow.get(0).setSelected(true);
+
+		// If you add more items here, you need to add more cases for
+		// "requestFor"
+		// in the lambda function below
+		Button[] tempButtonAction = { ref_request_glow, data_request_glow };
+		List<Button> buttonAction = Arrays.asList(tempButtonAction);
+		buttonAction.parallelStream().forEach((button) -> {
+			// Make sure this has a TextArea assigned to it!
+			final TextArea requestFor;
+			if (button.equals(ref_request_glow)) {
+				requestFor = genom_ref_id;
+			} else if (button.equals(data_request_glow)) {
+				requestFor = experiment_id;
+			} else {
+				// Only would get here if more items are added above.
+				requestFor = null;
 			}
+
+			button.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent arg0) {
+					if (request == null) {
+						// Log the user in and change the button name
+						createLoginDialog();
+					} else {
+						Task<Object> refReq = new GlowReferenceRequest(request, requestFor.getText());
+						// Run on a different thread so it doesn't lock up the
+						// UI.
+						new Thread(refReq).start();
+					}
+				}
+			});
 		});
 	}
 
-	/*
-	 * Creates a login dialog
-	 */
-	private void createLoginDialog() {
-		// Creates a new dialog which is just a popup
-		Dialog<Pair<String, String>> login = new Dialog<>();
-		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
-		login.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-		login.setTitle("Login Dialog");
-		login.setHeaderText("GLOW Login");
+	private void addListeners() {
+		/*
+		 * Creates a list of all the directories that need to be checked to see
+		 * if they exist as the user types in the directory. Then iterates over
+		 * the list in parallel and adds a listener.
+		 */
+		TextArea[] tempDirectoriesMayExist = { scriptDirectory, trimPath, fastqcPath, picardToolsPath, bwaPath,
+				bam2wigPath, rockhopperPath, cushawGpuPath, topHatPath, cushawPath, cushawIndexPath, hisatPath,
+				starPath };
+		List<TextArea> directoriesMayExist = Arrays.asList(tempDirectoriesMayExist);
 
-		// Layout from: http://code.makery.ch/blog/javafx-dialogs-official/
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(20, 150, 10, 10));
-
-		TextField username = new TextField();
-		username.setPromptText("GLOW Username");
-		PasswordField password = new PasswordField();
-		password.setPromptText("GLOW Password");
-
-		grid.add(new Label("GLOW Username:"), 0, 0);
-		grid.add(username, 1, 0);
-		grid.add(new Label("GLOW Password:"), 0, 1);
-		grid.add(password, 1, 1);
-
-		// Add everything to the dialog page
-		login.getDialogPane().setContent(grid);
-
-		// This returns the username and password as a pair so we can return
-		// both
-		// easily.
-		login.setResultConverter(dialogButton -> {
-			if (dialogButton == loginButtonType) {
-				return new Pair<>(username.getText(), password.getText());
-			}
-			return null;
+		directoriesMayExist.parallelStream().forEach((fileName) -> {
+			fileName.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+					File dest = new File(fileName.getText());
+					// Red if it can't be written to.
+					String color = "red";
+					if (dest.canWrite()) {
+						// If you can write to, makes it green.
+						color = "green";
+					}
+					// Just a nice little border
+					fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
+				}
+			});
 		});
 
-		login.show();
+		/*
+		 * Creates a list of all directories that need to be checked if they are
+		 * writable. Then iterates over the list in parallel and adds a
+		 * listener.
+		 */
+		TextArea[] tempDirectoryMayBeWritable = { storageDestination, destinationDirectory };
+		List<TextArea> directoryMayBeWritable = Arrays.asList(tempDirectoryMayBeWritable);
 
-		// The login button
-		Button login_button = (Button) login.getDialogPane().lookupButton(loginButtonType);
-
-		// Login listener
-		login_button.addEventFilter(EventType.ROOT, e -> {
-			if (e.getEventType().equals(ActionEvent.ACTION)) {
-				e.consume();
-				GlowRequest req = new GlowRequest(username.getText(), password.getText());
-				if (req.requestCookie()) {
-
-					// Login worked, assign it as the current login session
-					request = req;
-					Task<Object> t = request;
-					// Pings the server to verify connection
-					new Thread(t).start();
-
-					// Give a visual clue at the top of the UI that they are
-					// currently
-					// logged into the server. They are actually never really
-					// "logged in",
-					// we just keep using their initial credentials to send
-					// further
-					// requests and automatically renew the credentials as
-					// necessary.
-					Main.stage.setTitle(
-							"|   GLSeq2 User Interface   -  Currently logged in as " + username.getText() + "   |");
-
-					/*
-					 * If the user has logged in and not entered a destination
-					 * directory, we'll just auto-populate this as being the
-					 * base of their own directory
-					 */
-					data_request_glow.setText(REQUEST_GLOW);
-					ref_request_glow.setText(REQUEST_GLOW);
-					if (destinationDirectory.getText() == "") {
-						destinationDirectory.setText("/home/GLBRCORG/" + username.getText());
+		directoryMayBeWritable.parallelStream().forEach((fileName) -> {
+			fileName.textProperty().addListener(new ChangeListener<String>() {
+				@Override
+				public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
+					File dest = new File(fileName.getText());
+					// Red if it can't be written to.
+					String color = "red";
+					if (dest.canWrite()) {
+						// If you can write to, makes it green.
+						color = "green";
 					}
 
-					// Close the dialog as it's job is now complete
-					login.close();
-
-					// If the login failed
-				} else {
-					// http://stackoverflow.com/questions/29911552/how-to-shake-a-login-dialog-in-javafx-8
-					try {
-						/*
-						 * Do a little shake animation. Also clears both the
-						 * fields and adds a red border around them to further
-						 * indicate that their credentials were wrong.
-						 */
-						ShakeTransition anim = new ShakeTransition(login.getDialogPane(), null);
-						username.setText("");
-						username.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
-						password.setText("");
-						password.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
-						anim.playFromStart();
-					} catch (Exception a) {
-						// Do nothing
-						// Exceptions could be caused because of the null passed
-						// into the
-						// animation and this just removes the stack traces
-					}
+					// Just a nice little border
+					fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
 				}
-			}
+			});
 		});
 
 	}
@@ -391,28 +269,23 @@ public final class MainPageController extends MainPageItems implements Initializ
 
 	private void alignAndCountingOptions() {
 		constructOptionsMap();
-
 		/*
 		 * Sets up the radio button and check mark listeners for when different
 		 * options are selected.
 		 */
 		addAlignmentAndCountingListeners();
-
 		/*
 		 * The head of the alignment tree
 		 */
 		alignment = new TreeItem<String>("Alignment");
 		alignmentOptions.setRoot(alignment);
-
 		// This is just the "alignment" option we see at the head of the field.
 		alignmentOptions.setShowRoot(true);
-
 		/*
 		 * The head of the counting tree
 		 */
 		counting = new TreeItem<String>("Counting");
 		countingOptions.setRoot(counting);
-
 		countingOptions.setShowRoot(true);
 	}
 
@@ -425,182 +298,48 @@ public final class MainPageController extends MainPageItems implements Initializ
 	 * Result: A dynamic and responsive tree view to edit advanced options.
 	 */
 	private void addAlignmentAndCountingListeners() {
-		Bowtie.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (Bowtie.isSelected()) {
-					addTreeOption(Bowtie.getText());
-				} else {
-					removeTreeOption(Bowtie.getText());
+		// Alignment RadioButton
+		RadioButton[] tempModifyAlignOptions = { Bowtie, Bowtie2, Cushaw, BWA, Cushaw_Gpu, TopHat, star, hisat,
+				Rockhopper };
+		List<RadioButton> modifyAlignOptions = Arrays.asList(tempModifyAlignOptions);
+
+		modifyAlignOptions.parallelStream().forEach((radioButton) -> {
+			radioButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+					if (radioButton.isSelected()) {
+						// Rockhopper is special because it is both alignment
+						// and counting.
+						alignment.getChildren().clear();
+						alignment.getChildren().add(alignOptions.get(radioButton.getText()));
+						if (!radioButton.getText().equals(Bowtie.getText())) {
+							if (!radioButton.getText().equals(Bowtie2.getText())) {
+								alignment.getChildren().remove(alignOptions.get("RSEM"));
+							}
+						}
+					} else {
+						alignment.getChildren().remove(alignOptions.get(radioButton.getText()));
+					}
 				}
-			}
-		});
-		Bowtie2.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (Bowtie2.isSelected()) {
-					addTreeOption(Bowtie2.getText());
-				} else {
-					removeTreeOption(Bowtie2.getText());
-				}
-			}
-		});
-		Cushaw.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (Cushaw.isSelected()) {
-					addTreeOption(Cushaw.getText());
-				} else {
-					removeTreeOption(Cushaw.getText());
-				}
-			}
-		});
-		BWA.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (BWA.isSelected()) {
-					addTreeOption(BWA.getText());
-				} else {
-					removeTreeOption(BWA.getText());
-				}
-			}
-		});
-		Cushaw_Gpu.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (Cushaw_Gpu.isSelected()) {
-					addTreeOption(Cushaw_Gpu.getText());
-				} else {
-					removeTreeOption(Cushaw_Gpu.getText());
-				}
-			}
-		});
-		TopHat.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (TopHat.isSelected()) {
-					addTreeOption(TopHat.getText());
-				} else {
-					removeTreeOption(TopHat.getText());
-				}
-			}
-		});
-		Rockhopper.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (Rockhopper.isSelected()) {
-					addTreeOption("RockhopperAlign");
-				} else {
-					removeTreeOption("RockhopperAlign");
-				}
-			}
-		});
-		star.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (star.isSelected()) {
-					addTreeOption(star.getText());
-				} else {
-					removeTreeOption(star.getText());
-				}
-			}
-		});
-		hisat.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (hisat.isSelected()) {
-					addTreeOption(hisat.getText());
-				} else {
-					removeTreeOption(hisat.getText());
-				}
-			}
+			});
 		});
 
-		// Counting
+		// Counting CheckBoxes
+		CheckBox[] tempModifyCountOptions = { RSEM, HTseq, FeatureCounts, Cufflinks, rockhopperCount };
+		List<CheckBox> modifyCountOptions = Arrays.asList(tempModifyCountOptions);
 
-		RSEM.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (RSEM.isSelected()) {
-					addTreeOption(RSEM.getText());
-				} else {
-					removeTreeOption(RSEM.getText());
+		modifyCountOptions.parallelStream().forEach((checkBox) -> {
+			checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+					if (checkBox.isSelected()) {
+						counting.getChildren().add(countOptions.get(checkBox.getText()));
+					} else {
+						counting.getChildren().remove(countOptions.get(checkBox.getText()));
+					}
 				}
-			}
+			});
 		});
-		HTseq.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (HTseq.isSelected()) {
-					addTreeOption(HTseq.getText());
-				} else {
-					removeTreeOption(HTseq.getText());
-				}
-			}
-		});
-		FeatureCounts.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (FeatureCounts.isSelected()) {
-					addTreeOption(FeatureCounts.getText());
-				} else {
-					removeTreeOption(FeatureCounts.getText());
-				}
-			}
-		});
-		Cufflinks.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (Cufflinks.isSelected()) {
-					addTreeOption(Cufflinks.getText());
-				} else {
-					removeTreeOption(Cufflinks.getText());
-				}
-			}
-		});
-		rockhopperCount.selectedProperty().addListener(new ChangeListener<Boolean>() {
-			@Override
-			public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-				if (rockhopperCount.isSelected()) {
-					addTreeOption("RockhopperCount");
-				} else {
-					removeTreeOption("RockhopperCount");
-				}
-			}
-		});
-	}
-
-	/*
-	 * METHOD
-	 * 
-	 * Goal: Add options to the tree, while properly understanding which list it
-	 * should be added to and covering any special cases that are expected
-	 */
-	private void addTreeOption(String protocol) {
-		// Alignment
-		if (alignOptions.containsKey(protocol)) {
-			alignment.getChildren().clear();
-			alignment.getChildren().add(alignOptions.get(protocol));
-			if (!protocol.equals(Bowtie.getText())) {
-				if (!protocol.equals(Bowtie2.getText())) {
-					removeTreeOption("RSEM");
-				}
-			}
-		}
-		// Counting
-		if (countOptions.containsKey(protocol)) {
-			counting.getChildren().add(countOptions.get(protocol));
-		}
-	}
-
-	private void removeTreeOption(String protocol) {
-		if (alignOptions.containsKey(protocol)) {
-			alignment.getChildren().remove(alignOptions.get(protocol));
-		}
-		// Counting
-		if (countOptions.containsKey(protocol)) {
-			counting.getChildren().remove(countOptions.get(protocol));
-		}
 	}
 
 	/*
@@ -617,14 +356,14 @@ public final class MainPageController extends MainPageItems implements Initializ
 		alignOptions.put("Cushaw", new TreeItem<String>("Cushaw"));
 		alignOptions.put("Cushaw_GPU", new TreeItem<String>("Cushaw_GPU"));
 		alignOptions.put("HISAT", new TreeItem<String>("HISAT"));
-		alignOptions.put("RockhopperAlign", new TreeItem<String>("Rockhopper"));
+		alignOptions.put("Rockhopper", new TreeItem<String>("Rockhopper"));
 		alignOptions.put("STAR", new TreeItem<String>("STAR"));
 		alignOptions.put("TopHat", new TreeItem<String>("TopHat"));
 		// Counting
 		countOptions.put("Cufflinks", new TreeItem<String>("Cufflinks"));
 		countOptions.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
 		countOptions.put("HTSeq", new TreeItem<String>("HTSeq"));
-		countOptions.put("RockhopperCount", new TreeItem<String>("Rockhopper"));
+		countOptions.put("Rockhopper", new TreeItem<String>("Rockhopper"));
 		countOptions.put("RSEM", new TreeItem<String>("RSEM"));
 	}
 
@@ -675,10 +414,6 @@ public final class MainPageController extends MainPageItems implements Initializ
 		Tooltip presplitToolTip = new Tooltip(
 				"For paired-end libraries, data is split into left- and right-read FASTQ files for each library (if not, splitting at the pre-processing stage may be needed).");
 		presplit.setTooltip(presplitToolTip);
-
-		// Reference tab tooltips
-
-		// Algorithms tab tooltips
 
 	}
 
@@ -953,24 +688,6 @@ public final class MainPageController extends MainPageItems implements Initializ
 		return new Run(data_prep, alignment, counting, collect, run_name.getText());
 	}
 
-	/*
-	 * Alignment radio buttons need to be grouped into toggle groups to allow
-	 * only one selection. They are put into one of those here.
-	 */
-	private void radioButtonGroup() {
-		BWA.setToggleGroup(group);
-		Bowtie.setToggleGroup(group);
-		Bowtie2.setToggleGroup(group);
-		Cushaw.setToggleGroup(group);
-		Cushaw_Gpu.setToggleGroup(group);
-		TopHat.setToggleGroup(group);
-		Rockhopper.setToggleGroup(group);
-		star.setToggleGroup(group);
-		hisat.setToggleGroup(group);
-		BWA.setSelected(true);
-		toggleCountingDep(group);
-	}
-
 	private void toggleCountingDep(ToggleGroup group) {
 		RSEM.disableProperty().bind(
 				Bindings.when(Bowtie.selectedProperty().or(Bowtie2.selectedProperty())).then(false).otherwise(true));
@@ -1111,6 +828,115 @@ public final class MainPageController extends MainPageItems implements Initializ
 						action.writeAttributesFile(null, directory.getAbsolutePath());
 					} catch (IOException e) {
 						// Should be fine with selector
+					}
+				}
+			}
+		});
+	}
+
+	/*
+	 * Creates a login dialog
+	 */
+	private void createLoginDialog() {
+		// Creates a new dialog which is just a popup
+		Dialog<Pair<String, String>> login = new Dialog<>();
+		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
+		login.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+		login.setTitle("Login Dialog");
+		login.setHeaderText("GLOW Login");
+
+		// Layout from: http://code.makery.ch/blog/javafx-dialogs-official/
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+
+		TextField username = new TextField();
+		username.setPromptText("GLOW Username");
+		PasswordField password = new PasswordField();
+		password.setPromptText("GLOW Password");
+
+		grid.add(new Label("GLOW Username:"), 0, 0);
+		grid.add(username, 1, 0);
+		grid.add(new Label("GLOW Password:"), 0, 1);
+		grid.add(password, 1, 1);
+
+		// Add everything to the dialog page
+		login.getDialogPane().setContent(grid);
+
+		// This returns the username and password as a pair so we can return
+		// both
+		// easily.
+		login.setResultConverter(dialogButton -> {
+			if (dialogButton == loginButtonType) {
+				return new Pair<>(username.getText(), password.getText());
+			}
+			return null;
+		});
+
+		login.show();
+
+		// The login button
+		Button login_button = (Button) login.getDialogPane().lookupButton(loginButtonType);
+
+		// Login listener
+		login_button.addEventFilter(EventType.ROOT, e -> {
+			if (e.getEventType().equals(ActionEvent.ACTION)) {
+				e.consume();
+				GlowRequest req = new GlowRequest(username.getText(), password.getText());
+				if (req.requestCookie()) {
+
+					// Login worked, assign it as the current login session
+					request = req;
+					Task<Object> t = request;
+					// Pings the server to verify connection
+					new Thread(t).start();
+
+					// Give a visual clue at the top of the UI that they are
+					// currently
+					// logged into the server. They are actually never really
+					// "logged in",
+					// we just keep using their initial credentials to send
+					// further
+					// requests and automatically renew the credentials as
+					// necessary.
+					Main.stage.setTitle(
+							"|   GLSeq2 User Interface   -  Currently logged in as " + username.getText() + "   |");
+
+					/*
+					 * If the user has logged in and not entered a destination
+					 * directory, we'll just auto-populate this as being the
+					 * base of their own directory
+					 */
+					data_request_glow.setText(REQUEST_GLOW);
+					ref_request_glow.setText(REQUEST_GLOW);
+					if (destinationDirectory.getText() == "") {
+						destinationDirectory.setText("/home/GLBRCORG/" + username.getText());
+					}
+
+					// Close the dialog as it's job is now complete
+					login.close();
+
+					// If the login failed
+				} else {
+					// http://stackoverflow.com/questions/29911552/how-to-shake-a-login-dialog-in-javafx-8
+					try {
+						/*
+						 * Do a little shake animation. Also clears both the
+						 * fields and adds a red border around them to further
+						 * indicate that their credentials were wrong.
+						 */
+						ShakeTransition anim = new ShakeTransition(login.getDialogPane(), null);
+						username.setText("");
+						username.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
+						password.setText("");
+						password.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
+						anim.playFromStart();
+					} catch (Exception a) {
+						// Do nothing
+						// Exceptions could be caused because of the null passed
+						// into the
+						// animation and this just removes the stack traces
 					}
 				}
 			}

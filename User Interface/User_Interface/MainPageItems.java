@@ -175,6 +175,11 @@ class MainPageItems {
   protected RadioButton hisat;
 
   @FXML
+  protected RadioButton load_prev;
+  @FXML
+  protected RadioButton man_sam;
+  
+  @FXML
   protected TabPane tab_check;
   @FXML
   protected ProgressBar footer_progress;

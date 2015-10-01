@@ -263,6 +263,7 @@ public final class AttributeActions {
     // Add anything to further process the data here.
     String footer = "# Collect all the counting algos together \n";
     footer += "cAlgor <- c(HTSeq,RSEM,FeatureCounts,Cufflinks,rockhopperCount)\n";
+    // We depreciated these two, but it is easier to make sure they still run if the user has an older version of the Rscript.
     footer += "raw.dir <- data.directory\n";
     footer += "readyData.dir <- data.directory\n";
     writer.write(footer);
