@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -11,8 +12,6 @@ public class CombinatorialMutator {
 
 	private static ArrayList<ArrayList<String>> combinations = new ArrayList<ArrayList<String>>();
 
-	// Can be launched without the other parts of the program by using
-	// -cp as the java option and referring to this as application/RunJson
 	public static void main(String[] args) {
 		if (args.length < 1) {
 			printHelp();
@@ -142,10 +141,12 @@ public class CombinatorialMutator {
 	private static boolean loadAttributeFile(String file_name) {
 		AttributeActions action = new AttributeActions();
 		File att_file = new File(file_name);
-		if (att_file.exists()) {
+
+		try {
 			action.setAttributes(att_file);
 			return true;
+		} catch (FileNotFoundException e) {
+			return false;
 		}
-		return false;
 	}
 }

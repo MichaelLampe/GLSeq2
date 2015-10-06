@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class AttributeFile {
 
-  private static final AttributeActions att = new AttributeActions();
+  private static final AttributeActionsCommandLine att = new AttributeActionsCommandLine();
 
   // Can be launched without the other parts of the program by using
   // -cp as the java option and referring to this as application/AttributeFile

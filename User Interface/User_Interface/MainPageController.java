@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -596,7 +597,7 @@ public final class MainPageController extends MainPageItems implements Initializ
 							.setValue("NULL");
 				}
 
-				AttributeActions action = new AttributeActions();
+				AttributeActionsUI action = new AttributeActionsUI();
 				UpdateAttribute.getInstance().updateAttributes();
 				String attributeFileLocation = null;
 				try {
@@ -618,7 +619,7 @@ public final class MainPageController extends MainPageItems implements Initializ
 				if (args != null) {
 					// Might add some logic in the future that starts an SSH on
 					// windows/mac
-					Task<Object> task = new RunWorker(args, currentRun.getActiveRun());
+					Task<Object> task = new RunWorker(args);
 					// Run on a different thread so it doesn't lock up the UI.
 					new Thread(task).start();
 				} else {
@@ -776,7 +777,11 @@ public final class MainPageController extends MainPageItems implements Initializ
 				File att_file = fc.showOpenDialog(Main.stage);
 				if (att_file != null) {
 					AttributeActions action = new AttributeActions();
-					action.setAttributes(att_file);
+					try {
+						action.setAttributes(att_file);
+					} catch (FileNotFoundException e) {
+						System.out.println("Attribute File not found!");
+					}
 					String name = att_file.getName().split(".R")[0];
 					run_name.setText(name);
 					run_name.setDisable(true);
@@ -797,10 +802,13 @@ public final class MainPageController extends MainPageItems implements Initializ
 				fc.setSelectedExtensionFilter(R);
 				fc.setTitle("Open attribute file");
 				File att_file = fc.showOpenDialog(Main.stage);
-				if (att_file != null) {
+				try {
 					AttributeActions action = new AttributeActions();
 					action.setAttributes(att_file);
+				} catch (FileNotFoundException e) {
+					System.out.println("Attribute file not found!");
 				}
+
 			}
 		});
 

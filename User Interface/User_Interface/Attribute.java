@@ -59,7 +59,7 @@ class Attribute implements Attributable{
   @Override
   public String toString(){
     String message = "";
-    message += "Name:" + name + " with a value of " + value;
+    message += "Name: " + name + " with a value of " + value;
     return message;  
   }
 }

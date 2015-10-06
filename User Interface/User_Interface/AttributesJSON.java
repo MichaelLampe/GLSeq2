@@ -2,6 +2,9 @@ package application;
 
 // This contains the name (Enum name), default values, possible values, and tool tips.
 public enum AttributesJSON {
+	//
+	// CATEGORY: DATA
+	//
   dataDirectory("data.directory",Category.DATA.name, "The directory containing FASTQ files (either compressed or uncompressed; please select the compression options in the \'Algorithms > Pre-processing\' accordingly)"),
   
   storageDestination("storage.destination",Category.DATA.name, "This should be a parent directory to store the final result long-term (i.e. project folder on a bigdata volume); the actual directory will be a subfolder named after the run ID"),
@@ -35,6 +38,9 @@ public enum AttributesJSON {
   prevRunName("previous.run.name",
       Category.DATA.name,
       "If collecting data from a previous run, this is the name that was used for that run."),
+	//
+	// CATEGORY: REFERENCE
+	//
   referenceGenome("rGenome",
       Category.REFERENCE.name,
       "The reference genome will be used to index certain methods such as RSEM or BWA. Should be located in the script folder. The name contains no file extension."), 
@@ -48,7 +54,11 @@ public enum AttributesJSON {
       "The number of columns in the GTF file with the gene / other IDs character string"), 
   idAttr("idAttr",
       Category.REFERENCE.name, "gene_id", "GFF attribute to be used as feature ID"),
-
+	
+  	//
+	// CATEGORY: RUN
+	//
+  
   destinationDirectory("dest.dir.base",
       Category.RUN.name,
       "This should be a directory on a fast-access volume (Such as your home directory on the scarcity server system)"), 
@@ -60,12 +70,8 @@ public enum AttributesJSON {
       "Select to run the RSEM counting protocol. This protocol does not work with gapped aligners."), 
   HTseq("HTSeq",
       Category.RUN.name, "\"HTseq\",\"\"", "", "Select to run the HTSeq counting protocol"), 
-      
-      
   rockhopperCount("rockhopperCount",
       Category.RUN.name, "\"Rockhopper\",\"\"", "", "Select to run the Rockhopper counting protocol"), 
-      
-      
   Cufflinks("Cufflinks",
       Category.RUN.name, "\"Cufflinks\",\"\"", "", "Select to run the Cufflinks counting protocol"), 
   aAlgor("aAlgor",
@@ -77,7 +83,10 @@ public enum AttributesJSON {
       Category.RUN.name, "The number of parallel alignment streams that should happen"), 
   numberStreamsDataPrep("nStreamsDataPrep",
       Category.RUN.name, "The number of parallel data preparation streams that should happen"),
-
+	
+  	//
+  	// CATEGORY: PREPROCESSING
+  	//
   readTrim("readTrim",Category.PREPROCESS.name, "\"TRUE\",\"FALSE\"", "FALSE",
       "  reads during preprocessing. This removes some parts of the sequence prior to alignment."), 
   trimHead("trimhead",
@@ -88,12 +97,18 @@ public enum AttributesJSON {
       Category.PREPROCESS.name,
       "Name of the FASTA file with artificial sequences (Adapters, primers, etc.).  Located in the script directory."),
 
+	//
+	// CATEGORY: RSEM
+	//
   fragMaxLength("fragMaxLength",
       Category.RSEM.name, "1000", "Maximal length of a fragment in a paired-end library."),
   ciMem("ciMem",
       Category.RSEM.name, "4096",
       "Maximum size (MB) of the auxiliary buffer used to compute confidence intervals"), 
 
+	//
+	// CATEGORY: ENVIRONMENT
+	//
   scriptDirectory("base.dir",Category.ENVIRONMENT.name, "The location of the R Script Files. (GLSeq.Top.R)"), 
   trimPath("trimPath",
       Category.ENVIRONMENT.name,"/opt/bifxapps/Trimmomatic-0.30/trimmomatic-0.30.jar", "Path to the Trimmomatic"), 
