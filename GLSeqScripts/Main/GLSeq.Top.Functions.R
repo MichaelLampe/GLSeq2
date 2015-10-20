@@ -482,11 +482,6 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor=
   dest.dir <- trailDirCheck(dest.dir)
   setwd(base.dir)
   source("GLSeq.dataprep.R")
-  #Sys.sleep(10)
-  # <- paste(destDirLog, text.add, ".DataPrepLog.txt", sep="")
-  #dataPrepErr <- paste(destDirLog, text.add, ".DataPrepErr.txt", sep="")
-  #dataPrep <- paste("Rscript ", paste(base.dir,GLSeq.dataprep.R,sep=""), text.add," ",dest.dir," ",attrPath," 1>> ", dataPrepLog, " 2>> ", dataPrepErr, sep="")
-  #printOrExecute(dataPrep,Condor)
   relative.fqFiles
 }
 

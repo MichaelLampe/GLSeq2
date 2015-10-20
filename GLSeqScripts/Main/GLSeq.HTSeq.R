@@ -32,7 +32,7 @@ if (!is.null(libstrand)) {
 countOpt <- paste(countOpt, " --idattr=", idAttr, sep="")
 #
 # Throws the output into a counting file and then moves the output over into the HTSeq folder.
-HtSeq.comm <- paste("python -m HTSeq.scripts.count",countOpt, countable.sam, paste(dest.dir,refGFFname,sep=""), ">", countfile)
+htSeq.comm <- paste("python -m HTSeq.scripts.count",countOpt, countable.sam, paste(dest.dir,refGFFname,sep=""), ">", countfile)
 # Adds onto the end of or creates the count.comm which communicates the counting routine to the main command pool
-if (count.comm != "") count.comm <- paste(count.comm, HtSeq.comm)
-if (count.comm == "") count.comm <- paste(HtSeq.comm)
+if (count.comm != "") count.comm <- paste(count.comm, htSeq.comm)
+if (count.comm == "") count.comm <- paste(htSeq.comm)

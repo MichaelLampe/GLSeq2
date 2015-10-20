@@ -121,23 +121,38 @@ bam.files.thisRun.genome <- bam.files.thisRun.genome[-bai.ind]
 bai.files.thisRun.genome <- bam.files.thisRun.genome[bai.ind]
 #
 #
-if(!(strandExtract)) {
-  vizfiles.base <- substr(bam.files.thisRun.genome, 1, nchar(bam.files.thisRun.genome)-4)
-  wigfiles <- paste(vizfiles.base, "wig", sep=".")
-  bamMove <- paste("mv *.bam*", destDirBam)
-  for (ii in 1:length(bam.files.thisRun.genome)) {
+
+
+
+
+
+# Going to temp disable this for now.
+
+# Permission denied error (That's on Oleg's end I think)
+
+#if(FALSE) {
+ # vizfiles.base <- substr(bam.files.thisRun.genome, 1, nchar(bam.files.thisRun.genome)-4)
+ # wigfiles <- paste(vizfiles.base, "wig", sep=".")
+ # bamMove <- paste("mv *.bam*", destDirBam)
+ # for (ii in 1:length(bam.files.thisRun.genome)) {
     # wigGen.ii <- paste("rsem-bam2wig",  bamfiles[ii], wigfiles[ii], vizfiles.base[ii])
-    wigGen.ii <- paste(bam2wigPath, bam.files.thisRun.genome[ii], wigfiles[ii])
-    if (ii == 1) wigGen <- wigGen.ii
-    if (ii != 1) wigGen <- paste(wigGen, "&", wigGen.ii)
-  } # for bamfiles
-  try(system(bamMove))
-  Sys.sleep(5)
-  setwd(destDirBam)
-  system(paste(wigGen, "&"))
-  Sys.sleep(2)
-} # if not strand extract
+ #   wigGen.ii <- paste(bam2wigPath, bam.files.thisRun.genome[ii], wigfiles[ii])
+ #   if (ii == 1) wigGen <- wigGen.ii
+ #   if (ii != 1) wigGen <- paste(wigGen, "&", wigGen.ii)
+ # } # for bamfiles
+ # try(system(bamMove))
+ # Sys.sleep(5)
+ # setwd(destDirBam)
+ # system(paste(wigGen, "&"))
+ # Sys.sleep(2)
+#} # if not strand extract
 #
+
+
+
+
+
+
 ######################################################
 ################## PREPARE GRAPHS ####################
 ######################################################

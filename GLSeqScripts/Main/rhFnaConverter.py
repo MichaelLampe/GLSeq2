@@ -35,11 +35,9 @@ def writeConvertedFile(file_name,header,dna_sequence):
 
 directory = sys.argv[1]
 raw_file_name = sys.argv[2]
-destination_directory = sys.argv[3]
 
 directory = checkTrail(directory)
-destination_directory = checkTrail(destination_directory)
-# Takes off the last directory
+
 command_arg = ""
 count = 0
 file = directory + raw_file_name
@@ -53,13 +51,19 @@ with open(file,"r+b") as raw_file:
             # Don't run this write the first time
             if header != "":
                 writeConvertedFile(new_file_name,header,dna_sequence)
-            header = line
+            line = line.replace("\n","")
+            line = line.replace(">","")
+            header = ">" + line + "\n"
             new_file_dir = getDirName(line,directory)
-            os.mkdir(new_file_dir)
+            try:
+              os.mkdir(new_file_dir)
+            # Assume this means that the directory is already there.
+            except:
+              pass
             if (command_arg == ""):
-                command_arg = "\"" + new_file_dir + "\""
+                command_arg = new_file_dir
             else:
-                command_arg = command_arg + "," + "\"" + new_file_dir + "\""
+                command_arg = command_arg + "," + new_file_dir
             new_file_name = getFileName(line,new_file_dir)
             dna_sequence = ""
             count = count + 1
@@ -69,9 +73,11 @@ with open(file,"r+b") as raw_file:
 if (dna_sequence != ""):
     writeConvertedFile(new_file_name,header,dna_sequence)
     count = count + 1
+    if (command_arg == ""):
+        command_arg = new_file_dir
+    else:
+        command_arg = command_arg + "," + new_file_dir
 os.remove(file)
-create_formatted_file = "echo " + command_arg + " > " + destination_directory +"referenceGenomes"
+create_formatted_file = "echo " + command_arg + " > referenceGenomes.txt"
 Popen(create_formatted_file,shell=True)
-print("Converted input fastq file into " + str(count) + " fna files.")
 sys.exit(0)
-

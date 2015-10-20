@@ -10,7 +10,6 @@ copy.genome <- function(base.dir,rGenome,refFASTAname,dest.dir){
   rGenome <- trailDirCheck(rGenome)
   ref.dir <- paste(base.dir, rGenome, sep="")
   indCopy <- paste("cp",paste(ref.dir,refFASTAname,sep=""),dest.dir)
-  indCopy
 }
 
 countable.sam.name <- function(this.resName){

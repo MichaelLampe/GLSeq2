@@ -1,10 +1,13 @@
 __author__ = 'mlampe'
 
 import networkx as nx
-import matplotlib
 # Let's us run this without a display
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+except ImportError:
+    pass
 import re
 
 
@@ -85,15 +88,15 @@ class Graph:
         self.remove_edge(parents, children)
 
     def remove_node(self, node):
-        parents , children = self.get_parents(node) , self.get_children(node)
+        parents, children = self.get_parents(node), self.get_children(node)
         # Links the gap that would be created by removing the node
-        self.add_edge(parents,children)
-        self.remove_edge(parents,node)
-        self.remove_edge(node,children)
+        self.add_edge(parents, children)
+        self.remove_edge(parents, node)
+        self.remove_edge(node, children)
         self.G.remove_node(node)
 
     # Different from remove node as it makes no attempt to bridge the gap.
-    def delete_node(self,node):
+    def delete_node(self, node):
         self.G.remove_node(node)
 
     def get_parents(self, node):
@@ -133,14 +136,14 @@ class Graph:
         # Remove the initial node so that it doesn't stay in the graph
         self.remove_node(node)
 
-    def merge_nodes(self,nodes, new_data):
+    def merge_nodes(self, nodes, new_data):
         parents = [parent for node in nodes for parent in self.get_parents(node) if parent not in nodes]
         children = [child for node in nodes for child in self.get_children(node) if child not in nodes]
         # Setup the new node
         merged_node = Node(new_data)
         self.add_node(merged_node)
-        self.add_edge(parents,merged_node)
-        self.add_edge(merged_node,children)
+        self.add_edge(parents, merged_node)
+        self.add_edge(merged_node, children)
         # Remove all the old nodes
         for node in nodes:
             try:
@@ -284,6 +287,7 @@ class Graph:
                 gpu_color.append("#FF0000")
         return gpu_color
 
+
 # An individual unit of data for the graph.
 class Node:
     node_count = 0
@@ -298,7 +302,7 @@ class Node:
         # This is not the actual count of how many nodes currently exist, but
         # the count of how many times we have created a node.  If a node is deleted this will just continue
         # to count up and not go back to fill that number
-        self.number , Node.node_count = Node.node_count , Node.node_count + 1
+        self.number, Node.node_count = Node.node_count, Node.node_count + 1
 
 
 # This does the parsing and processing of the incoming commands.
@@ -318,12 +322,45 @@ class CommandProcessor:
         'wait',
     ]
 
-    def __init__(self, commands):
+    def __init__(self, commands, run_name):
         # The list of all commands broken into the order they were sent
+        self.run_name = run_name
         self.commands = commands
         self.graph = Graph()
 
+        # Precompile all the regex.  Goes faster.
+        self.summary_eff = re.compile("EfficiencyAnalyzer.py (.*?)", re.IGNORECASE)
+        self.bash = re.compile("bash (.*?)", re.IGNORECASE)
+        self.gunzip = re.compile("gunzip (.*?)", re.IGNORECASE)
+        self.mkcopymv = re.compile("mkdir (.*?)|cp (.*?)|mv (.*?)", re.IGNORECASE)
+        self.featureCounts = re.compile("featurecounts.R(?=[ ])", re.IGNORECASE)
+        self.htseq = re.compile("HTSeq.scripts.count(?=[ ])", re.IGNORECASE)
+        self.rockhopper_converter = re.compile("rhFnaConverter.py", re.IGNORECASE)
+        self.samtools = re.compile("^(.*?)samtools(?=[ ])", re.IGNORECASE)
+        self.bifxapps = re.compile("^(.*?)bifxapps(?=[ ])", re.IGNORECASE)
+        self.rockhopper = re.compile("rockhopperWrapper.py", re.IGNORECASE)
+        self.picardTools = re.compile("picard-tools(?=[ ])", re.IGNORECASE)
+        self.bam2wig = re.compile("bam2wig(?=[ ])", re.IGNORECASE)
+        self.fastqc = re.compile("^(.*?)fastqc(?=[ ])", re.IGNORECASE)
+        self.cufflinks = re.compile("^(.*?)cufflinks(?=[ ])", re.IGNORECASE)
+        self.tophat = re.compile("^(.*?)tophat(?=[ ])", re.IGNORECASE)
+        self.bowtie = re.compile("^(.*?)bowtie(?=[ ])", re.IGNORECASE)
+        self.bwa = re.compile("^(.*?)bwa(?=[ ])", re.IGNORECASE)
+        self.cushaw = re.compile("^(.*?)cushaw(?=[ ])", re.IGNORECASE)
+        self.rsem = re.compile("^(.*?)rsem(?=[ ])", re.IGNORECASE)
+        self.rsem_expression = re.compile("^(.*?)rsem-calculate-expression(?=[ ])", re.IGNORECASE)
+        self.samtools_sort = re.compile("samtools sort", re.IGNORECASE)
+        self.cushaw_gpu = re.compile("^(.*?)cushaw2-gpu(?=[ ])", re.IGNORECASE)
+        self.trim = re.compile("trimmomatic(.*?).jar", re.IGNORECASE)
+        self.hisat = re.compile("hisat (.*?)", re.IGNORECASE)
+        self.hisat_build = re.compile("hisat (.*?)", re.IGNORECASE)
+        self.star = re.compile("STAR (.*?)", re.IGNORECASE)
+        self.star_build = re.compile("STAR --runMode genomeGenerate", re.IGNORECASE)
+
+        self.removewait = re.compile("^wait$", re.IGNORECASE)
+
     def create_graph(self):
+
         # A new graph structure
         nodes = list()
         for c in range(0, len(self.commands)):
@@ -344,7 +381,7 @@ class CommandProcessor:
             self.split_parallel_proc(node)
         for node in self.graph.nodes():
             self.split_linked(node)
-        for n in range(len(self.graph.nodes())-1,-1,-1):
+        for n in range(len(self.graph.nodes())-1, -1, -1):
             # Removes white space
             self.graph.nodes()[n].command = self.graph.nodes()[n].command.strip()
             # Get rid of any nodes that have been filled with whitespace
@@ -357,16 +394,37 @@ class CommandProcessor:
             except nx.NetworkXError:
                 # The node could have already been merged in which case this will just skip it
                 pass
+        # Remove "Waits" as they are not useful here.
+        for node in self.graph.nodes():
+            if re.search(self.removewait, node.command):
+                self.graph.remove_node(node)
+        # Add summary scripts
+        childless_nodes = list()
+        for node in self.graph.nodes():
+            if len(self.graph.get_children(node)) == 0:
+                childless_nodes.append(node)
+        for node in self.summary_scripts():
+            self.graph.add_node(node, childless_nodes)
+
+        # Assign resources
         for node in self.graph.nodes():
             mem, cpus, gpus = self.assign_resources(node.command)
             self.graph.G.node[node]['mem'] = mem
             self.graph.G.node[node]['cpus'] = cpus
             self.graph.G.node[node]['gpus'] = gpus
+
         # Renumber the nodes
-        for i, node in enumerate(nx.topological_sort(self.graph.G),start=1):
+        for i, node in enumerate(nx.topological_sort(self.graph.G), start=1):
             node.number = i
+
         return self.graph
 
+    def summary_scripts(self):
+        summary = list()
+        # Summary script 1
+        summary_node1 = Node("python EfficiencyAnalyzer.py" + " " + self.run_name + "/LogFile/" + " " + self.run_name)
+        summary.append(summary_node1)
+        return summary
 
     def split_parallel_proc_away(self, node):
         parallel = re.compile('(\(.*?(?<!&)&(?!&).*?\))')
@@ -393,54 +451,55 @@ class CommandProcessor:
             self.graph.split_node_parallel(node, new_nodes)
 
     def split_background_proc(self, node):
-        def filter_split(split_commands):
+        def filter_split(filter_command):
             background = re.compile('(?<!&)&(?!&)')
             # This undoes the split that was done by the regex split_background
             # Thus, we effectively have only split by single &'s that are outside of any parenthesis
-            for c in range(len(split_commands) - 1, -1, -1):
-                if split_commands[c] is not None:
-                    if re.search(background, split_commands[c]):
-                        if c < len(split_commands) - 1:
-                            if split_commands[c + 1] is not None:
-                                split_commands[c] = split_commands[c] + split_commands[c + 1]
+            for c in range(len(filter_command) - 1, -1, -1):
+                if filter_command[c] is not None:
+                    if re.search(background, filter_command[c]):
+                        if c < len(filter_command) - 1:
+                            if filter_command[c + 1] is not None:
+                                filter_command[c] = filter_command[c] + filter_command[c + 1]
                         if c > 0:
-                            if split_commands[c - 1] is not None:
-                                split_commands[c] = split_commands[c - 1] + split_commands[c]
+                            if filter_command[c - 1] is not None:
+                                filter_command[c] = filter_command[c - 1] + filter_command[c]
             # Remove some junk characters to make figuring out if we have an end command easier
-            split_commands = [command for command in split_commands if command is not "" or " "]
+            filter_command = [fcommand for fcommand in filter_command if fcommand is not "" or " "]
             # An end command is if there is a trailing, nonparallel job attached to some parallel jobs
             # All of the & symbols not within parenthesis leave the value "None" in their place, so we can use
             # Those as markers prior to removing them to figure out if there was an & at the end or not.
-            end_command = ""
-            for c in range(len(split_commands) - 1, -1, -1):
-                if split_commands[c] is not None:
-                    end_command = split_commands[c] + end_command
-                    split_commands.pop(c)
+            e_command = ""
+            for c in range(len(filter_command) - 1, -1, -1):
+                if filter_command[c] is not None:
+                    e_command = filter_command[c] + e_command
+                    filter_command.pop(c)
                 else:
                     break
-            # If the last command is not None, that means we should do the last stuff sequentially AFTER the parallel stuff
+            # If the last command is not None, that means we should do the last stuff sequentially
+            #  AFTER the parallel stuff
             # Thus, we'll eat up the end until we find a None and place that as a node at the end
             # Here we remove the item that was after the split which is now a duplicate
-            for c in range(len(split_commands) - 1, -1, -1):
-                if split_commands[c] is not None:
-                    if re.search(background, split_commands[c]):
-                        if c < len(split_commands) - 1:
-                            split_commands.pop(c + 1)
+            for c in range(len(filter_command) - 1, -1, -1):
+                if filter_command[c] is not None:
+                    if re.search(background, filter_command[c]):
+                        if c < len(filter_command) - 1:
+                            filter_command.pop(c + 1)
             # Here we remove the item that was before the split which is not also a duplicate
             # We need to move forward in this case otherwise we get stuck eating the entire sequence
             # But that also means we'll get an index error if we eat anything, so that's why we catch it here.
-            for c in range(0, len(split_commands)):
+            for c in range(0, len(filter_command)):
                 try:
-                    if split_commands[c] is not None:
-                        if re.search(background, split_commands[c]):
+                    if filter_command[c] is not None:
+                        if re.search(background, filter_command[c]):
                             if c > 0:
-                                split_commands.pop(c - 1)
+                                filter_command.pop(c - 1)
                 except IndexError:
                     pass
             # Cleans up a bunch of stuff that might be leftover
-            cleaned_commands = filter(bool, split_commands)
-            cleaned_commands = [command for command in cleaned_commands if command is not " "]
-            return cleaned_commands, end_command
+            cleaned_commands = filter(bool, filter_command)
+            cleaned_commands = [ccommand for ccommand in cleaned_commands if ccommand is not " "]
+            return cleaned_commands, e_command
 
         # This picks up both the single &, but notices if they are within a parenthesis or not.
         # If the & is not within the parenthesis, it will be replaced with None when split, while the
@@ -456,8 +515,8 @@ class CommandProcessor:
 
     def merge_trivial_commands(self, node):
         # Breadth first search to find as many mergers as possible while best retaining order
-        def bfs(node):
-            queue , merge_nodes, new_command = [node] , [node] , ""
+        def bfs(individual_node):
+            queue, merge_nodes, new_command = [individual_node], [individual_node], ""
             while queue:
                 # Remove the first node and look at that
                 current_node = queue.pop(0)
@@ -479,12 +538,12 @@ class CommandProcessor:
                                 new_command = new_command + " && " + current_node.command
                             queue = queue + self.graph.get_children(current_node)
                             break
-            return merge_nodes , new_command
+            return merge_nodes, new_command
         for word in CommandProcessor.group_keywords:
             if word in node.command:
-                merge_nodes , new_command = bfs(node)
+                merge_nodes, new_command = bfs(node)
                 if new_command is not "":
-                    self.graph.merge_nodes(merge_nodes,new_command)
+                    self.graph.merge_nodes(merge_nodes, new_command)
                 break
 
     def split_linked(self, node):
@@ -549,90 +608,78 @@ class CommandProcessor:
             "1"
             # return gpu_needed[0],gpu_needed[1],gpu_needed[2]
         ]
-        # Default
-        default = medium_resource[0], medium_resource[1], medium_resource[2]
-        trim = re.compile("trimmomatic(.*?).jar", re.IGNORECASE)
-        if found_match(trim, command):
+
+        if found_match(self.hisat_build, command):
+            return "50M", "1", "0"
+        if found_match(self.hisat, command):
+            return "300M", "4", "0"
+        if found_match(self.star_build, command):
+            return "400M", "1", "0"
+        if found_match(self.star, command):
+            return "4G", "4", "0"
+        if found_match(self.trim, command):
             return "12G", "20", "0"
         # The ^(.*?) ____ (?=[ ]) regex is there so that we only match the first word
         # As we sometimes use the aligners/counters as run names and that can
         # cause a lot of things to ask for a lot of resources
-        cushaw_gpu = re.compile("^(.*?)cushaw2-gpu(?=[ ])", re.IGNORECASE)
-        if found_match(cushaw_gpu, command):
+        if found_match(self.cushaw_gpu, command):
             return gpu_needed[0], gpu_needed[1], gpu_needed[2]
         # This is often the slowest step, so lets give it a lot of RAM to work with
-        samtools_sort = re.compile("samtools sort", re.IGNORECASE)
-        if found_match(samtools_sort, command):
+        if found_match(self.samtools_sort, command):
             return "18G", "6", "0"
-        rsem_expression = re.compile("^(.*?)rsem-calculate-expression(?=[ ])", re.IGNORECASE)
         # RSEM uses sort and also takes a long time.
         # I've seen it range from 3GB up to 17GB on pretty much the same files.
         # We'll set it to 32 to be pretty safe when given even larger files.
-        if found_match(rsem_expression, command):
+        if found_match(self.rsem_expression, command):
             return "18G", "8", "0"
         # We can give low memory to other RSEM tools that we use.
-        rsem = re.compile("^(.*?)rsem(?=[ ])", re.IGNORECASE)
         # RSEM uses sort and also takes a long time.
-        if found_match(rsem, command):
+        if found_match(self.rsem, command):
             return "1G", "1", "0"
         # High Resource
-        cushaw = re.compile("^(.*?)cushaw(?=[ ])", re.IGNORECASE)
-        if found_match(cushaw, command):
+        if found_match(self.cushaw, command):
             return "400M", "8", "0"
-        bwa = re.compile("^(.*?)bwa(?=[ ])", re.IGNORECASE)
-        if found_match(bwa, command):
+        if found_match(self.bwa, command):
             return "1G", "8", "0"
-        bowtie = re.compile("^(.*?)bowtie(?=[ ])", re.IGNORECASE)
-        if found_match(bowtie, command):
+        if found_match(self.bowtie, command):
             return "1G", "4", "0"
-        tophat = re.compile("^(.*?)tophat(?=[ ])", re.IGNORECASE)
-        if found_match(tophat, command):
+        if found_match(self.tophat, command):
             return "4G", "8", "0"
-        cufflinks = re.compile("^(.*?)cufflinks(?=[ ])", re.IGNORECASE)
-        if found_match(cufflinks, command):
+        if found_match(self.cufflinks, command):
             return high_resource[0], high_resource[1], high_resource[2]
         # Medium Resources
-        fastqc = re.compile("^(.*?)fastqc(?=[ ])", re.IGNORECASE)
-        if found_match(fastqc, command):
+        if found_match(self.fastqc, command):
             return "200M", "1", "0"
-        bam2wig = re.compile("bam2wig(?=[ ])", re.IGNORECASE)
-        if found_match(bam2wig, command):
+        if found_match(self.bam2wig, command):
             return medium_resource[0], medium_resource[1], medium_resource[2]
-        picardTools = re.compile("picard-tools(?=[ ])", re.IGNORECASE)
-        if found_match(picardTools, command):
+        if found_match(self.picardTools, command):
             return medium_resource[0], medium_resource[1], medium_resource[2]
-        rockhopper = re.compile("rockhopperWrapper.py", re.IGNORECASE)
-        if found_match(rockhopper, command):
+        if found_match(self.rockhopper, command):
             return "4G", "1", "0"
         # bifxapps isn't an app, but is our app folder.
         # This should catch any absolute path someone introduces to try and assign it
         #  to a "medium resources" setting (Assuming the app is in bifxapps)
-        bifxapps = re.compile("^(.*?)bifxapps(?=[ ])", re.IGNORECASE)
-        if found_match(bifxapps, command):
+        if found_match(self.bifxapps, command):
             return medium_resource[0], medium_resource[1], medium_resource[2]
         # Low Resource
-        samtools = re.compile("^(.*?)samtools(?=[ ])", re.IGNORECASE)
-        if found_match(samtools, command):
+        if found_match(self.samtools, command):
             return "100M", "1", "0"
-
-        rockhopper_converter = re.compile("rhFnaConverter.py",re.IGNORECASE)
-        if found_match(rockhopper_converter,command):
-            return "50M","1","0"
+        if found_match(self.rockhopper_converter, command):
+            return "50M", "1", "0"
         # Scarce Resource
-        htseq = re.compile("HTSeq.scripts.count(?=[ ])", re.IGNORECASE)
-        if found_match(htseq, command):
+        if found_match(self.htseq, command):
             return "75M", "1", "0"
-        featureCounts = re.compile("featurecounts.R(?=[ ])", re.IGNORECASE)
-        if found_match(featureCounts, command):
+        if found_match(self.featureCounts, command):
             return scarce_resource[0], scarce_resource[1], scarce_resource[2]
-        mkcopymv = re.compile("mkdir (.*?)|cp (.*?)|mv (.*?)", re.IGNORECASE)
-        if found_match(mkcopymv, command):
+        if found_match(self.mkcopymv, command):
             return "5M", "1", "0"
-        gunzip = re.compile("gunzip (.*?)", re.IGNORECASE)
-        if found_match(gunzip, command):
+        if found_match(self.gunzip, command):
             return "100M", "1", "0"
-        bash = re.compile("bash (.*?)", re.IGNORECASE)
-        if found_match(bash, command):
+        if found_match(self.bash, command):
             return "100M", "1", "0"
-        # If nothing else has returned by now, return whatever was set as the defautl value.
+        if found_match(self.summary_eff, command):
+            return "20M", "1", "0"
+
+        # If nothing else has returned by now return default
+        default = medium_resource[0], medium_resource[1], medium_resource[2]
         return default

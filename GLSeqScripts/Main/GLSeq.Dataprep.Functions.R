@@ -48,6 +48,7 @@ check.ifFiles <- function(fqFiles.zip,fqFiles.unzip){
 # These files have .fq or .fastq extensions
 get.files.unzipped <- function(raw.dir,libList){
   if (is.null(libList)){
+    print(raw.dir)
     raw.dir <- trailDirCheck(raw.dir)
     if (length(unique(raw.dir)) == 1){
       # Takes either fasta or fq files
@@ -67,6 +68,7 @@ copy.files.to.dest.unzipped <- function(raw.dir,dest.dir,libList){
   dest.dir <- trailDirCheck(dest.dir)
 
   copy <- ""
+
   if (is.null(libList)) {
     raw.dir <- trailDirCheck(raw.dir)
     # Copy all relevant file types into the folder.
@@ -74,11 +76,18 @@ copy.files.to.dest.unzipped <- function(raw.dir,dest.dir,libList){
     fastqFiles <- paste(raw.dir,"*.fastq",sep="")
     copy <- paste("cp",fqFiles,dest.dir,"; cp",fastqFiles,dest.dir)
   } else {
-    for (i in 1:length(libList)){
+    for (i in 1:length(libList)) {
+      # Make it so that the liblist will know if to add the raw.dir or not.
+      if (substr(libList[i],1,1) == "/"){
         copy.fastq <- paste("cp",libList[i],dest.dir)
         copy <- paste(copy,copy.fastq,"&")
+      } else{
+        copy.fastq <- paste("cp",paste(raw.dir,libList[i],sep=""),dest.dir)
+        copy <- paste(copy,copy.fastq,"&")
+      }
     }
   }
+  print(copy)
   printOrExecute(copy,Condor)
   copy
 }

@@ -20,11 +20,8 @@ args <- commandArgs(trailingOnly = TRUE)
 # update attributes from DB? (otherwise, use values from GLSeg.R as is)
 # values: "update", "noupdate" or the name of a particular file with run attributes (GLSeq.attr.XXX.R)
 #
-#
 #### CURRENTLY NOT USED FOR ANYTHING
 updateFromDb <- as.character(args[1])
-#
-#
 #
 # prepare data from fastq.gz files? (if not, the split and ready fastq files must be already in the dest.dir)
 # values: "dataprep", "nodataprep"
@@ -65,7 +62,7 @@ destDirTest <- NULL
 #
 #
 source(attrPath)
-# Little trick that allows us to run the top script from anywhere instead of having to be within the RScript folder
+# Allows us to run the top script from anywhere instead of having to be within the RScript folder
 setwd(base.dir)
 source("GLSeq.Util.R")
 source("GLSeq.Top.Functions.R")
@@ -75,12 +72,12 @@ source("GLSeq.Top.Functions.R")
 if(is.na(Condor)){
   Condor <- FALSE
 }
+# Set to a really high number so that Condor can establish all of the computational resources most effectively. (Parallelize the most stuff)
 if(Condor){
   nStreams <- 1000
   nStreamsDataPrep <- 1000
 }
 #
-##################################################################################################
 ##################################################################################################
 # Running Script Area
 ##################################################################################################
@@ -90,6 +87,7 @@ runDate <- gsub(":", "_", runDate)
 
 ###########
 # Create general files and folders.
+#
 ###########
 # Checks the directories
 dest.dir.base <- trailDirCheck(dest.dir.base)
@@ -156,16 +154,15 @@ if (alignment == "alignment") {
 
     if (is.null(libList)){
       copy.preprocessed.files.dir(readyData.dir,dest.dir,Condor)
-      fqfiles.table <- convert.file.list.to.table.dir(paired.end,readyData.dir,NULL)
+      fqfiles.table <- convert.file.list.to.table(paired.end,readyData.dir,NULL)
     } else {
       copy.preprocessed.files.list(libList,dest.dir,Condor)
-      fqfiles.table <- convert.file.list.to.table.dir(paired.end,NULL,libList)
+      fqfiles.table <- convert.file.list.to.table(paired.end,NULL,libList)
     }
 
   }
   if (dataPrepare == "dataprep"){
     fqfiles.table <- convert.file.list.to.table(paired.end,NULL,relative.fqFiles)
-
   }
   nStreams <- check.nStreams(fqfiles.table,nStreams)
   rangelist <- prepare.chunk.function(fqfiles.table,nStreams)
@@ -245,6 +242,7 @@ if (resCollect == "collect"){
 if (!is.null(comm.stack.pool)){
   execute.comm.stack(comm.stack.pool,Condor)
 }
+
 # Creates a memory of a completed run so that the User Interface knows that this run has completed and should not allow any user to overwrite this run.
 run.id.run <- paste(base.dir,paste(expID,"RData",sep="."),sep="")
 save.image(file=run.id.run)

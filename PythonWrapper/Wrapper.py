@@ -4,8 +4,11 @@ import subprocess
 # The goal of this class is to create a wrapper from within which we can run
 # GLSeq and receive the output command
 
+
 class GlSeqRun:
-    def __init__(self,glseq_path,update_database,prepare_data,align,count,collect,run_name,protocol_id,attribute_file_path,condor):
+    def __init__(self, glseq_path, update_database, prepare_data, align,
+                 count, collect, run_name, protocol_id, attribute_file_path, condor):
+
         self.glseq_path = glseq_path
         self.update = update_database
         self.prepare = prepare_data
@@ -19,27 +22,29 @@ class GlSeqRun:
 
     def run(self):
         # Scarcity server uses Python 2.6, so we need to do it this way.
-        output = subprocess.Popen(self.defineRunArgs(),stdout=subprocess.PIPE)
+        output = subprocess.Popen(self.define_run_args(), stdout=subprocess.PIPE)
         out, err = output.communicate()
         output_file = self.run_name + "/" + self.run_name + "_GLSeqOutput.txt"
-        with open(output_file,'w') as log_file:
-            if (out != None):
+        with open(output_file, 'w') as log_file:
+            if out is not None:
                 log_file.write("The output was:\n")
                 log_file.write(out)
             else:
                 log_file.write("There was no output.\n")
-            if(err != None):
+            if err is not None:
                 log_file.write("The errors were:\n")
                 log_file.write(err)
             else:
                 log_file.write("There were no error messages.\n")
-        try:output.kill()
-        except:pass
+        try:
+            output.kill()
+        except:
+            pass
         # The Rscript will give us a command output here.
         # This is just a big long string that we need to parse.
-        return self.parseCommand(out)
+        return self.parse_command(out)
 
-    def defineRunArgs(self):
+    def define_run_args(self):
         run = list()
         run.append("Rscript")
         run.append(self.glseq_path)
@@ -54,16 +59,16 @@ class GlSeqRun:
         run.append(self.condor)
         return run
 
-    def parseCommand(self,command):
+    def parse_command(self,command):
         initial_pattern = "[1] \""
         broken_command = command.split(initial_pattern)
         # First element will always be an empty string
         broken_command.pop(0)
-        for x in range (len(broken_command)-1,-1,-1,):
+        for x in range(len(broken_command)-1, -1, -1, ):
             # Remove quotes from end of the command
-            broken_command[x] = broken_command[x].replace("\"","")
-            broken_command[x] = broken_command[x].replace("\n","")
-            if (len(broken_command[x]) <= 0):
+            broken_command[x] = broken_command[x].replace("\"", "")
+            broken_command[x] = broken_command[x].replace("\n", "")
+            if len(broken_command[x]) <= 0:
                 broken_command.pop(x)
         # This broken apart array is what we will give to Command to construct things in CentralInterface
         return broken_command

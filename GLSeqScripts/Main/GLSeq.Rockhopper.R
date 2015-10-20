@@ -36,8 +36,6 @@ for (zz in 1:nStreams) {
   comm.stack.pool <- NULL
   # assembly and runing the system command, one library at a time:
   for (i in rangelist[[zz]]) {
-    print("FQ FILES")
-    print(fqfiles.table[i,1])
     ###################
     # Alignment with SAM output
     ###################
