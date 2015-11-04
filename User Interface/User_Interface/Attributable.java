@@ -6,4 +6,3 @@ public interface Attributable {
     public String getName();
     public void setValue(String update);
 }
-

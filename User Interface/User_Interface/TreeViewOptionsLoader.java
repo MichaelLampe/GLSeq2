@@ -1,0 +1,86 @@
+package application;
+
+import java.awt.List;
+import java.io.File;
+import java.io.IOException;
+
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableListBase;
+import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.cell.ComboBoxTreeCell;
+import javafx.scene.control.cell.TextFieldTreeCell;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+public class TreeViewOptionsLoader {
+
+	private Document myOptions;
+
+	public TreeViewOptionsLoader() {
+		DocumentBuilder xml = null;
+		try {
+			xml = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			myOptions = xml.parse(new File("treeOptions.xml"));
+		} catch (SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public TreeItem<String> createTreeElementfromXml(String itemName)
+			throws DuplicateElementsInXmlError {
+		TreeItem<String> optionsHead = new TreeItem<String>("Options");
+
+		// This is here because we could get some hidden bugs if we don't notice
+		// that we are grabbing multiple XML elements, invalidating a key
+		// assumption that this code has.
+		if (myOptions.getElementsByTagName(itemName).getLength() > 1) {
+			throw new DuplicateElementsInXmlError();
+		}
+		System.out.println(itemName);
+		Node itemNode = myOptions.getElementsByTagName(itemName).item(0);
+		Node optionsNode = itemNode.getChildNodes().item(1);
+
+		// First and last nodes are just text, so we ignore those two.
+		for (int i = 1; i < optionsNode.getChildNodes().getLength() - 1; i++) {
+			if (!optionsNode.getChildNodes().item(i).getNodeName()
+					.equals("#text")) {
+				optionsHead.getChildren().add(
+						parseSingleOption(optionsNode.getChildNodes().item(i)));
+			}
+		}
+
+		return optionsHead;
+	}
+
+	private TreeItem<String> parseSingleOption(Node optionXml) {
+		// Every option has three properties:
+
+		// Command
+		// Input Type
+		// Default Value
+		CheckBoxTreeItem<String> option = new CheckBoxTreeItem<String>(
+				optionXml.getNodeName());
+		String input_type = optionXml.getAttributes()
+				.getNamedItem("input_type").getNodeValue();
+		if (!input_type.equals("add")) {
+			option.getChildren().add(new SpecialInputTreeItem<String>(input_type));
+		}
+		return option;
+	}
+
+}
