@@ -1,0 +1,242 @@
+<GlSeqOptions>
+	<Aligners>
+		<BWA>
+			<Options>
+				<FractionOfMissingAlignments command="-n" input_type="float" default_value="0.04"></FractionOfMissingAlignments>
+				<MaxNumberOfGapOpens command="-o" input_type="int" default_value="1"></MaxNumberOfGapOpens>
+				<MaxNumberOfGapExtensions command="-e" input_type="int" default_value="-1"></MaxNumberOfGapExtensions>
+				<DisallowLongDeletionWithinNumberBasePairsOfThreePrimeEnd command="-d" input_type="int" default_value="16"></DisallowLongDeletionWithinNumberBasePairsOfThreePrimeEnd>
+				<DisallowAnIndelWithinNumberBasePairsTowardsEnds command="-d" input_type="int" default_value="5"></DisallowAnIndelWithinNumberBasePairsTowardsEnds>
+				<FirstNumberSubsequenceAsSeed command="-l" input_type="int" default_value="inf"></FirstNumberSubsequenceAsSeed>
+				<MaxEditDistanceInSeed command="-k" input_type="int" default_value="2"></MaxEditDistanceInSeed >
+				<MismatchPenalty command="-M" input_type="int" default_value="3"></MismatchPenalty>
+				<GapOpenPenalty command="-O" input_type="int" default_value="11"></GapOpenPenalty>
+				<GapExtensionPenalty command="-E" input_type="int" default_value="4"></GapExtensionPenalty>
+				<AlignIfFewerThanNumberEqualHits command="-R" input_type="int" default_value="30"></AlignIfFewerThanNumberEqualHits>
+				<DisableIterativeSearch command="-N" input_type="add" default_value="no_add"></DisableIterativeSearch>
+				<TrimRead command="-B" input_type="int" default_value="0"></TrimRead>
+				<InputIsIllumina1.3Format command="-I" input_type="add" default_value="no_add"></InputIsIllumina1.3Format>
+				<LengthOf5PrimeBarcode command="-B" input_type="int" default_value="0"></LengthOf5PrimeBarcode >
+			</Options>
+		</BWA>
+		<Bowtie>
+			<Options>
+					<SkipFirstNReads command="-s" input_type="int" default_value="0"></SkipFirstNReads>
+					<StopAfterFirstNReads command="u" input_type="int" default_value="0"></StopAfterFirstNReads>
+					<TrimNBasesFromFivePrime command="--trim5" input_type="int" default_value="0"></TrimNBasesFromFivePrime>
+					<TrimNBasesFromThreePrime command="--trim3" input_type="int" default_value="0"></TrimNBasesFromThreePrime>				
+					<ReportEndToEndHits command="-v" input_type="int" default_value="0"></ReportEndToEndHits>
+					<MaxMismatchesInSeed command="-n" input_type="int" default_value="2"></MaxMismatchesInSeed>
+					<MaxSumOfMismatchQualsAcrossAlignment command="-e" input_type="int" default_value="70"></MaxSumOfMismatchQualsAcrossAlignment >
+					<SeedLength command="-l" input_type="int" default_value="28"></SeedLength>
+					<DisableMaqLikeQualityRounding command="--nomaqround" input_type="add" default_value="no_add"></DisableMaqLikeQualityRounding>
+					<MinInsertSizeForPairedAlignments command="-I" input_type="int" default_value="0"></MinInsertSizeForPairedAlignments>
+					<MaxInsertSizeForPairedAlignments command="-X" input_type="int" default_value="250"></MaxInsertSizeForPairedAlignments>
+					<MaxNBacktracks command="--maxbts" input_type="int" default_value="125"></MaxNBacktracks>
+					<MaxNAttemptsToFindMateForAnchorHit command="--pairtries" input_type="int" default_value="100"></MaxNAttemptsToFindMateForAnchorHit>
+					<TryHardToFindValidAlignments command="--tryhard" input_type="add" default_value="no_add"></TryHardToFindValidAlignments>
+					<ReportUpToNAlignmentsPerRead command="-k" input_type="int" default_value="1"></ReportUpToNAlignmentsPerRead>
+					<ReportAllAlignmentsPerRead command="--all" input_type="add" default_value="no_add"></ReportAllAlignmentsPerRead>
+					<HitsGuaranteedBestStratum command="--best" input_type="add" default_value="no_add"></HitsGuaranteedBestStratum>
+					<PrintTimeTakenBySearchPhases command="--time" input_type="add" default_value="no_add"></PrintTimeTakenBySearchPhases>
+					<LeftmostRefOffsetIsN command="-B" input_type="int" default_value="0"></LeftmostRefOffsetIsN>
+					<QuietOutputMode command="--quiet" input_type="add" default_value="no_add"></QuietOutputMode>
+					<OutputReference command="--refout" input_type="add" default_value="no_add"></OutputReference>
+					<ReferToRefSeqsByIndexRatherThanName command="--refidx" input_type="add" default_value="no_add"></ReferToRefSeqsByIndexRatherThanName>
+					<WriteEntireRefName command="--fullref" input_type="add" default_value="no_add"></WriteEntireRefName>
+			</Options>
+		</Bowtie>
+		<Bowtie2>
+			<Options>
+					<SkipFirstNReads command="-s" input_type="int" default_value="0"></SkipFirstNReads>
+					<StopAfterFirstNReads command="u" input_type="int" default_value="0"></StopAfterFirstNReads>
+					<TrimNBasesFromFivePrime command="--trim5" input_type="int" default_value="0"></TrimNBasesFromFivePrime>
+					<TrimNBasesFromThreePrime command="--trim3" input_type="int" default_value="0"></TrimNBasesFromThreePrime>	
+					<MaxMismatchesInSeed command="-N" input_type="int" default_value="0"></MaxMismatchesInSeed>
+					<SeedLength command="-L" input_type="int" default_value="22"></SeedLength>
+					<IncludeNExtraRefCharsOnSidesOfDpTable command="--dpad" input_type="int" default_value="15"></IncludeNExtraRefCharsOnSidesOfDpTable>
+					<DisallowGapsWithinNNucsOfReadExtremes command="--gbar" input_type="int" default_value="4"></DisallowGapsWithinNNucsOfReadExtremes>
+					<IgnoreQualityScores command="--ignore-quals" input_type="add" default_value="no_add"></IgnoreQualityScores>
+					<DoNotAllowOneMismatchAlignmentsBeforeScanning command="--no-1mm-upfront" input_type="add" default_value="no_add"></DoNotAllowOneMismatchAlignmentsBeforeScanning>
+					<EntireReadMustAlign command="--end-to-end" input_type="add" default_value="no_add"></EntireReadMustAlign>
+					<LocalAlignment command="--local" input_type="add" default_value="no_add"></LocalAlignment>
+					<MatchBonus command="--ma" input_type="int" default_value="0"></MatchBonus>
+					<MaxPenaltyForMismatch command="--mp" input_type="int" default_value="6"></MaxPenaltyForMismatch>
+					<PenaltyForNonNormalBasePairsInRead command="--np" input_type="int" default_value="1"></PenaltyForNonNormalBasePairsInRead>
+					<ReadGapOpenExtendPenalties command="--rdg" input_type="int,int" default_value="5,3"></ReadGapOpenExtendPenalties>
+					<ReferenceGapOpen command="--rfg" input_type="int,int" default_value="5,3"></ReferenceGapOpen>
+					<ReportUpToNAlignmentsPerRead command="-k" input_type="int" default_value="1"></ReportUpToNAlignmentsPerRead>
+					<ReportAllAlignmentsPerRead command="--all" input_type="add" default_value="no_add"></ReportAllAlignmentsPerRead>
+					<GiveUpExtendingAfterNFailedExtendsInARow command="-D" input_type="int" default_value="15"></GiveUpExtendingAfterNFailedExtendsInARow>
+					<TryNSetsOfSeedsForReadsWithRepetitiveSeeds command="-R" input_type="int" default_value="2"></TryNSetsOfSeedsForReadsWithRepetitiveSeeds>
+					<MinFragLengthForPairedAlignments command="-I" input_type="int" default_value="0"></MinFragLengthForPairedAlignments>
+					<MaxFragLengthForPairedAlignments command="-X" input_type="int" default_value="500"></MaxFragLengthForPairedAlignments>
+					<SuppressUnpairedAlignmentsForPairedReads command="--no-mixed" input_type="add" default_value="no_add"></SuppressUnpairedAlignmentsForPairedReads>
+					<SuppressDiscordantAlignmentsForPairedReads command="--no-discordant" input_type="add" default_value="no_add"></SuppressDiscordantAlignmentsForPairedReads>
+					<NotConcordantWhenMatesExtendPastEachOther command="--no-dovetail" input_type="add" default_value="no_add"></NotConcordantWhenMatesExtendPastEachOther>
+					<NotConcordantWhenOneMateAlignmentContainsOther command="--no-contain" input_type="add" default_value="no_add"></NotConcordantWhenOneMateAlignmentContainsOther>
+					<NotConcordantWhenMatesOverlapAtAll command="--no-overlap" input_type="add" default_value="no_add"></NotConcordantWhenMatesOverlapAtAll>
+					<PrintTimeTakenBySearchPhases command="--time" input_type="add" default_value="no_add"></PrintTimeTakenBySearchPhases>
+					<QuietOutputMode command="--quiet" input_type="add" default_value="no_add"></QuietOutputMode>
+					<FilterOutReadsThatAreBadAccordingToQSEQfilter command="--qc-filter" input_type="add" default_value="no_add"></FilterOutReadsThatAreBadAccordingToQSEQfilter>
+			</Options>
+		</Bowtie2>
+		<Cushaw>
+			<Options>
+					<OutputNEquivalentBestAlignments command="-multi" input_type="int" default_value="1"></OutputNEquivalentBestAlignments>
+					<ScoreForAMatch command="-match" input_type="int" default_value="1"></ScoreForAMatch>
+					<PenaltyForAMismatch command="-mismatch" input_type="int" default_value="3"></PenaltyForAMismatch>
+					<GapOpenPenalty command="-gopen" input_type="int" default_value="5"></GapOpenPenalty>
+					<GapExtensionPenalty command="-gext" input_type="int" default_value="2"></GapExtensionPenalty>
+					<SensitiveAlignment command="-sensitive" input_type="add" default_value="no_add"></SensitiveAlignment>
+					<MinimalOptimalLocalAlignmentScoreDividedBymatchingScore command="-min_score" input_type="int" default_value="30"></MinimalOptimalLocalAlignmentScoreDividedBymatchingScore>
+					<MinimalIdentityOfOptimalLocalAlignments command="-min_id" input_type="float" default_value="0.90"></MinimalIdentityOfOptimalLocalAlignments>
+					<MinimalRatioOfReadsInOptimalLocalAlignments command="-min_ratio" input_type="float" default_value="0.80"></MinimalRatioOfReadsInOptimalLocalAlignments>
+					<TopNumberOfReadPairsForInsertSizeEstimation command="ins_npairs" input_type="int" default_value="1"></TopNumberOfReadPairsForInsertSizeEstimation>
+					<MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate command="-ins_mapq" input_type="int" default_value="20"></MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate>
+					<MaxNumberOfSeedPairsPerReadPair command="-max_seedpairs" input_type="int" default_value="10000000"></MaxNumberOfSeedPairsPerReadPair>
+					<NoRescue command="-no_rescue" input_type="add" default_value="no_add"></NoRescue>
+					<NoSecondRescue command="-no_rescue_twice" input_type="add" default_value="no-add"></NoSecondRescue>
+			</Options>
+		</Cushaw>
+		<Cushaw_GPU>
+			<Options>
+					<OutputNEquivalentBestAlignments command="-multi" input_type="int" default_value="1"></OutputNEquivalentBestAlignments>
+					<ScoreForAMatch command="-match" input_type="int" default_value="1"></ScoreForAMatch>
+					<PenaltyForAMismatch command="-mismatch" input_type="int" default_value="3"></PenaltyForAMismatch>
+					<GapOpenPenalty command="-gopen" input_type="int" default_value="5"></GapOpenPenalty>
+					<GapExtensionPenalty command="-gext" input_type="int" default_value="2"></GapExtensionPenalty>
+					<SensitiveAlignment command="-sensitive" input_type="add" default_value="no_add"></SensitiveAlignment>
+					<MinimalOptimalLocalAlignmentScoreDividedBymatchingScore command="-min_score" input_type="int" default_value="30"></MinimalOptimalLocalAlignmentScoreDividedBymatchingScore>
+					<MinimalIdentityOfOptimalLocalAlignments command="-min_id" input_type="float" default_value="0.90"></MinimalIdentityOfOptimalLocalAlignments>
+					<MinimalRatioOfReadsInOptimalLocalAlignments command="-min_ratio" input_type="float" default_value="0.80"></MinimalRatioOfReadsInOptimalLocalAlignments>
+					<TopNumberOfReadPairsForInsertSizeEstimation command="ins_npairs" input_type="int" default_value="1"></TopNumberOfReadPairsForInsertSizeEstimation>
+					<MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate command="-ins_mapq" input_type="int" default_value="20"></MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate>
+					<MaxNumberOfSeedPairsPerReadPair command="-max_seedpairs" input_type="int" default_value="10000000"></MaxNumberOfSeedPairsPerReadPair>
+					<NoRescue command="-no_rescue" input_type="add" default_value="no_add"></NoRescue>
+					<NoSecondRescue command="-no_rescue_twice" input_type="add" default_value="no-add"></NoSecondRescue>
+			</Options>
+		</Cushaw_GPU>
+		<TopHat>
+			<Options>
+					<DiscardReadsWithNManyMismatches command="--read-mismatches" input_type="int" default_value="2"></DiscardReadsWithNManyMismatches>
+					<ReadGapLength command="--read-gap-length" input_type="int" default_value="2"></ReadGapLength>
+					<ReadEditDistance command="--read-edit-dist" input_type="int" default_value="2"></ReadEditDistance>	
+					<UseBowtie1InsteadOf2 command="--bowtie1" input_type="add" default_value="no_add"></UseBowtie1InsteadOf2>
+					<ExpectedMeanInnerDistancebetweenMatePairs command="--mate-inner-dist" input_type="int" default_value="50"></ExpectedMeanInnerDistancebetweenMatePairs>
+					<StandardDeviationOfInnerDistancesBetweenMatePairs command="--mate-std-dev" input_type="int" default_value="20"></StandardDeviationOfInnerDistancesBetweenMatePairs>
+					<MinimumAnchorLength command="--min-anchor-length" input_type="int" default_value="8"></MinimumAnchorLength>
+					<MaxMismatchesInAnchorRegion command="--splice-mismatches" input_type="int" default_value="0"></MaxMismatchesInAnchorRegion>
+					<MinIntronLength command="--min-intron-length" input_type="int" default_value="70"></MinIntronLength>
+					<MaxIntronLength command="--max-intron-length" input_type="int" default_value="500000"></MaxIntronLength>
+					<MaxInsertionLength command="--max-insertion-length" input_type="int" default_value="3"></MaxInsertionLength>
+					<MaxDeletionLength command="--max-deletion-length" input_type="int" default_value="3"></MaxDeletionLength>
+					<AllowNAlignmentsToReferenceARead command="--max-multihits" input_type="int" default_value="20"></AllowNAlignmentsToReferenceARead>
+					<ReportAdditionalSecondaryAlignments command="--report-secondary-alignments" input_type="add" default_value="no_add"></ReportAdditionalSecondaryAlignments>
+					<ReportOnlyConcordantMappings command="--no-discordant" input_type="add" default_value="no_add"></ReportOnlyConcordantMappings>
+					<OnlyReportWhenBothPairsMapped command="--no-mixed" input_type="add" default_value="no_add"></OnlyReportWhenBothPairsMapped>
+					<DisableCoverageBasedJunctionSearch command="--no-coverage-search" input_type="add" default_value="no_add"></DisableCoverageBasedJunctionSearch>
+					<EnableCoverageBasedJunctionSearch command="--coverage-search" input_type="add" default_value="no_add"></EnableCoverageBasedJunctionSearch>
+					<SearchForMicroExons command="--microexon-search" input_type="add" default_value="no_add"></SearchForMicroExons>
+					<AllowNMismatchesPerSegmentAlignment command="--segment_mismatches" input_type="int" default_value="2"></AllowNMismatchesPerSegmentAlignment>
+					<DivideEachReadIntoSegmentsOfSizeN command="--segment-length" input_type="int" default_value="25"></DivideEachReadIntoSegmentsOfSizeN>
+					<SegmentMinIntronLength command="--min-segment-intron" input_type="int" default_value="50"></SegmentMinIntronLength>
+					<SegmentMaxIntronLength command="--max-segment-intron" input_type="int" default_value="500000"></SegmentMaxIntronLength>
+					<CoverageSearchMinIntronLength command="--min-coverage-intron" input_type="int" default_value="50"></CoverageSearchMinIntronLength>
+					<CoverageSearchMaxIntronLength command="--max-coverage-intron" input_type="int" default_value="20000"></CoverageSearchMaxIntronLength>				
+			</Options>
+		</TopHat>
+		<Rockhopper>
+			<Options>
+					<MaxBasesBetweenPairEndPairs command="-d" input_type="int" default_value="500"></MaxBasesBetweenPairEndPairs>
+					<IdentifyOnlyOneAlignment command="-a" input_type="boolean" default_value="true"></IdentifyOnlyOneAlignment>
+			</Options>
+		</Rockhopper>
+		<STAR>
+			<Options>
+					<MaxNumberOfMultipleAlignments command="--outFilterMultimapNmax" input_type="int" default_value="10"></MaxNumberOfMultipleAlignments>
+					<AlignmentMaxMismatches command="--outFilterMismatchNmax" input_type="int" default_value="10"></AlignmentMaxMismatches>
+					<ClipN3PrimeBases command="--clip3pNbases" input_type="int" default_value="0"></ClipN3PrimeBases>
+					<ClipN5PrimeBases command="--clip5pNbases" input_type="int" default_value="0"></ClipN5PrimeBases>
+					<MaxJunctionsInOneRead command="--limitOutSJoneRead" input_type="int" default_value="1000"></MaxJunctionsInOneRead>
+					<MaxCollapsedJunctions command="--limitOutSJcollapsed" input_type="int" default_value="1000000"></MaxCollapsedJunctions>	
+			</Options>
+		</STAR>
+		<HISAT>
+			<Options>
+					<TrimNBasesFromThreePrime command="--trim3" input_type="int" default_value="0"></TrimNBasesFromThreePrime>
+					<TrimNBasesFromFivePrime command="--trim5" input_type="int" default_value="0"></TrimNBasesFromFivePrime>
+					<IgnoreQualityScores command="--ignore-quals" input_type="add" default_value="no_add"></IgnoreQualityScores>
+					<PenaltyForCanonicalSpliceSite command="--pen-cansplice" input_type="int" default_value="0"></PenaltyForCanonicalSpliceSite>
+					<PenaltyForNoncanonicalSpliceSite command="--pen-noncansplice" input_type="int" default_value="3"></PenaltyForNoncanonicalSpliceSite>
+					<MinIntronLength command="--min-intronlen" input_type="int" default_value="20"></MinIntronLength>
+					<MaxIntronLength command="--max-intronlen" input_type="int" default_value="500000"></MaxIntronLength>
+					<DisableSplicedAlignment command="--no-spliced-alignment" input_type="add" default_value="no_add"></DisableSplicedAlignment>
+					<ReportUpToNAlignmentsPerRead command="-k" input_type="int" default_value="5"></ReportUpToNAlignmentsPerRead>
+					<SuppressUnpairedAlignmentsForPairedReads command="--no-mixed" input_type="add" default_value="no_add"></SuppressUnpairedAlignmentsForPairedReads>
+					<SuppressDiscordantAlignmentsForPairedReads command="--no-discordant" input_type="add" default_value="no_add"></SuppressDiscordantAlignmentsForPairedReads>
+					<ConcordantWhenMatesExtendPastEachOther command="--dovetail" input_type="add" default_value="no_add"></ConcordantWhenMatesExtendPastEachOther>
+					<NotConcordantWhenOneMateAlignmentContainsOther command="--no-contain" input_type="add" default_value="no_add"></NotConcordantWhenOneMateAlignmentContainsOther>
+					<NotConcordantWhenMatesOverlapAtAll command="--no-overlap" input_type="add" default_value="no_add"></NotConcordantWhenMatesOverlapAtAll>
+					<PrintTimeTakenBySearchPhases command="--time" input_type="add" default_value="no_add"></PrintTimeTakenBySearchPhases>
+					
+			</Options>
+		</HISAT>
+	</Aligners>
+	<Counters>
+		<HTSeq>
+			<Options>
+				<SkipReadsLowerThanQualityN command="-a" input_type="int" default_value="10"></SkipReadsLowerThanQualityN>
+				<CountingMode command="-m" input_type="text" default_value="union"></CountingMode>
+			</Options>
+		</HTSeq>
+		<FeatureCounts>
+			<Options>
+				<OnlyConsiderFragmentsWithBothEndsMapped command="-B" input_type="add" default_value="no_add"></OnlyConsiderFragmentsWithBothEndsMapped>
+				<DoNotCountChimericFragments command="-C" input_type="add" default_value="no_add"></DoNotCountChimericFragments>
+				<MinFragLength command="-d" input_type="int" default_value="50"></MinFragLength>
+				<MaxFragLength command="-D" input_type="int" default_value="600"></MaxFragLength>
+				<MinQualityScore command="-Q" input_type="int" default_value="0"></MinQualityScore>
+				<DoNotSortReads command="--donotsort" input_type="add" default_value="no_add"></DoNotSortReads>
+				<AssignToLargestOverlap command="--largestOverlap" input_type="add" default_value="no_add"></AssignToLargestOverlap>
+				<MinOverlappingBasesBetweenReadAndOverlappingFeature command="--minOverlap" input_type="int" default_value="1"></MinOverlappingBasesBetweenReadAndOverlappingFeature>
+				<OnlyCountPrimaryAlignments command="--primary" input_type="add" default_value="no_add"></OnlyCountPrimaryAlignments>
+				<ExtendRead5Prime command="--readExtension5" input_type="int" default_value="0"></ExtendRead5Prime>
+				<ExtendRead3Prime command="--readExtension3" input_type="int" default_value="0"></ExtendRead3Prime>		
+			</Options>
+		</FeatureCounts>
+		<RSEM>
+			<Options>
+				<NoQualityScores command="--no_qualities" input_type="add" default_value="no_add"></NoQualityScores>
+				<OutputGenomeBam command="--output-genome-bam" input_type="add" default_value="no_add"></OutputGenomeBam>
+				<LengthOfSeed command="--seed-length" input_type="int" default_value="25"></LengthOfSeed>
+				<ProbabilityOfGeneratingAReadFromFowardTranscript command="--forward-prob" input_type="float" default_value="0.5"></ProbabilityOfGeneratingAReadFromFowardTranscript>
+				<MinReadLengthAllowed command="--fragment-length-min" input_type="int" default_value="1"></MinReadLengthAllowed>
+				<MaxReadLengthAllowed command="--fragment-length-max" input_type="int" default_value="1000"></MaxReadLengthAllowed>
+				<ConfidenceIntervalConfidence command="--ci-credibility-level" input_type="float" default_value="0.95"></ConfidenceIntervalConfidence>
+			</Options>
+		</RSEM>
+		<Cufflinks>
+			<Options>
+				<ExpectedMeanLengthofFragment command="-frag-len-mean" input_type="int" default_value="200"></ExpectedMeanLengthofFragment>
+				<ExpectedStdOfFragment command="-frag-len-std-dev" input_type="int" default_value="80"></ExpectedStdOfFragment>
+				<NormalizeByUpperQuartile command="-upper-quartile-norm" input_type="add" default_value="no_add"></NormalizeByUpperQuartile>
+				<NormalizeByTotalhits command="-total-hits-norm" input_type="add" default_value="no_add"></NormalizeByTotalhits>
+				<NormalizeByCompatibleHits command="-compatible-hits-norm" input_type="add" default_value="no_add"></NormalizeByCompatibleHits>
+				<MaxLocusFragments command="-max-bundle-frags" input_type="int" default_value="1000000"></MaxLocusFragments>
+				<DisableEffectiveLengthCorrection command="-no-effective-length-correction" input_type="add" default_value="no_add"></DisableEffectiveLengthCorrection>
+				<NoLengthCorrection command="-no-length-correction" input_type="add" default_value="no_add"></NoLengthCorrection>
+				<MinIsoformFraction command="-min-isoform-fraction" input_type="float" default_value="0.1"></MinIsoformFraction>
+				<PreMRnaFraction command="-pre-mrna-fraction" input_type="float" default_value="0.15"></PreMRnaFraction>
+				<MinIntronLength command="min-intron-length" input_type="int" default_value="50"></MinIntronLength>
+				<MaxIntronLength command="-max-intron-length" input_type="int" default_value="300000"></MaxIntronLength>
+				<AlphaValueForSplicedAlignmentFiltering command="-junc-alpha" input_type="float" default_value="0.001"></AlphaValueForSplicedAlignmentFiltering>
+				<SmallAnchorFilterFraction command="-small-anchor-fraction" input_type="float" default_value="0.09"></SmallAnchorFilterFraction>
+				<MinFragsPerTransfrag command="-min-frags-per-transfrag" input_type="int" default_value="10"></MinFragsPerTransfrag>
+				<NBPOverhangTolerance command="-overhang-tolerance" input_type="int" default_value="8"></NBPOverhangTolerance>
+				<MaxBundleLength command="-max-bundle-length" input_type="int" default_value="3500000"></MaxBundleLength>		
+			</Options>
+		</Cufflinks>
+	</Counters>
+</GlSeqOptions>
+	
