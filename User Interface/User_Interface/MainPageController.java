@@ -26,6 +26,7 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -46,7 +47,10 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.control.cell.ComboBoxTreeCell;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -311,35 +315,12 @@ public final class MainPageController extends MainPageItems implements
 		 */
 		alignment = new TreeItem<String>("Alignment");
 		alignmentOptions.setRoot(alignment);
+
 		alignmentOptions
 				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
 					@Override
 					public TreeCell<String> call(TreeView<String> param) {
-						return new CheckBoxTreeCell<String>() {
-							@Override
-							public void updateItem(String item, boolean empty) {
-								super.updateItem(item, empty);
-								if (getTreeItem() instanceof SpecialInputTreeItem){
-									// TODO: Do special stuff here to make the correct inputs possible at this given cell.
-								
-								}
-								// If there is no information for the Cell, make
-								// it
-								// empty
-								if (empty) {
-									setGraphic(null);
-									setText(null);
-									// Otherwise if it's not representation as
-									// an item
-									// of the tree
-									// is not a CheckBoxTreeItem, remove the
-									// checkbox
-									// item
-								} else if (!(getTreeItem() instanceof CheckBoxTreeItem)) {
-									setGraphic(null);
-								}
-							}
-						};
+						return new MyTreeCell();
 					}
 				});
 		// This is just the "alignment" option we see at the head of the field.
@@ -353,27 +334,7 @@ public final class MainPageController extends MainPageItems implements
 				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
 					@Override
 					public TreeCell<String> call(TreeView<String> param) {
-						return new CheckBoxTreeCell<String>() {
-							@Override
-							public void updateItem(String item, boolean empty) {
-								super.updateItem(item, empty);
-								// If there is no information for the Cell, make
-								// it
-								// empty
-								if (empty) {
-									setGraphic(null);
-									setText(null);
-									// Otherwise if it's not representation as
-									// an item
-									// of the tree
-									// is not a CheckBoxTreeItem, remove the
-									// checkbox
-									// item
-								} else if (!(getTreeItem() instanceof CheckBoxTreeItem)) {
-									setGraphic(null);
-								}
-							}
-						};
+						return new MyTreeCell();
 					}
 				});
 		countingOptions.setShowRoot(true);
@@ -483,7 +444,6 @@ public final class MainPageController extends MainPageItems implements
 	}
 
 	private void appendOptionsToTreeItems() {
-		System.out.println("Started loading XML");
 		TreeViewOptionsLoader load = new TreeViewOptionsLoader();
 		for (String keys : alignOptions.keySet()) {
 			try {

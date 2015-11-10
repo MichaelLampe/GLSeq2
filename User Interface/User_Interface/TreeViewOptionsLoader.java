@@ -1,16 +1,11 @@
 package application;
 
-import java.awt.List;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableListBase;
 import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.cell.ComboBoxTreeCell;
-import javafx.scene.control.cell.TextFieldTreeCell;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,7 +29,14 @@ public class TreeViewOptionsLoader {
 		}
 
 		try {
-			myOptions = xml.parse(new File("treeOptions.xml"));
+			String xml_path = "xml_data/treeOptions.xml";
+			// This should fix running in eclipse vs JAR file loading of the XML file
+			try {
+				myOptions = xml.parse(new File(xml_path));
+			} catch (FileNotFoundException e) {
+				myOptions = xml.parse(TreeViewOptionsLoader.class
+						.getResourceAsStream(xml_path));
+			}
 		} catch (SAXException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,7 +53,6 @@ public class TreeViewOptionsLoader {
 		if (myOptions.getElementsByTagName(itemName).getLength() > 1) {
 			throw new DuplicateElementsInXmlError();
 		}
-		System.out.println(itemName);
 		Node itemNode = myOptions.getElementsByTagName(itemName).item(0);
 		Node optionsNode = itemNode.getChildNodes().item(1);
 
@@ -77,8 +78,13 @@ public class TreeViewOptionsLoader {
 				optionXml.getNodeName());
 		String input_type = optionXml.getAttributes()
 				.getNamedItem("input_type").getNodeValue();
+		String default_value = optionXml.getAttributes()
+				.getNamedItem("default_value").getNodeValue();
+
 		if (!input_type.equals("add")) {
-			option.getChildren().add(new SpecialInputTreeItem<String>(input_type));
+			option.getChildren()
+					.add(new SpecialInputTreeItem<String>(input_type,
+							default_value));
 		}
 		return option;
 	}
