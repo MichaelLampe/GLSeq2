@@ -35,8 +35,8 @@ for (zz in 1:nStreams) {
     # Two alignments happen no matter what, after the SAI file is made we can combine paired files into one SAM
     # file using some BWA tools.
     align.options <- paste("-t 8")
-    aln.left <- paste(bwaPath, "aln",align.options,paste(dest.dir,refFASTAname,sep=""), fq.left, ">", sainame.left)
-    if (paired.end) aln.right <- paste(bwaPath, "aln", paste(dest.dir,refFASTAname,sep=""), fq.right, ">", sainame.right)
+    aln.left <- paste(bwaPath, "aln",align.options,alignmentSpecialOptions, paste(dest.dir,refFASTAname,sep=""), fq.left, ">", sainame.left)
+    if (paired.end) aln.right <- paste(bwaPath, "aln", alignmentSpecialOptions, paste(dest.dir,refFASTAname,sep=""), fq.right, ">", sainame.right)
     # Sam File Creation
     # Sampe/Samse transforms a .sai file into a SAM file.
     # We take the output of the Sam*e program and appends the content to the unsorted SAM file

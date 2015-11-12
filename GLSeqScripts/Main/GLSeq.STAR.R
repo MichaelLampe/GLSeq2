@@ -38,9 +38,9 @@ for (zz in 1:nStreams) {
     star.output.dir <- paste(this.resName,"STAR.Alignment/",sep=".")
     printOrExecute(paste("mkdir",star.output.dir),Condor)
     if (paired.end){
-      alignment.command <- paste(star.path,"--genomeDir",reference.genome.folder,"--readFilesIn",paste(fq.left,",",fq.right,sep=""),"--outFileNamePrefix",star.output.dir)
+      alignment.command <- paste(star.path,"--genomeDir",reference.genome.folder,alignmentSpecialOptions,"--readFilesIn",paste(fq.left,",",fq.right,sep=""),"--outFileNamePrefix",star.output.dir)
     } else{
-      alignment.command <- paste(star.path,"--genomeDir",reference.genome.folder,"--readFilesIn",fq.left,"--outFileNamePrefix",star.output.dir)
+      alignment.command <- paste(star.path,"--genomeDir",reference.genome.folder,alignmentSpecialOptions,"--readFilesIn",fq.left,"--outFileNamePrefix",star.output.dir)
     }
     # 6 Cores, roughly 24GB of ram they estimate for this.
     if (Condor) alignment.command <- paste(alignment.command,"--runThreadN 6")

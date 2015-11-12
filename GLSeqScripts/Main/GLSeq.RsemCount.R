@@ -27,6 +27,7 @@ if (Condor){
 }
 if (paired.end) rsemOptions <- paste(rsemOptions,"--sam","--paired-end")
 if (!paired.end) rsemOptions <- paste(rsemOptions,"--sam")
+rsemOptions <- paste(rsemOptions,RsemSpecialOptions)
 # Organize the files into the RSEM count folder.
 organize.files <- paste("mv",paste(this.resName,"*.RSEM.counts.*",sep=""),destDirRSEMCount)
 organize.files <- paste(organize.files,"&&","mv",paste(this.resName,"*.index.*",sep=""),destDirRSEMCount)

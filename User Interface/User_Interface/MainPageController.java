@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -26,7 +22,6 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -47,10 +42,7 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.CheckBoxTreeCell;
-import javafx.scene.control.cell.ComboBoxTreeCell;
-import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -81,6 +73,8 @@ public final class MainPageController extends MainPageItems implements
 	private static GlowRequest request = null;
 
 	public final static ArrayList<String> liblistData = new ArrayList<String>();
+
+	private final static TreeViewOptionsLoader load = new TreeViewOptionsLoader();
 
 	// CONSTANTS
 	private final String LOGIN_GLOW = "Login to GLOW";
@@ -279,18 +273,19 @@ public final class MainPageController extends MainPageItems implements
 							@Override
 							public void updateItem(String item, boolean empty) {
 								super.updateItem(item, empty);
-								// If there is no information for the Cell, make
-								// it
-								// empty
+								/*
+								 * If there is no information for the Cell, make
+								 * it empty
+								 */
 								if (empty) {
 									setGraphic(null);
 									setText(null);
-									// Otherwise if it's not representation as
-									// an item
-									// of the tree
-									// is not a CheckBoxTreeItem, remove the
-									// checkbox
-									// item
+									/*
+									 * Otherwise if it's not representation as
+									 * an item of the tree is not a
+									 * CheckBoxTreeItem, remove the checkbox
+									 * item
+									 */
 								} else if (!(getTreeItem() instanceof CheckBoxTreeItem)) {
 									setGraphic(null);
 								}
@@ -444,10 +439,18 @@ public final class MainPageController extends MainPageItems implements
 	}
 
 	private void appendOptionsToTreeItems() {
-		TreeViewOptionsLoader load = new TreeViewOptionsLoader();
 		for (String keys : alignOptions.keySet()) {
 			try {
 				alignOptions.get(keys).getChildren()
+						.add(load.createTreeElementfromXml(keys));
+			} catch (DuplicateElementsInXmlError e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		for (String keys : countOptions.keySet()) {
+			try {
+				countOptions.get(keys).getChildren()
 						.add(load.createTreeElementfromXml(keys));
 			} catch (DuplicateElementsInXmlError e) {
 				// TODO Auto-generated catch block
@@ -717,6 +720,10 @@ public final class MainPageController extends MainPageItems implements
 					Attributes.getInstance().attributesCollection.get(
 							AttributesJSON.libList.field_name).setValue("NULL");
 				}
+
+				// Make it work
+				UpdateAttribute.getInstance().addSpecialArgs(alignment,
+						counting, load);
 
 				AttributeActionsUI action = new AttributeActionsUI();
 				UpdateAttribute.getInstance().updateAttributes();

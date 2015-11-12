@@ -74,8 +74,8 @@ if (aAlgor == "Cushaw_GPU"){
         nCores <- 6
         warning("Too many cores can slow alignment.  Adjusting maximum cores to 6.")
       }
-      if (paired.end)  create <- paste(CUSHAW.GPU.path, "-r", paste(dest.dir,refFASTAname,sep=""), "-q", fq.right, fq.left, "-o", unsorted.sam,"-t", nCores)
-      if (!(paired.end)) create <- paste(CUSHAW.GPU.path, "-r", paste(dest.dir,refFASTAname,sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (paired.end)  create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,refFASTAname,sep=""), "-q", fq.right, fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (!(paired.end)) create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,refFASTAname,sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
       # Checks to make sure that this process actually is GPU
       # The is.null is there for later on implementation of parallel GPU runs. (Hopefully!)
       if (is.null(sam.create)){

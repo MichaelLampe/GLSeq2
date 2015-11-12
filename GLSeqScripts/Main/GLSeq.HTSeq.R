@@ -30,6 +30,7 @@ if (!is.null(libstrand)) {
 }
 # selecting ID attribute for counts reporting:
 countOpt <- paste(countOpt, " --idattr=", idAttr, sep="")
+countOpt <- paste(countOpt,HtSeqSpecialOptions)
 #
 # Throws the output into a counting file and then moves the output over into the HTSeq folder.
 htSeq.comm <- paste("python -m HTSeq.scripts.count",countOpt, countable.sam, paste(dest.dir,refGFFname,sep=""), ">", countfile)

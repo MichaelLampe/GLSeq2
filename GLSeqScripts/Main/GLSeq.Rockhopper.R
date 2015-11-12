@@ -101,7 +101,8 @@ for (zz in 1:nStreams) {
       }
     }
 
-    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,rockhopper.output.folder,strand.command)
+    commands <- paste (strand.command,alignmentSpecialOptions)
+    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,rockhopper.output.folder,commands)
     countable.sam <- countable.sam.name(this.resName)
     create.countable <- paste("mv",paste(rockhopper.output.folder,"dirty.sam",sep=""),countable.sam)
 
