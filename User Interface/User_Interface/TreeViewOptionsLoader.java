@@ -3,6 +3,7 @@ package application;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;
@@ -18,7 +19,8 @@ import org.xml.sax.SAXException;
 public class TreeViewOptionsLoader {
 
 	private Document myOptions;
-
+	public static HashMap<String,String> commandMap = new HashMap<String, String>();
+	
 	public TreeViewOptionsLoader() {
 		DocumentBuilder xml = null;
 		try {
@@ -80,7 +82,10 @@ public class TreeViewOptionsLoader {
 				.getNamedItem("input_type").getNodeValue();
 		String default_value = optionXml.getAttributes()
 				.getNamedItem("default_value").getNodeValue();
-
+		
+		// We'll use this later as we don't necessarily want to display this.
+		commandMap.put(optionXml.getNodeName(), optionXml.getAttributes().getNamedItem("command").getNodeValue());
+		
 		if (!input_type.equals("add")) {
 			option.getChildren()
 					.add(new SpecialInputTreeItem<String>(input_type,

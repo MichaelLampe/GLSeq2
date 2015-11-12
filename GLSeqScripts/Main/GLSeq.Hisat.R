@@ -32,6 +32,7 @@ for (zz in 1:nStreams) {
     } else{
       alignment.options <- paste("-x",paste(dest.dir,rGenome,sep=""))
     }
+    alignment.options <- paste(alignment.options,alignmentSpecialOptions)
     hisat.location <- paste(hisat.directory,"hisat",sep="")
     if (paired.end){
       align <- paste("perl",hisat.location,alignment.options,"-1",fq.left,"-2",fq.right,"-S",countable.sam)

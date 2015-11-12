@@ -10,7 +10,6 @@
 #
 source("GLSeq.Alignment.Functions.R")
 source("GLSeq.Util.R")
-
 comm.stack.pool <- NULL
 comm.stack.pools <- NULL
 file.name.change <- NULL
@@ -73,7 +72,7 @@ for (zz in 1:nStreams) {
     # the main folder for further processing/display, but retain some of TopHat's excellent post-run notes
     #
     tophat.output.dir <- paste(this.resName,"TopHat.Alignment",sep=".")
-    alignmentOptions <- paste("-p 8","-o",tophat.output.dir)
+    alignmentOptions <- paste("-p 8","-o",tophat.output.dir,alignmentSpecialOptions)
     align <- paste(TopHat.path,alignmentOptions,paste(dest.dir,rGenome,sep=""),fq.left)
     if (paired.end){
       align <- paste(align,fq.right)

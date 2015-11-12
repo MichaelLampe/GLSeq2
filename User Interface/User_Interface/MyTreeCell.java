@@ -12,7 +12,6 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
 public class MyTreeCell extends CheckBoxTreeCell<String> {
 	public MyTreeCell() {
 		// instantiate the root context menu
-
 	}
 
 	@Override
@@ -42,60 +41,103 @@ public class MyTreeCell extends CheckBoxTreeCell<String> {
 
 				// Integers
 				if (input_type.equals("int")) {
-					Spinner<Integer> intSpinner = new Spinner<Integer>();
-					int default_value = (int) Integer.valueOf(treeItem
-							.getDefaultValue());
-					/*
-					 * Default values imported from SpecialInputTreeItem
-					 */
+					if (this.getGraphic() == null) {
+						Spinner<Integer> intSpinner = new Spinner<Integer>();
+						int default_value = (int) Integer.valueOf(treeItem
+								.getDefaultValue());
+						/*
+						 * Default values imported from SpecialInputTreeItem
+						 */
 
-					// Create the factory
-					intSpinner
-							.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(
-									0, 10000000));
-					// THEN you can set the value
-					intSpinner.getValueFactory().setValue(default_value);
-					// We also allow direct editing.
-					intSpinner.setEditable(true);
-					// Graphics take nodes, spinners are nodes.
-					setGraphic(intSpinner);
+						// Create the factory
+						intSpinner
+								.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(
+										0, 10000000));
+						intSpinner.valueProperty().addListener(
+								(obs, oldValue, newValue) -> treeItem
+										.setDefaultValue(String
+												.valueOf(newValue)));
+						intSpinner.focusedProperty().addListener(
+								(s, ov, nv) -> (intSpinner.getValueFactory()
+										.setValue(Integer.valueOf(intSpinner
+												.getEditor().getText()))
+								));
+						intSpinner.focusedProperty().addListener(
+								(s, ov, nv) -> (treeItem
+										.setDefaultValue(intSpinner.getEditor()
+												.getText())));
+						// THEN you can set the value
+						intSpinner.getValueFactory().setValue(default_value);
+						// We also allow direct editing.
+						intSpinner.setEditable(true);
+						// Graphics take nodes, spinners are nodes.
+						setGraphic(intSpinner);
+					}
 				}
 				// Float
 				if (input_type.equals("float")) {
-					Spinner<Double> doubleSpinner = new Spinner<Double>();
-					double default_value = (double) Double.valueOf(treeItem
-							.getDefaultValue());
-					/*
-					 * Default values imported from SpecialInputTreeItem
-					 */
+					if (this.getGraphic() == null) {
+						Spinner<Double> doubleSpinner = new Spinner<Double>();
+						double default_value = (double) Double.valueOf(treeItem
+								.getDefaultValue());
+						/*
+						 * Default values imported from SpecialInputTreeItem
+						 */
 
-					// Create the factory
-					DoubleSpinnerValueFactory dblSpinFact = new SpinnerValueFactory.DoubleSpinnerValueFactory(
-							0.0, 1.0);
-					dblSpinFact.amountToStepByProperty().set(0.01);
-					doubleSpinner.setValueFactory(dblSpinFact);
-					// THEN you can set the value
-					doubleSpinner.getValueFactory().setValue(default_value);
-					// We also allow direct editing.
-					doubleSpinner.setEditable(true);
-					// Graphics take nodes, spinners are nodes.
-					setGraphic(doubleSpinner);
+						// Create the factory
+						DoubleSpinnerValueFactory dblSpinFact = new SpinnerValueFactory.DoubleSpinnerValueFactory(
+								0.0, 1.0);
+						dblSpinFact.valueProperty().addListener(
+								(obs, oldValue, newValue) -> treeItem
+										.setDefaultValue(String
+												.valueOf(newValue)));
+						doubleSpinner.focusedProperty().addListener(
+								(s, ov, nv) -> (doubleSpinner.getValueFactory()
+										.setValue(Double.valueOf(doubleSpinner
+												.getEditor().getText()))
+
+								));
+						doubleSpinner.focusedProperty().addListener(
+								(s, ov, nv) -> (treeItem
+										.setDefaultValue(doubleSpinner
+												.getEditor().getText())));
+						dblSpinFact.amountToStepByProperty().set(0.01);
+						doubleSpinner.setValueFactory(dblSpinFact);
+						// THEN you can set the value
+						doubleSpinner.getValueFactory().setValue(default_value);
+						// We also allow direct editing.
+						doubleSpinner.setEditable(true);
+						// Graphics take nodes, spinners are nodes.
+						setGraphic(doubleSpinner);
+					}
 				}
 				// Boolean
 				if (input_type.equals("boolean")) {
-					String default_value = treeItem.getDefaultValue();
+					if (this.getGraphic() == null) {
+						String default_value = treeItem.getDefaultValue();
 
-					ObservableList<String> options = FXCollections
-							.observableArrayList("True", "False");
-					ComboBox<String> combo = new ComboBox<String>(options);
-					combo.setValue(default_value);
-					/*
-					 * Default values imported from SpecialInputTreeItem
-					 */
+						ObservableList<String> options = FXCollections
+								.observableArrayList("True", "False");
+						ComboBox<String> combo = new ComboBox<String>(options);
+						combo.getSelectionModel().select(default_value);
+						combo.valueProperty().addListener(
+								(obs, oldValue, newValue) -> treeItem
+										.setDefaultValue(String
+												.valueOf(newValue)));
+						combo.focusedProperty()
+								.addListener(
+										(obs) -> treeItem.setDefaultValue(combo
+												.getSelectionModel()
+												.getSelectedItem()));
+						;
+						/*
+						 * Default values imported from SpecialInputTreeItem
+						 */
 
-					// Create the factory
-					// Graphics take nodes, spinners are nodes.
-					setGraphic(combo);
+						// Create the factory
+						// Graphics take nodes, spinners are nodes.
+						setGraphic(combo);
+					}
 				}
 
 			} else {

@@ -73,9 +73,9 @@ for (zz in 1:nStreams) {
       if (paired.end){
         # These are options normally used by the RSEM peeps, see the same link as above for documentation on this.
         Bowtie2Options <- paste(Bowtie2Options,"--no-mixed","--no-discordant")
-        align <- paste("bowtie2",Bowtie2Options,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,"-S",countable.sam)
+        align <- paste("bowtie2",Bowtie2Options,alignmentSpecialOptions,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,"-S",countable.sam)
       }else{
-        align <- paste("bowtie2",Bowtie2Options,paste(dest.dir,rGenome,sep=""),"-U",fq.left,"-S",countable.sam)
+        align <- paste("bowtie2",Bowtie2Options,alignmentSpecialOptions,paste(dest.dir,rGenome,sep=""),"-U",fq.left,"-S",countable.sam)
       }
     }
     ###################
