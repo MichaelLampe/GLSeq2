@@ -2,17 +2,14 @@ package application;
 
 import java.util.ArrayList;
 
-import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 
 // This class is a singleton, no need to have multiple attempts to update
 public class UpdateAttribute {
@@ -92,7 +89,7 @@ public class UpdateAttribute {
 					.getChildren().get(i);
 			if (checkVariant.isSelected()) {
 				String optionName = options.getChildren().get(i).getValue();
-				String command = commandHolder.commandMap.get(optionName);
+				String command = TreeViewOptionsLoader.getCommandMap().get(optionName);
 
 				alignSpecialOptions.append(command);
 				alignSpecialOptions.append(" ");
@@ -123,7 +120,7 @@ public class UpdateAttribute {
 		// Aligner Name -> Options
 		TreeItem<String> options = aligner.getChildren().get(0);
 		// All the options
-		Attribute align = attributes.getInstance().attributesCollection
+		Attribute align = Attributes.getInstance().attributesCollection
 				.get("alignmentSpecialOptions");
 		align.setValue(constructSpecialArg(options, commandHolder));
 
@@ -135,24 +132,24 @@ public class UpdateAttribute {
 			TreeItem<String> option = counter.getChildren().get(0);
 
 			if (counter.getValue().equals("HTSeq")) {
-				Attribute htseq = attributes.getInstance().attributesCollection
+				Attribute htseq = Attributes.getInstance().attributesCollection
 						.get("HtSeqSpecialOptions");
 				htseq.setValue(constructSpecialArg(option, commandHolder));
 
 			}
 			if (counter.getValue().equals("RSEM")) {
-				Attribute rsem = attributes.getInstance().attributesCollection
+				Attribute rsem = Attributes.getInstance().attributesCollection
 						.get("RsemSpecialOptions");
 				rsem.setValue(constructSpecialArg(option, commandHolder));
 			}
 			if (counter.getValue().equals("FeatureCounts")) {
-				Attribute featureCounts = attributes.getInstance().attributesCollection
+				Attribute featureCounts = Attributes.getInstance().attributesCollection
 						.get("FeatureCountsSpecialOptions");
 				featureCounts.setValue(constructSpecialArg(option,
 						commandHolder));
 			}
 			if (counter.getValue().equals("Cufflinks")) {
-				Attribute cufflinks = attributes.getInstance().attributesCollection
+				Attribute cufflinks = Attributes.getInstance().attributesCollection
 						.get("CufflinksSpecialOptions");
 				cufflinks.setValue(constructSpecialArg(option, commandHolder));
 			}

@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 public class TreeViewOptionsLoader {
 
 	private Document myOptions;
-	public static HashMap<String,String> commandMap = new HashMap<String, String>();
+	private static HashMap<String,String> commandMap = new HashMap<String, String>();
 	
 	public TreeViewOptionsLoader() {
 		DocumentBuilder xml = null;
@@ -84,7 +84,7 @@ public class TreeViewOptionsLoader {
 				.getNamedItem("default_value").getNodeValue();
 		
 		// We'll use this later as we don't necessarily want to display this.
-		commandMap.put(optionXml.getNodeName(), optionXml.getAttributes().getNamedItem("command").getNodeValue());
+		getCommandMap().put(optionXml.getNodeName(), optionXml.getAttributes().getNamedItem("command").getNodeValue());
 		
 		if (!input_type.equals("add")) {
 			option.getChildren()
@@ -92,6 +92,14 @@ public class TreeViewOptionsLoader {
 							default_value));
 		}
 		return option;
+	}
+
+	public static HashMap<String,String> getCommandMap() {
+		return commandMap;
+	}
+
+	public static void setCommandMap(HashMap<String,String> commandMap) {
+		TreeViewOptionsLoader.commandMap = commandMap;
 	}
 
 }

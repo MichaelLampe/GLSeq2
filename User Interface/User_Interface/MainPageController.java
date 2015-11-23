@@ -83,31 +83,26 @@ public final class MainPageController extends MainPageItems implements
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		addListeners();
-
+		
+		addScrollbarListeners();
+		
+		progressBarListener();
+		
+		alignAndCountingOptions();
+		
 		constructRadioButtons();
 
 		setupComboBoxes();
 
 		setupStartRun();
 
-		addScrollbarListeners();
-
-		progressBarListener();
-
 		runBindings();
+		
 		menuListeners();
 
 		appendTooltips();
 
-		alignAndCountingOptions();
-
 		fileSelectTree();
-
-	}
-
-	private void fillOptions(String option) {
-		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw,
-				Cushaw_Gpu, TopHat, Rockhopper, star, hisat, BWA };
 	}
 
 	private void constructRadioButtons() {
@@ -298,13 +293,13 @@ public final class MainPageController extends MainPageItems implements
 	}
 
 	private void alignAndCountingOptions() {
-		constructOptionsMap();
-		appendOptionsToTreeItems();
 		/*
 		 * Sets up the radio button and check mark listeners for when different
 		 * options are selected.
 		 */
 		addAlignmentAndCountingListeners();
+		constructOptionsMap();
+		appendOptionsToTreeItems();
 		/*
 		 * The head of the alignment tree
 		 */
@@ -349,11 +344,9 @@ public final class MainPageController extends MainPageItems implements
 				Cushaw_Gpu, TopHat, star, hisat, Rockhopper };
 		List<RadioButton> modifyAlignOptions = Arrays
 				.asList(tempModifyAlignOptions);
-
+		
 		modifyAlignOptions.parallelStream().forEach((radioButton) -> {
-			// Adds the options of that button into the HashMap
-				fillOptions(radioButton.getText());
-				// Then add listeners to everything
+			// Then add listeners to everything
 				radioButton.selectedProperty().addListener(
 						new ChangeListener<Boolean>() {
 							@Override
@@ -444,7 +437,6 @@ public final class MainPageController extends MainPageItems implements
 				alignOptions.get(keys).getChildren()
 						.add(load.createTreeElementfromXml(keys));
 			} catch (DuplicateElementsInXmlError e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -453,7 +445,6 @@ public final class MainPageController extends MainPageItems implements
 				countOptions.get(keys).getChildren()
 						.add(load.createTreeElementfromXml(keys));
 			} catch (DuplicateElementsInXmlError e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -509,7 +500,6 @@ public final class MainPageController extends MainPageItems implements
 		Tooltip presplitToolTip = new Tooltip(
 				"For paired-end libraries, data is split into left- and right-read FASTQ files for each library (if not, splitting at the pre-processing stage may be needed).");
 		presplit.setTooltip(presplitToolTip);
-
 	}
 
 	/*
@@ -746,7 +736,7 @@ public final class MainPageController extends MainPageItems implements
 				// Grabs the args from that instance
 				// If true, run on HTcondor, else do not
 				List<String> args = currentRun.constructArgs(
-						htcondor_check.isSelected(), attributeFileLocation);
+						htcondor_check.isSelected(), attributeFileLocation, scriptDirectory.getText());
 				if (args != null) {
 					// Might add some logic in the future that starts an SSH on
 					// windows/mac
