@@ -54,6 +54,10 @@ command["attribute_file_path"] = ""
 
 try:
     command["glseq_path"] = sys.argv[1]
+    if not command["glseq_path"].endswith("GLSeq.top.R"):
+      # Make sure we are using GLSeq top script.
+      command["glseq_path"] = trail_check(command["glseq_path"])
+      command["glseq_path"] = command["glseq_path"] + "GLSeq.top.R"
     command["update_database"] = sys.argv[2]
     command["prepare"] = sys.argv[3]
     command["align"] = sys.argv[4]
@@ -143,20 +147,21 @@ else:
                            "TRUE")
     # # Initiates a run through the wrapper, and takes in all the output which is the various commands that would be run
     commands = current_run.run()
-    # Creates the directory for the Dagman shell scripts and log files
+    attribute_file_path = trail_check(command["attribute_file_path"])
+    run_name = os.path.splitext(attribute_file_path)[0]
     # Trims and groups commands
-    processor = CommandProcessor(commands)
+    processor = CommandProcessor(commands, run_name)
     # Puts the commands into an organized graph structure
     graph = processor.create_graph()
     # Starts a command stack which will do the processing moving forward
     command_stack = Stack(graph)
-    # Creates a new stack by a run name
-    command_stack.create_stack(command["run_name"])
-    # Submits the workflow to condor.
-    command_stack.submit()
     try:
         command_stack.plot_graph(command["run_name"])
     except:
         pass
+    # Creates a new stack by a run name
+    command_stack.create_stack(command["run_name"])
+    # Submits the workflow to condor.
+    command_stack.submit()
     clear_classes()
 exit(0)
