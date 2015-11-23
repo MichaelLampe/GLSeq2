@@ -13,7 +13,8 @@ public class Run {
 	private final boolean counting;
 	private final boolean collect;
 
-	public Run(boolean dataprep, boolean alignment, boolean counting, boolean collect, String run_name) {
+	public Run(boolean dataprep, boolean alignment, boolean counting,
+			boolean collect, String run_name) {
 		this.run_name = run_name;
 		this.dataprep = dataprep;
 		this.alignment = alignment;
@@ -26,7 +27,7 @@ public class Run {
 		return runs_count;
 	}
 
-	public List<String> constructArgs(boolean Condor, String attribute_file) {
+	public List<String> constructArgs(boolean Condor, String attribute_file, String scriptsDirectory) {
 		List<String> args = new ArrayList<String>();
 		// Condor Wrapper to run via Condor
 		if (Condor) {
@@ -37,9 +38,12 @@ public class Run {
 			args.add("Rscript");
 			args.add("GLSeq.top.R");
 		}
+		// GLSeq Script Directory
+		args.add(scriptsDirectory);
+		
 		// Where update was, might add to here later
 		args.add("Placeholder");
-
+		
 		// Dataprep
 		if (dataprep)
 			args.add("dataprep");
@@ -65,8 +69,9 @@ public class Run {
 			args.add("nocollect");
 
 		// This means it is a directory, so we don't assign a name
-		if (!attribute_file.endsWith("/"))
-			args.add(run_name);
+		if (!attribute_file.endsWith("/")) {
+			args.add(this.run_name);
+		}
 
 		// Protocol ID
 		args.add("0");
