@@ -1,23 +1,28 @@
-__author__ = 'mlampe'
-
+__author__ = 'Michael Lampe'
+__version__ = "1.0.0"
+__maintainer__ = "Michael Lampe"
+__email__ = "MrLampe@Wisc.edu"
+__status__ = "Development"
 
 import re
 import os
 import sys
 import numpy as np
-import matplotlib
+try:
+    import matplotlib
 # Let's us run this without a display
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+except ImportError:
+    print("Unable to import matplotlib libraries - efficiency analyzer closing.")
+    exit(1)
 
 memory = re.compile("Memory ")
 job_name = re.compile("JOB[0-9]*")
 
-
 class ResourceSummarizer:
     def __init__(self, log_directory, run_name):
         self.log_directory = log_directory
-        self.run_name = run_name
         # Makes sure has an ending slash
         if not self.log_directory.endswith("/"):
             self.log_directory += "/"
@@ -33,7 +38,7 @@ class ResourceSummarizer:
             # It will be used as the key for all of this
             # And also the label for the bars.
             # The try is here in case we get a badly formed log file.
-            # This may occur if we run the efficiency analyzer as a member of the DAG, in which case its log
+            # This may occur primarily if we run the efficiency analyzer as a member of the DAG, in which case its log
             #  file wouldn't be complete.
             try:
                 job_number = self.parse_job_name(log_file)
@@ -41,7 +46,7 @@ class ResourceSummarizer:
                 # Calculate the efficiency of the request vs allocation
                 used, expected = self.analyze_log_file(log_file)
                 resources[job_number] = (used, expected)
-                efficiency[job_number] = (self.resource_efficiency(used, expected))
+                efficiency[job_number] = self.resource_efficiency(used, expected)
             except:
                 pass
         # After we have everything, plot it

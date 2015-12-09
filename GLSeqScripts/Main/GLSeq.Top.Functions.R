@@ -33,7 +33,7 @@ create.dest.dir.log <- function(dest.dir,text.add){
 }
 
 # Instantiates a few of the basic log properties at the start
-add.basic.logs <- function(log.file=NULL){
+add.basic.logs <- function(log.file=NULL) {
   if(is.null(log.file)) return
   # Just a bunch of logs that are added.
   # This may be expanded/ made customizable in the future to allow for custom loggin
@@ -484,14 +484,12 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor=
   source("GLSeq.dataprep.R")
   relative.fqFiles
 }
-
 # Executes the communication stack
 execute.comm.stack <- function (comm.stack.pool, Condor=FALSE) {
   if (is.null(comm.stack.pool)) stop("Arguments should not be NULL")
   stack.start.time <- proc.time()
   printOrExecute(comm.stack.pool,Condor)
 }
-
 # Creates the collection directories
 previous.run.directories <- function(previous.dir,previous.run.name){
   if (is.null(previous.dir) || is.null(previous.run.name)) stop("Arguments should not be NULL")

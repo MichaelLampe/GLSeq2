@@ -151,15 +151,13 @@ if (dataPrepare == "dataprep") {
 # Construct alignment + counting comm stack
 if (alignment == "alignment") {
   if (dataPrepare == "nodataprep") {
-
-    if (is.null(libList)){
+    if (is.null(libList)) {
       copy.preprocessed.files.dir(readyData.dir,dest.dir,Condor)
       fqfiles.table <- convert.file.list.to.table(paired.end,readyData.dir,NULL)
     } else {
       copy.preprocessed.files.list(libList,dest.dir,Condor)
       fqfiles.table <- convert.file.list.to.table(paired.end,NULL,libList)
     }
-
   }
   if (dataPrepare == "dataprep"){
     fqfiles.table <- convert.file.list.to.table(paired.end,NULL,relative.fqFiles)
@@ -168,7 +166,6 @@ if (alignment == "alignment") {
   rangelist <- prepare.chunk.function(fqfiles.table,nStreams)
   comm.stack.pool <- start.alignment.process(base.dir,rangelist,nStreams,Condor)
 }
-
 
 if (alignment == "noalignment") {
   # If only counting, construct counting comm stack

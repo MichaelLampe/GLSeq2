@@ -2,7 +2,7 @@ __original_author__ = 'Michael Lampe'
 # If updated by another person, please change the values below
 __author__ = 'Michael Lampe'
 __version__ = '1.0'
-__last_update__ = "August 2015"
+__last_update__ = "October 2015"
 
 import os
 import re
@@ -38,6 +38,7 @@ if len(sys.argv) < 3:
     print_help()
 
 for i , command in enumerate(sys.argv):
+    # Make sure it is a string
     command = str(command)
     if i == 0:
         pass
@@ -47,11 +48,14 @@ for i , command in enumerate(sys.argv):
     elif i == 2:
         # Directory to write files and folders to
         directory_name = command
+
     # Advanced commands
     elif i > 2:
         try:
             split_command = command.split("=")
             option_name, opt_value = split_command[0], split_command[1]
+
+            command_executed = False
             if option_name is "NUMBER_OF_INPUT_FILE_COLUMNS":
                 gtf_column_count = int(opt_value)
                 command_executed = True
@@ -70,6 +74,7 @@ for i , command in enumerate(sys.argv):
 if not file_name.endswith("gtf") and not file_name.endswith("gff"):
     print "ERROR: Input file to be converted should have either gtf or gff file ending."
     exit(2)
+
 # Append trailing slash
 if not directory_name.endswith("/"):
     directory_name = directory_name + "/"
@@ -81,6 +86,7 @@ gene_id = re.compile("(?<=gene_id \").*(?=\"; transcript_id)", re.IGNORECASE)
 # Remove gtf file ending and absolute file path stuff
 species = re.search("[0-9a-zA-Z_.]*$", file_name, re.IGNORECASE).group(0)
 species = species.split(".")[0]
+
 """
 PTT File Format
 Location	Strand	Length	PID	Gene	Synonym	Code	COG	Product
@@ -154,6 +160,7 @@ with open (file_name) as file:
                             code + "\t" + \
                             cog + "\t" + \
                             product
+
             files_data[div_in[0]][1].append(ptt_file_line)
 
 for key in files_data:

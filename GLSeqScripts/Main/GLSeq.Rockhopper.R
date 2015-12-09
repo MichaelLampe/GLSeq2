@@ -101,10 +101,12 @@ for (zz in 1:nStreams) {
       }
     }
 
-    commands <- paste (strand.command,alignmentSpecialOptions)
-    rockhopper.align <- paste("python",paste(base.dir,"rockhopperWrapper.py",sep=""),Rockhopper.path,dest.dir,rockhopper.files,rockhopper.output.folder,commands)
+    commands <- paste (strand.command," ",alignmentSpecialOptions,sep="")
+    # Replace spaces with question marks so that we can pass this across the command line
+    commands <- gsub(" ","?",commands)
+    rockhopper.align <- paste("python", paste(base.dir,"rockhopperWrapper.py",sep=""), Rockhopper.path, dest.dir, rockhopper.files, rockhopper.output.folder, commands)
     countable.sam <- countable.sam.name(this.resName)
-    create.countable <- paste("mv",paste(rockhopper.output.folder,"dirty.sam",sep=""),countable.sam)
+    create.countable <- paste("mv", paste(rockhopper.output.folder,"dirty.sam",sep=""), countable.sam)
 
     count.comm <- ""
     if (counting == "counting"){

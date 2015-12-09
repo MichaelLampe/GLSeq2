@@ -1,4 +1,4 @@
-__author__ = 'mlampe'
+__author__ = 'Michael Lampe'
 
 import networkx as nx
 # Let's us run this without a display
@@ -14,17 +14,21 @@ import re
 # This is a wrapper for the networkx Digraph class
 # This is the structure that will hold onto the commands data
 class Graph:
+    # Creates a digraph using the nx digraph at Graph initialization
     def __init__(self):
         # Digraph allows directionality which is key
         self.G = nx.DiGraph()
 
+    # Draws the graph using the nx library.
     def draw_graph(self):
         pos = nx.graphviz_layout(self.G)
         nx.draw_networkx(self.G, pos)
 
+    # Gives back all the nodes of the graph
     def nodes(self):
         return self.G.nodes()
 
+    # Adds a node with given parents and attributes
     def add_node(self, new_node, parents=None, attributes=None):
         # Indexed by its number
         # Only add an attribute if it is worth adding one, aka there is something there
@@ -40,11 +44,13 @@ class Graph:
                 self.G.add_node(new_node, attributes)
             self.add_edge(parents, new_node)
 
+    # Returns any node that has no parents (Aka root nodes)
     def get_root_nodes(self):
         # We'll only do this when we ask for it so we aren't doing this a ton
         root_nodes = [node for node, degree in self.G.nodes().in_degree().items() if degree == 0]
         return root_nodes
 
+    # Between two or more nodes, adds an edge.  You can add a list of parents and/or a list of children.
     def add_edge(self, parents, children):
         if type(parents) is not list:
             if type(children) is not list:
@@ -61,6 +67,7 @@ class Graph:
                     for child in children:
                         self.G.add_edge(parent, child)
 
+    # Between two or modes nodes, removes an edge.  You can remove a list of parents and/or a list of children.
     def remove_edge(self, parents, children):
         if type(parents) is not list:
             if type(children) is not list:
@@ -77,6 +84,7 @@ class Graph:
                     for child in children:
                         self.G.remove_edge(parent, child)
 
+    # For a list of one or more parents, inserts a node between the parent(s) and any of their children.
     def insert_node(self, parents, new_node):
         if type(parents) is list:
             children = [child for parent in parents for child in self.get_children(parent)]
@@ -87,6 +95,7 @@ class Graph:
         self.add_edge(new_node, children)
         self.remove_edge(parents, children)
 
+    # Just takes a node out of the graph, but then tries to connect the previous children and parents together.
     def remove_node(self, node):
         parents, children = self.get_parents(node), self.get_children(node)
         # Links the gap that would be created by removing the node
@@ -99,9 +108,11 @@ class Graph:
     def delete_node(self, node):
         self.G.remove_node(node)
 
+    # All the parents of a given node
     def get_parents(self, node):
         return self.G.predecessors(node)
 
+    # All the children of a given node
     def get_children(self, node):
         return self.G.successors(node)
 
@@ -136,7 +147,10 @@ class Graph:
         # Remove the initial node so that it doesn't stay in the graph
         self.remove_node(node)
 
+    # Combines two nodes by merging their data and making all of their parents the new node's parents and all of their
+    # children the new nodes children.
     def merge_nodes(self, nodes, new_data):
+        # List comprehension fun.  Combines the two groups of parents.
         parents = [parent for node in nodes for parent in self.get_parents(node) if parent not in nodes]
         children = [child for node in nodes for child in self.get_children(node) if child not in nodes]
         # Setup the new node
@@ -183,12 +197,14 @@ class Graph:
         plt.savefig(run_name + "/" + "CondorGpuUtilization.png")
         plt.clf()
 
+    # The label of each memory node
     def memory_labels(self):
         labels = {}
         for node in self.G.nodes():
             labels[node] = str(node.number) + "\n" + self.G.node[node]['mem']
         return labels
 
+    # The color of each memory node.  More red = more, more blue = less
     def memory_colors(self):
         memory_color = []
         for node in self.G.nodes():
@@ -230,12 +246,14 @@ class Graph:
                 memory_color.append("#FF0000")
         return memory_color
 
+    # Label on the CPU
     def cpu_labels(self):
         labels = {}
         for node in self.G.nodes():
             labels[node] = str(node.number) + "\n" + self.G.node[node]['cpus']
         return labels
 
+    # The color of each CPU node.  More red = more, more blue = less
     def cpu_colors(self):
         cpu_color = []
         for node in self.G.nodes():
@@ -264,12 +282,14 @@ class Graph:
                 cpu_color.append("#FF0000")
         return cpu_color
 
+    # The label describing how many GPUs are used.
     def gpu_labels(self):
         labels = {}
         for node in self.G.nodes():
             labels[node] = str(node.number) + "\n" + self.G.node[node]['gpus']
         return labels
 
+    # The color of each GPU node.  More red = more, more blue = less
     def gpu_colors(self):
         gpu_color = []
         for node in self.G.nodes():
@@ -329,6 +349,11 @@ class CommandProcessor:
         self.graph = Graph()
 
         # Precompile all the regex.  Goes faster.
+        self.parallel = re.compile('(\(.*?(?<!&)&(?!&).*?\))')
+        self.ampersand = re.compile('(?<!&)&(?!&)')
+        self.background = re.compile('(?<!&)&(?!&)')
+        self.split_background = re.compile('(\(.*?(?<!&)&(?!&).*?\))|(?<!&)&(?!&)')
+
         self.summary_eff = re.compile("EfficiencyAnalyzer.py (.*?)", re.IGNORECASE)
         self.bash = re.compile("bash (.*?)", re.IGNORECASE)
         self.gunzip = re.compile("gunzip (.*?)", re.IGNORECASE)
@@ -359,8 +384,8 @@ class CommandProcessor:
 
         self.removewait = re.compile("^wait$", re.IGNORECASE)
 
+    # Creates a given graph
     def create_graph(self):
-
         # A new graph structure
         nodes = list()
         for c in range(0, len(self.commands)):
@@ -370,10 +395,12 @@ class CommandProcessor:
                 self.graph.add_node(current_node)
             else:
                 self.graph.add_node(current_node, nodes[c - 1])
+
         # At each of these steps the number of nodes could change so we'll
         # Keep iterating over them individually for each of these commands
         for node in self.graph.nodes():
             self.split_background_proc(node)
+
         # This splits parallel processes within parallel process away into their own command set
         for node in self.graph.nodes():
             self.split_parallel_proc_away(node)
@@ -381,6 +408,8 @@ class CommandProcessor:
             self.split_parallel_proc(node)
         for node in self.graph.nodes():
             self.split_linked(node)
+
+        # Merges commands that are not computationally intensive to lessen the number of jobs we hav to run.
         for n in range(len(self.graph.nodes())-1, -1, -1):
             # Removes white space
             self.graph.nodes()[n].command = self.graph.nodes()[n].command.strip()
@@ -394,10 +423,12 @@ class CommandProcessor:
             except nx.NetworkXError:
                 # The node could have already been merged in which case this will just skip it
                 pass
+
         # Remove "Waits" as they are not useful here.
         for node in self.graph.nodes():
             if re.search(self.removewait, node.command):
                 self.graph.remove_node(node)
+
         # Add summary scripts
         childless_nodes = list()
         for node in self.graph.nodes():
@@ -419,16 +450,25 @@ class CommandProcessor:
 
         return self.graph
 
+    # This summary script just analyzed the efficiency of our run after the run.
+    # Efficiency is determined by the amount of memory used vs the amount of memory requested
     def summary_scripts(self):
         summary = list()
         # Summary script 1
-        summary_node1 = Node("python EfficiencyAnalyzer.py" + " " + self.run_name + "/LogFile/" + " " + self.run_name)
+        # Let's run this as python2.7 so we don't get import errors
+        if self.run_name.endswith("/"):
+            log_file = self.run_name + "LogFile/"
+        else:
+            log_file = self.run_name + "/LogFile/"
+        command = "python2.7 EfficiencyAnalyzer.py" + " " + log_file + " " + self.run_name
+        summary_node1 = Node(command)
         summary.append(summary_node1)
         return summary
 
+    # Splitting it so that the large grouping of parallel processes like ( ___ & ___ & ___ &) should be one
+    # First handled sequentially
     def split_parallel_proc_away(self, node):
-        parallel = re.compile('(\(.*?(?<!&)&(?!&).*?\))')
-        if re.search(parallel, node.command):
+        if re.search(self.parallel, node.command):
             # Remove parens
             commands = node.command
             commands = re.split("\(|\)", commands)
@@ -439,25 +479,25 @@ class CommandProcessor:
             new_nodes = [Node(command) for command in commands]
             self.graph.split_node_sequential(node, new_nodes)
 
+    # Parallel processes should be split into parallel nodes.
     def split_parallel_proc(self, node):
-        ampersand = re.compile('(?<!&)&(?!&)')
-        if re.search(ampersand, node.command):
+        if re.search(self.ampersand, node.command):
             command = node.command
-            commands = re.split(ampersand, command)
+            commands = re.split(self.ampersand, command)
             for x in range(0, len(commands)):
                 commands[x] = commands[x].strip()
             commands = filter(bool, commands)
             new_nodes = [Node(command) for command in commands]
             self.graph.split_node_parallel(node, new_nodes)
 
+    # Parallel jobs are handled here.
     def split_background_proc(self, node):
         def filter_split(filter_command):
-            background = re.compile('(?<!&)&(?!&)')
             # This undoes the split that was done by the regex split_background
             # Thus, we effectively have only split by single &'s that are outside of any parenthesis
             for c in range(len(filter_command) - 1, -1, -1):
                 if filter_command[c] is not None:
-                    if re.search(background, filter_command[c]):
+                    if re.search(self.background, filter_command[c]):
                         if c < len(filter_command) - 1:
                             if filter_command[c + 1] is not None:
                                 filter_command[c] = filter_command[c] + filter_command[c + 1]
@@ -482,7 +522,7 @@ class CommandProcessor:
             # Here we remove the item that was after the split which is now a duplicate
             for c in range(len(filter_command) - 1, -1, -1):
                 if filter_command[c] is not None:
-                    if re.search(background, filter_command[c]):
+                    if re.search(self.background, filter_command[c]):
                         if c < len(filter_command) - 1:
                             filter_command.pop(c + 1)
             # Here we remove the item that was before the split which is not also a duplicate
@@ -491,7 +531,7 @@ class CommandProcessor:
             for c in range(0, len(filter_command)):
                 try:
                     if filter_command[c] is not None:
-                        if re.search(background, filter_command[c]):
+                        if re.search(self.background, filter_command[c]):
                             if c > 0:
                                 filter_command.pop(c - 1)
                 except IndexError:
@@ -504,8 +544,7 @@ class CommandProcessor:
         # This picks up both the single &, but notices if they are within a parenthesis or not.
         # If the & is not within the parenthesis, it will be replaced with None when split, while the
         # in the parenthesis nothing will happen.
-        split_background = re.compile('(\(.*?(?<!&)&(?!&).*?\))|(?<!&)&(?!&)')
-        split_commands = re.split(split_background, node.command)
+        split_commands = re.split(self.split_background, node.command)
         if len(split_commands) > 1:
             split_commands, end_command = filter_split(split_commands)
             new_nodes = [Node(command) for command in split_commands]
@@ -513,8 +552,9 @@ class CommandProcessor:
             if end_command is not "":
                 self.graph.insert_node(new_nodes, Node(end_command))
 
+    # Trivial commands that are not computationally intensive should be merged here.
     def merge_trivial_commands(self, node):
-        # Breadth first search to find as many mergers as possible while best retaining order
+        # Breadth first search to find as many mergers as possible while retaining order
         def bfs(individual_node):
             queue, merge_nodes, new_command = [individual_node], [individual_node], ""
             while queue:
@@ -546,6 +586,7 @@ class CommandProcessor:
                     self.graph.merge_nodes(merge_nodes, new_command)
                 break
 
+    # Two linked commands should be split
     def split_linked(self, node):
         split_linked = re.compile("&&|;")
         split_commands = re.split(split_linked, node.command)
@@ -554,6 +595,7 @@ class CommandProcessor:
             new_nodes = [Node(command) for command in split_commands]
             self.graph.split_node_sequential(node, new_nodes)
 
+    # We have resources assigned here both as defaults and specifically based on the type of command.
     def assign_resources(self, command):
         def found_match(pattern, command):
             x = re.search(pattern, command)

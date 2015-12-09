@@ -12,11 +12,7 @@ rock_path = argv[1].strip("\n")
 destination_directory = argv[2].strip("\n")
 rockhopper_files = argv[3].strip("\n")
 unique_output_directory = argv[4].strip("\n")
-libstrand = argv[5].strip("\n")
-paired = argv[6].strip("\n")
-commands = argv[7].strip("\n")
-commands = commands[1:]
-commands = commands[:-1]
+args = argv[5].strip("\n")
 # Gets the result of rhFnaConverter 
 referenceFilesDir = destination_directory+"ReferenceGenome" + "/"
 directories = ""
@@ -29,24 +25,25 @@ for i, folder in enumerate(folders):
     else:
         directories = directories + "," + folder
 
-programArgs = ""
-if (paired == "TRUE"):
-  if (libstrand == "NULL"):
-    programArgs = "-s false"
-  elif (libstrand == "F"):
-    programArgs = "-fr -s true"
-  elif (libstrand == "R"):
-    programArgs = "-rf -s true"
-else:
-  if (libstrand == "NULL"):
-    programArgs = "-s false"
-  elif (libstrand == "F"):
-    programArgs = "-c false"
-  elif (libstrand == "R"):
-    programArgs = "-c true"
+#programArgs = ""
+#if (paired == "TRUE"):
+#  if (libstrand == "NULL"):
+#    programArgs = "-s false"
+#  elif (libstrand == "F"):
+#    programArgs = "-fr -s true"
+#  elif (libstrand == "R"):
+#    programArgs = "-rf -s true"
+#else:
+#  if (libstrand == "NULL"):
+#    programArgs = "-s false"
+#  elif (libstrand == "F"):
+#    programArgs = "-c false"
+#  elif (libstrand == "R"):
+#    programArgs = "-c true"
 
+programArgs = args.replace("?"," ")
 # Uses that output in addition to the Rscripts message to generate a command
-rock_options = " -o " + unique_output_directory + " -v true -SAM -TIME " + programArgs + str(commands)
+rock_options = " -o " + unique_output_directory + " -v true -SAM -TIME " + programArgs
 rock_align = "java -Xmx4096m -cp " + rock_path + " Rockhopper "+ "-g " + directories + rock_options + " \"" + rockhopper_files + "\""
 print(rock_align)
 process = Popen(rock_align,shell=True)

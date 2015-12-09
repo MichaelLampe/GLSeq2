@@ -44,9 +44,9 @@ for (zz in 1:nStreams) {
     ###################
     if (aAlgor == "Bowtie"){
       if (Condor){
-        BowtieOptions <- paste("-S","-p 4","-t","-q","--chunkmbs","512")
+        BowtieOptions <- paste("-S","-p 4","-t","-q","--chunkmbs","512",alignmentSpecialOptions)
       } else{
-        BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512")
+        BowtieOptions <- paste("-S","-t","-q","--chunkmbs","512",alignmentSpecialOptions)
       }
       if (paired.end){
         align <- paste("bowtie",BowtieOptions,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,countable.sam)
@@ -66,16 +66,16 @@ for (zz in 1:nStreams) {
         # This is under the assumption that any leftover cores would be able to be used by other processes while running in parallel.
         # Thus, we'll be able to fill up the servers as efficiently as posible with the LCD, which is 4.
         # Based on https://www.biostars.org/p/92366/ as well showing a non-linear speedup of runs. (4 -> 8 is not half time)
-        Bowtie2Options <- paste("-t","-p 4","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
+        Bowtie2Options <- paste("-t","-p 4","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1", alignmentSpecialOptions)
       } else{
-        Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1")
+        Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1", alignmentSpecialOptions)
       }
       if (paired.end){
         # These are options normally used by the RSEM peeps, see the same link as above for documentation on this.
         Bowtie2Options <- paste(Bowtie2Options,"--no-mixed","--no-discordant")
-        align <- paste("bowtie2",Bowtie2Options,alignmentSpecialOptions,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,"-S",countable.sam)
-      }else{
-        align <- paste("bowtie2",Bowtie2Options,alignmentSpecialOptions,paste(dest.dir,rGenome,sep=""),"-U",fq.left,"-S",countable.sam)
+        align <- paste("bowtie2",Bowtie2Options,paste(dest.dir,rGenome,sep=""),"-1",fq.left,"-2",fq.right,"-S",countable.sam)
+      } else{
+        align <- paste("bowtie2",Bowtie2Options,paste(dest.dir,rGenome,sep=""),"-U",fq.left,"-S",countable.sam)
       }
     }
     ###################

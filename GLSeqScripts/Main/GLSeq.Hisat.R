@@ -1,7 +1,7 @@
 source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
 
-hisat.directory <- trailDirCheck(hisat.directory)
+hisat.directory <- trailDirCheck(hisat.path)
 
 comm.stack.pool <- NULL
 comm.stack.pools <- NULL
@@ -51,7 +51,9 @@ for (zz in 1:nStreams) {
     # Command Construction
     ###################
     comm.i <- paste(align)
-    comm.i <- paste(comm.i, "&&", count.comm)
+    if (count.comm != ""){
+      comm.i <- paste(comm.i, "&&", count.comm)
+    }
     # For the very first assembly in the stack:
     if (i == rangelist[[zz]][1])  comm.stack.pools <- paste(comm.i)
     # For subsequent assemblies of every stack:
