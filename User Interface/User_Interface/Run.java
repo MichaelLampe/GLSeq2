@@ -30,17 +30,17 @@ public class Run {
 	public List<String> constructArgs(boolean Condor, String attribute_file, String scriptsDirectory) {
 		List<String> args = new ArrayList<String>();
 		// Condor Wrapper to run via Condor
+		if (!scriptsDirectory.endsWith("/")){
+			scriptsDirectory = scriptsDirectory + "/";
+		}
 		if (Condor) {
 			args.add("python");
-			args.add("PyGLSeqWrapper.py");
+			args.add(scriptsDirectory + "PyGLSeqWrapper.py");
 			// RScript
 		} else {
 			args.add("Rscript");
-			args.add("GLSeq.top.R");
+			args.add(scriptsDirectory + "GLSeq.top.R");
 		}
-		// GLSeq Script Directory
-		args.add(scriptsDirectory);
-		
 		// Where update was, might add to here later
 		args.add("Placeholder");
 		

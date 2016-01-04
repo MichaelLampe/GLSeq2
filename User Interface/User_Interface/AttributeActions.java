@@ -28,7 +28,7 @@ public class AttributeActions {
 	 * @throws FileNotFoundException
 	 *
 	 */
-	public void setAttributes(File attributeFile) throws FileNotFoundException {
+	public void setAttributesAttributeFile(File attributeFile) throws FileNotFoundException {
 		if (!attributeFile.exists()) {
 			throw new FileNotFoundException();
 		}
@@ -50,7 +50,7 @@ public class AttributeActions {
 					String attributeValue = tempArray[1];
 
 					try {
-						tempArray[1] = tempArray[1].replace("\"", "");
+						attributeValue = attributeValue.replace("\"", "");
 						Attributes.getInstance().attributesCollection.get(attributeName).setValue(attributeValue);
 						matchedAttributes.add(Attributes.getInstance().attributesCollection.get(attributeName));
 					} catch (Exception e) {
@@ -72,6 +72,60 @@ public class AttributeActions {
 		UpdateUI.getInstance().updateDefaults();
 	}
 	
+	/**
+	 * Creates a new or replaces the current attribute file and adds all the
+	 * field data to that attribute file.
+	 * 
+	 * This method uses a saved text config file.
+	 * 
+	 * @throws FileNotFoundException
+	 *
+	 */
+	public void setAttributesTextConfig(File attributeFile) throws FileNotFoundException {
+		if (!attributeFile.exists()) {
+			throw new FileNotFoundException();
+		}
+
+		// Tracks if attributes were matched to a value or not (If within this
+		// list, it was matched)
+		ArrayList<Attribute> matchedAttributes = new ArrayList<Attribute>();
+
+		try (Scanner scnr = new Scanner(attributeFile)) {
+			// Looks through the whole document for variables that match field
+			// names
+			while (scnr.hasNextLine()) {
+				String singleLine = scnr.nextLine();
+				// This is the R Attribute file variable assignment expression.
+				if (singleLine.contains("=")) {
+					String[] tempArray = singleLine.split(" = ");
+					// If the split only has one item, it doesn't have anything worth assigning.
+					if (tempArray.length > 1){
+						String attributeName = tempArray[0];
+						String attributeValue = tempArray[1];
+	
+						try {
+							tempArray[1] = tempArray[1].replace("\"", "");
+							Attributes.getInstance().attributesCollection.get(attributeName).setValue(attributeValue);
+							matchedAttributes.add(Attributes.getInstance().attributesCollection.get(attributeName));
+						} catch (Exception e) {
+							// if doesn't map
+						}
+					}
+				}
+			}
+		}
+		ArrayList<Attribute> attributeArray = new ArrayList<Attribute>(
+				Attributes.getInstance().attributesCollection.values());
+
+		// For every value that didn't have a matched field, we just set the
+		// value to the default.
+		for (Attribute attribute : attributeArray) {
+			if (!matchedAttributes.contains(attribute)) {
+				attribute.setValue(attribute.getDefault());
+			}
+		}
+		UpdateUI.getInstance().updateDefaults();
+	}
 	
 	
 	/**

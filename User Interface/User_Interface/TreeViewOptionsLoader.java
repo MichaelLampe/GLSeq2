@@ -66,7 +66,6 @@ public class TreeViewOptionsLoader {
 						parseSingleOption(optionsNode.getChildNodes().item(i)));
 			}
 		}
-
 		return optionsHead;
 	}
 

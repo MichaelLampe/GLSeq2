@@ -81,102 +81,98 @@
             <content>
               <AnchorPane fx:id="locations_pane" minHeight="700.0" minWidth="0.0" prefHeight="700.0" prefWidth="873.0" styleClass="tab_pane">
                      <children>
-                        <TextArea fx:id="destinationDirectory" layoutX="13.0" layoutY="47.0" prefHeight="32.0" prefWidth="847.0" promptText="Working Directory" wrapText="true">
+                        <TextArea fx:id="destinationDirectory" layoutX="13.0" layoutY="30.0" prefHeight="32.0" prefWidth="847.0" promptText="Working Directory" wrapText="true">
                            <tooltip>
                               <Tooltip text="This is the directory where your files will be prepared.  This directory should be located on a fast drive." />
                            </tooltip></TextArea>
-                        <TextArea fx:id="countableSamDir" layoutX="13.0" layoutY="260.0" prefHeight="32.0" prefWidth="847.0" promptText="Sam Files Location" wrapText="true">
+                        <TextArea fx:id="countableSamDir" layoutX="13.0" layoutY="533.0" prefHeight="32.0" prefWidth="847.0" promptText="Sam Files Location" wrapText="true">
                            <tooltip>
                               <Tooltip text="Location of previously prepared countable.sam files.  To make sure that everything will work, please use SAM files prepared by the GLSeq2 program." />
                            </tooltip></TextArea>
-                        <Label layoutX="13.0" layoutY="7.0" text="Common Options" textFill="WHITE">
-                           <font>
-                              <Font size="27.0" />
-                           </font>
-                        </Label>
-                        <TextArea fx:id="storageDestination" layoutX="13.0" layoutY="107.0" prefHeight="32.0" prefWidth="848.0" promptText="Destination Data Directory" wrapText="true">
+                        <TextArea fx:id="storageDestination" layoutX="13.0" layoutY="90.0" prefHeight="32.0" prefWidth="848.0" promptText="Destination Data Directory" wrapText="true">
                            <tooltip>
                               <Tooltip text="The final directory where your data should be stored long term. " />
                            </tooltip></TextArea>
-                        <Label layoutX="13.0" layoutY="158.0" text="Continue from pre-aligned reads" textFill="WHITE">
+                        <Label layoutX="13.0" layoutY="431.0" text="If continuing from pre-aligned reads" textFill="WHITE">
                            <font>
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <RadioButton fx:id="load_prev" layoutX="13.0" layoutY="210.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="421.0" text="Load file locations based on a previous run ID" textFill="WHITE">
+                        <RadioButton fx:id="load_prev" layoutX="13.0" layoutY="483.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="421.0" text="Load file locations based on a previous run ID" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="man_sam" layoutX="430.0" layoutY="217.0" mnemonicParsing="false" text="Indicate a directory containing SAM files manually" textFill="WHITE">
+                        <RadioButton fx:id="man_sam" layoutX="430.0" layoutY="490.0" mnemonicParsing="false" text="Indicate a directory containing SAM files manually" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <TextArea fx:id="strain" layoutX="13.0" layoutY="354.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the strain of your data?">
+                        <TextArea fx:id="strain" layoutX="13.0" layoutY="627.0" prefHeight="32.0" prefWidth="848.0" promptText="What is the strain of your data?">
                            <tooltip>
                               <Tooltip text="The strain of your data" />
                            </tooltip></TextArea>
-                        <Label layoutX="13.0" layoutY="314.0" text="Data Characteristics" textFill="WHITE">
+                        <Label layoutX="13.0" layoutY="587.0" text="Data Characteristics" textFill="WHITE">
                            <font>
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <ComboBox fx:id="seqPlatform" layoutX="13.0" layoutY="456.0" prefHeight="25.0" prefWidth="363.0" promptText="What sequencing platform did you use to gather this data?">
+                        <ComboBox fx:id="seqPlatform" layoutX="13.0" layoutY="170.0" prefHeight="25.0" prefWidth="363.0" promptText="What sequencing platform did you use to gather this data?">
                            <tooltip>
                               <Tooltip text="List of GLSeq2's supported sequencing platforms." />
                            </tooltip></ComboBox>
-                        <ComboBox fx:id="libStrands" layoutX="447.0" layoutY="456.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the strandedness of your library?">
+                        <ComboBox fx:id="libStrands" layoutX="453.0" layoutY="170.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the strandedness of your library?">
                            <tooltip>
                               <Tooltip text="If your data was prepared in a stranded matter, indicate that." />
                            </tooltip></ComboBox>
-                        <ComboBox fx:id="qualityScores" layoutX="14.0" layoutY="536.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the quality score format of your library?">
+                        <ComboBox fx:id="qualityScores" layoutX="13.0" layoutY="250.0" prefHeight="25.0" prefWidth="363.0" promptText="What is the quality score format of your library?">
                            <tooltip>
                               <Tooltip text="Phred quality formats of your data." />
                            </tooltip></ComboBox>
-                        <ComboBox fx:id="unzipped" layoutX="447.0" layoutY="616.0" prefHeight="25.0" prefWidth="363.0" promptText="Is your data zipped or unzipped format?">
+                        <ComboBox fx:id="unzipped" layoutX="453.0" layoutY="330.0" prefHeight="25.0" prefWidth="363.0" promptText="Is your data zipped or unzipped format?">
                            <tooltip>
                               <Tooltip text="Indicate if your data is zipped in a .gz format. " />
                            </tooltip></ComboBox>
-                        <ComboBox fx:id="pairedEnd" layoutX="13.0" layoutY="616.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it paired ended or single ended?">
+                        <ComboBox fx:id="pairedEnd" layoutX="13.0" layoutY="330.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it paired ended or single ended?">
                            <tooltip>
                               <Tooltip text="If the data was prepared to be single or paired ended." />
                            </tooltip></ComboBox>
-                        <ComboBox fx:id="presplit" layoutX="447.0" layoutY="536.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it presplit or unsplit?">
+                        <ComboBox fx:id="presplit" layoutX="453.0" layoutY="250.0" prefHeight="25.0" prefWidth="363.0" promptText="Is it presplit or unsplit?">
                            <tooltip>
                               <Tooltip text="For paired ended files, indicate if they are already split into two distinct files, or if they are currently in one big file." />
                            </tooltip>
                         </ComboBox>
-                        <Label layoutX="14.0" layoutY="426.0" text="Sequencing Platform" textFill="WHITE">
+                        <Label layoutX="13.0" layoutY="140.0" text="Sequencing Platform" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="15.0" layoutY="506.0" text="Quality Score Format" textFill="WHITE">
+                        <Label layoutX="13.0" layoutY="220.0" text="Quality Score Format" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="14.0" layoutY="586.0" text="Paired-end library?" textFill="WHITE">
+                        <Label layoutX="13.0" layoutY="300.0" text="Paired-end library?" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="447.0" layoutY="426.0" text="Library Strandedness" textFill="WHITE">
+                        <Label layoutX="453.0" layoutY="140.0" text="Library Strandedness" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="447.0" layoutY="506.0" text="Pre-split data?" textFill="WHITE">
+                        <Label layoutX="453.0" layoutY="220.0" text="Pre-split data?" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="447.0" layoutY="586.0" text="Uncompressed data?" textFill="WHITE">
+                        <Label layoutX="453.0" layoutY="300.0" text="Uncompressed data?" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
+                        <Line endX="863.0" layoutY="399.0" startX="10.0" stroke="WHITE" />
                      </children>
                   </AnchorPane>
             </content>
@@ -231,143 +227,130 @@
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="tab_pane">
                      <children>
-                        <ComboBox fx:id="readTrim" layoutX="15.0" layoutY="87.0" prefHeight="25.0" prefWidth="285.0" promptText="Would you like to trim your raw reads?">
+                        <ComboBox fx:id="readTrim" layoutX="26.0" layoutY="221.0" prefHeight="34.0" prefWidth="372.0" promptText="Would you like to trim your raw reads?">
                            <tooltip>
                               <Tooltip text="Trimming will remove some sections of the reads (As indicated by you) during the data preparation stage." />
                            </tooltip></ComboBox>
-                        <Label layoutX="443.0" layoutY="282.0" prefHeight="27.0" prefWidth="431.0" text="Counting Algorithm (1 or more per run)" textFill="WHITE">
+                        <Label layoutX="565.0" layoutY="275.0" prefHeight="27.0" prefWidth="304.0" text="Counting Algorithms" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label fx:id="trim_head_label" layoutX="316.0" layoutY="13.0" text="Head trim, 12 bases" textFill="WHITE">
+                        <Label fx:id="trim_head_label" layoutX="23.0" layoutY="65.0" text="Head trim, 12 bases" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="trimHead" layoutX="315.0" layoutY="43.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="540.0" showTickMarks="true" value="12.0" />
-                        <Label fx:id="min_read_length_label" layoutX="317.0" layoutY="69.0" text="Minimal trimmed read length of 36 bases" textFill="WHITE">
+                        <Slider fx:id="trimHead" layoutX="540.0" layoutY="65.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="12.0" />
+                        <Label fx:id="min_read_length_label" layoutX="23.0" layoutY="105.0" text="Minimal trimmed read length of 36 bases" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="minTrim" layoutX="315.0" layoutY="99.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="540.0" showTickMarks="true" value="36.0" />
-                        <TextArea fx:id="artificialFasta" layoutX="414.0" layoutY="194.0" prefHeight="32.0" prefWidth="445.0" promptText="Artificial sequences file">
+                        <Slider fx:id="minTrim" layoutX="540.0" layoutY="105.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="36.0" />
+                        <TextArea fx:id="artificialFasta" layoutX="408.0" layoutY="222.0" prefHeight="32.0" prefWidth="445.0" promptText="Artificial sequences file">
                            <tooltip>
                               <Tooltip text="A FASTA file containign artificial sequences.  These will be trimmed from the reads by the Trimmomatic program." />
                            </tooltip></TextArea>
-                        <Label layoutX="17.0" layoutY="281.0" text="Alignment Algorithm (1 per run)" textFill="WHITE">
+                        <Label layoutX="17.0" layoutY="275.0" text="Alignment Algorithm" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <CheckBox fx:id="HTseq" layoutX="740.0" layoutY="323.0" mnemonicParsing="false" text="HTSeq" textFill="WHITE">
+                        <CheckBox fx:id="HTseq" layoutX="565.0" layoutY="310.0" mnemonicParsing="false" text="HTSeq" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </CheckBox>
-                        <CheckBox fx:id="FeatureCounts" layoutX="584.0" layoutY="323.0" mnemonicParsing="false" text="FeatureCounts" textFill="WHITE">
+                        <CheckBox fx:id="RSEM" layoutX="695.0" layoutY="310.0" mnemonicParsing="false" text="RSEM" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </CheckBox>
-                        <CheckBox fx:id="RSEM" layoutX="586.0" layoutY="362.0" mnemonicParsing="false" text="RSEM" textFill="WHITE">
+                        <CheckBox fx:id="Cufflinks" layoutX="565.0" layoutY="350.0" mnemonicParsing="false" text="Cufflinks" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </CheckBox>
-                        <CheckBox fx:id="Cufflinks" layoutX="443.0" layoutY="323.0" mnemonicParsing="false" text="Cufflinks" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </CheckBox>
-                        <RadioButton fx:id="BWA" layoutX="301.0" layoutY="308.0" mnemonicParsing="false" text="BWA" textFill="WHITE">
+                        <RadioButton fx:id="BWA" layoutX="380.0" layoutY="310.0" mnemonicParsing="false" text="BWA" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="Bowtie" layoutX="21.0" layoutY="308.0" mnemonicParsing="false" text="Bowtie" textFill="WHITE">
+                        <RadioButton fx:id="Bowtie" layoutX="20.0" layoutY="310.0" mnemonicParsing="false" text="Bowtie" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="Bowtie2" layoutX="161.0" layoutY="308.0" mnemonicParsing="false" text="Bowtie2" textFill="WHITE">
+                        <RadioButton fx:id="Bowtie2" layoutX="200.0" layoutY="308.0" mnemonicParsing="false" text="Bowtie2" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="Cushaw" layoutX="21.0" layoutY="347.0" mnemonicParsing="false" text="Cushaw" textFill="WHITE">
+                        <RadioButton fx:id="Cushaw" layoutX="20.0" layoutY="350.0" mnemonicParsing="false" text="Cushaw" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="Cushaw_Gpu" layoutX="161.0" layoutY="347.0" mnemonicParsing="false" text="Cushaw_GPU" textFill="WHITE">
+                        <RadioButton fx:id="Cushaw_Gpu" layoutX="200.0" layoutY="347.0" mnemonicParsing="false" text="Cushaw_GPU" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="TopHat" layoutX="301.0" layoutY="386.0" mnemonicParsing="false" text="TopHat" textFill="WHITE">
+                        <RadioButton fx:id="TopHat" layoutX="380.0" layoutY="390.0" mnemonicParsing="false" text="TopHat" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="Rockhopper" layoutX="21.0" layoutY="386.0" mnemonicParsing="false" text="Rockhopper" textFill="WHITE">
+                        <RadioButton fx:id="Rockhopper" layoutX="20.0" layoutY="390.0" mnemonicParsing="false" text="Rockhopper" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="hisat" layoutX="301.0" layoutY="347.0" mnemonicParsing="false" text="HISAT" textFill="WHITE">
+                        <RadioButton fx:id="hisat" layoutX="380.0" layoutY="350.0" mnemonicParsing="false" text="HISAT" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="star" layoutX="161.0" layoutY="386.0" mnemonicParsing="false" text="STAR" textFill="WHITE">
+                        <RadioButton fx:id="star" layoutX="200.0" layoutY="386.0" mnemonicParsing="false" text="STAR" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <CheckBox fx:id="rockhopperCount" layoutX="443.0" layoutY="362.0" mnemonicParsing="false" text="Rockhopper" textFill="WHITE">
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </CheckBox>
-                        <Label layoutX="13.0" layoutY="13.0" text="Data pre-processing" textFill="WHITE">
+                        <Label layoutX="20.0" layoutY="14.0" text="Data pre-processing" textFill="WHITE">
                            <font>
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <Label layoutX="14.0" layoutY="242.0" text="Reads alignment / counting" textFill="WHITE">
-                           <font>
-                              <Font size="27.0" />
-                           </font>
-                        </Label>
-                        <Slider fx:id="three_prime_trim_slide" layoutX="15.0" layoutY="210.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="370.0" showTickMarks="true" value="36.0" />
-                        <Label fx:id="three_prime_trim_text" layoutX="15.0" layoutY="180.0" text="Size of the sliding window for 3'-end trimming" textFill="WHITE">
+                        <Slider fx:id="three_prime_trim_slide" layoutX="540.0" layoutY="185.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="36.0" />
+                        <Label fx:id="three_prime_trim_text" layoutX="23.0" layoutY="185.0" text="Size of the sliding window for 3'-end trimming" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="min_avg_qual_slide" layoutX="15.0" layoutY="153.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="840.0" showTickMarks="true" value="12.0" />
-                        <Label fx:id="min_avg_qual_text" layoutX="15.0" layoutY="123.0" prefHeight="27.0" prefWidth="600.0" text="Minimal average base calling quality within the sliding window" textFill="WHITE">
+                        <Slider fx:id="min_avg_qual_slide" layoutX="540.0" layoutY="145.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="12.0" />
+                        <Label fx:id="min_avg_qual_text" layoutX="23.0" layoutY="145.0" prefHeight="27.0" prefWidth="600.0" text="Minimal average base calling quality within the sliding window" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="428.0" prefHeight="243.0" prefWidth="417.0">
+                        <ScrollPane hbarPolicy="NEVER" layoutX="13.0" layoutY="428.0" prefHeight="243.0" prefWidth="522.0">
                            <content>
-                              <TreeView fx:id="alignmentOptions" prefHeight="244.0" prefWidth="416.0" showRoot="false" />
+                              <TreeView fx:id="alignmentOptions" prefHeight="244.0" prefWidth="532.0" showRoot="false" />
                            </content>
                         </ScrollPane>
-                        <ScrollPane hbarPolicy="NEVER" layoutX="443.0" layoutY="428.0" prefHeight="243.0" prefWidth="417.0">
+                        <ScrollPane hbarPolicy="NEVER" layoutX="567.0" layoutY="398.0" prefHeight="273.0" prefWidth="286.0">
                            <content>
-                              <TreeView fx:id="countingOptions" prefHeight="246.0" prefWidth="416.0" showRoot="false" />
+                              <TreeView fx:id="countingOptions" prefHeight="273.0" prefWidth="285.0" showRoot="false" />
                            </content>
                         </ScrollPane>
-                        <Label layoutX="15.0" layoutY="54.0" text="Trim the reads" textFill="WHITE">
+                        <Line endX="853.0" layoutY="265.0" startX="20.0" stroke="WHITE" />
+                        <Line endX="853.0" layoutY="60.0" startX="20.0" stroke="WHITE" />
+                        <CheckBox fx:id="FeatureCounts" layoutX="695.0" layoutY="350.0" mnemonicParsing="false" text="Feature Counts" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
-                        </Label>
+                        </CheckBox>
                      </children>
                   </AnchorPane>
                </content>

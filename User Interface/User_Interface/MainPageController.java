@@ -203,10 +203,10 @@ public final class MainPageController extends MainPageItems implements
 				fastqcPath, picardToolsPath, bwaPath, bam2wigPath,
 				rockhopperPath, cushawGpuPath, topHatPath, cushawPath,
 				cushawIndexPath, hisatPath, starPath };
-
+		
 		List<TextArea> directoriesMayExist = Arrays
 				.asList(tempDirectoriesMayExist);
-
+		
 		directoriesMayExist.parallelStream().forEach((fileName) -> {
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
@@ -215,7 +215,7 @@ public final class MainPageController extends MainPageItems implements
 					File dest = new File(fileName.getText());
 					// Red if it can't be written to.
 					String color = "red";
-					if (dest.canWrite()) {
+					if (dest.isDirectory()) {
 						// If you can write to, makes it green.
 						color = "green";
 					}
@@ -379,11 +379,12 @@ public final class MainPageController extends MainPageItems implements
 			});
 
 		// Counting CheckBoxes
-		CheckBox[] tempModifyCountOptions = { RSEM, HTseq, FeatureCounts,
-				Cufflinks };
+		CheckBox[] tempModifyCountOptions = {RSEM,
+				HTseq,
+				FeatureCounts,
+				Cufflinks};
 		List<CheckBox> modifyCountOptions = Arrays
 				.asList(tempModifyCountOptions);
-
 		modifyCountOptions.parallelStream().forEach(
 				(checkBox) -> {
 					checkBox.selectedProperty().addListener(
@@ -392,14 +393,15 @@ public final class MainPageController extends MainPageItems implements
 								public void changed(
 										ObservableValue<? extends Boolean> arg0,
 										Boolean arg1, Boolean arg2) {
+									String countOptionName = checkBox.getText();
+									// Feature counts has a space, so remove the space
+									countOptionName = countOptionName.replace(" ", "");
 									if (checkBox.isSelected()) {
 										counting.getChildren().add(
-												countOptions.get(checkBox
-														.getText()));
+												countOptions.get(countOptionName));
 									} else {
 										counting.getChildren().remove(
-												countOptions.get(checkBox
-														.getText()));
+												countOptions.get(countOptionName));
 									}
 								}
 							});
@@ -425,8 +427,7 @@ public final class MainPageController extends MainPageItems implements
 		alignOptions.put("TopHat", new TreeItem<String>("TopHat"));
 		// Counting
 		countOptions.put("Cufflinks", new TreeItem<String>("Cufflinks"));
-		countOptions
-				.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
+		countOptions.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
 		countOptions.put("HTSeq", new TreeItem<String>("HTSeq"));
 		countOptions.put("RSEM", new TreeItem<String>("RSEM"));
 	}
@@ -631,9 +632,9 @@ public final class MainPageController extends MainPageItems implements
 				int trim = (int) trimHead.getValue();
 				String message;
 				if (trim > 1) {
-					message = "Head trim, " + trim + " base";
-				} else {
 					message = "Head trim, " + trim + " bases";
+				} else {
+					message = "Head trim, " + trim + " base";
 				}
 				trim_head_label.textProperty().setValue(message);
 			}
@@ -647,15 +648,44 @@ public final class MainPageController extends MainPageItems implements
 				int read = (int) minTrim.getValue();
 				String message;
 				if (read > 1) {
-					message = "Minimal trimmed read length of " + read
-							+ " base";
-				} else {
-					message = "Minimal trimmed read length of " + read
+					message = "Min trimmed read length of " + read
 							+ " bases";
+				} else {
+					message = "Min trimmed read length of " + read
+							+ " base";
 				}
 				min_read_length_label.textProperty().setValue(message);
 			}
 		});
+		
+		// Min Avg Qual Text
+		int read = (int) min_avg_qual_slide.getValue();
+		String message = "Min average base calling quality within sliding window is " + read;
+		min_avg_qual_text.textProperty().setValue(message);
+		min_avg_qual_slide.valueProperty().addListener(new ChangeListener<Object>() {
+			@Override
+			public void changed(ObservableValue<?> arg0, Object arg1,
+					Object arg2) {
+				int read = (int) min_avg_qual_slide.getValue();
+				String message = "Min average base calling quality within sliding window is " + read;
+				min_avg_qual_text.textProperty().setValue(message);
+			}
+		});
+		
+		// Three Prime Trim
+		int r = (int) three_prime_trim_slide.getValue();
+		String m = "Sliding window for 3'end trimming is " + r;
+		three_prime_trim_text.textProperty().setValue(m);
+		three_prime_trim_slide.valueProperty().addListener(new ChangeListener<Object>() {
+			@Override
+			public void changed(ObservableValue<?> arg0, Object arg1,
+					Object arg2) {
+				int read = (int) three_prime_trim_slide.getValue();
+				String message = "Sliding window for 3'end trimming is " + read;
+				three_prime_trim_text.textProperty().setValue(message);
+			}
+		});
+		
 	}
 
 	/*
@@ -918,7 +948,7 @@ public final class MainPageController extends MainPageItems implements
 				if (att_file != null) {
 					AttributeActions action = new AttributeActions();
 					try {
-						action.setAttributes(att_file);
+						action.setAttributesAttributeFile(att_file);
 					} catch (FileNotFoundException e) {
 						System.out.println("Attribute File not found!");
 					}
@@ -944,7 +974,7 @@ public final class MainPageController extends MainPageItems implements
 				File att_file = fc.showOpenDialog(Main.stage);
 				try {
 					AttributeActions action = new AttributeActions();
-					action.setAttributes(att_file);
+					action.setAttributesAttributeFile(att_file);
 				} catch (FileNotFoundException e) {
 					System.out.println("Attribute file not found!");
 				}

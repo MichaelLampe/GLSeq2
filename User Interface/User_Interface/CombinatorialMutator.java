@@ -143,7 +143,7 @@ public class CombinatorialMutator {
 		File att_file = new File(file_name);
 
 		try {
-			action.setAttributes(att_file);
+			action.setAttributesAttributeFile(att_file);
 			return true;
 		} catch (FileNotFoundException e) {
 			return false;

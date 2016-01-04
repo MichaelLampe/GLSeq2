@@ -30,7 +30,7 @@ public class Main extends Application {
 		// Update attributes from previous save
 		String defaultAttributeFile = "AttributesConfig.txt";
 		try {
-			att.setAttributes(new File(defaultAttributeFile));
+			att.setAttributesTextConfig(new File(defaultAttributeFile));
 		} catch (FileNotFoundException e) {
 			System.out.println("Presaved attributes config file not found (" + defaultAttributeFile + ").");
 		}

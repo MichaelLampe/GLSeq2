@@ -49,7 +49,7 @@
 		<Bowtie2>
 			<Options>
 					<SkipFirstNReads command="-s" input_type="int" default_value="0"></SkipFirstNReads>
-					<StopAfterFirstNReads command="u" input_type="int" default_value="0"></StopAfterFirstNReads>
+					<StopAfterFirstNReads command="-u" input_type="int" default_value="0"></StopAfterFirstNReads>
 					<TrimNBasesFromFivePrime command="--trim5" input_type="int" default_value="0"></TrimNBasesFromFivePrime>
 					<TrimNBasesFromThreePrime command="--trim3" input_type="int" default_value="0"></TrimNBasesFromThreePrime>	
 					<MaxMismatchesInSeed command="-N" input_type="int" default_value="0"></MaxMismatchesInSeed>

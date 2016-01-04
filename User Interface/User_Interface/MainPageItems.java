@@ -54,6 +54,16 @@ class MainPageItems {
   protected Slider minTrim;
   @FXML
   protected Label min_read_length_label;
+  
+  @FXML
+  protected Slider min_avg_qual_slide;
+  @FXML
+  protected Label min_avg_qual_text;
+  
+  @FXML
+  protected Slider three_prime_trim_slide;
+  @FXML
+  protected Label three_prime_trim_text;
 
   @FXML
   protected ComboBox<String> readTrim;
@@ -147,8 +157,6 @@ class MainPageItems {
   protected CheckBox FeatureCounts;
   @FXML
   protected CheckBox Cufflinks;
-  @FXML
-  protected CheckBox rockhopperCount;
 
   @FXML
   protected Button start_run;
