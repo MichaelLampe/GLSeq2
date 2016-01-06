@@ -93,17 +93,17 @@
                            <tooltip>
                               <Tooltip text="The final directory where your data should be stored long term. " />
                            </tooltip></TextArea>
-                        <Label layoutX="13.0" layoutY="431.0" text="If continuing from pre-aligned reads" textFill="WHITE">
+                        <Label layoutX="14.0" layoutY="407.0" text="If continuing from pre-aligned reads" textFill="WHITE">
                            <font>
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <RadioButton fx:id="load_prev" layoutX="13.0" layoutY="483.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="421.0" text="Load file locations based on a previous run ID" textFill="WHITE">
+                        <RadioButton fx:id="load_prev" layoutX="15.0" layoutY="446.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="847.0" text="Load file locations based on a previous run ID" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="man_sam" layoutX="430.0" layoutY="490.0" mnemonicParsing="false" text="Indicate a directory containing SAM files manually" textFill="WHITE">
+                        <RadioButton fx:id="man_sam" layoutX="15.0" layoutY="497.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="847.0" text="Indicate a directory containing SAM files manually" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -241,13 +241,13 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="trimHead" layoutX="540.0" layoutY="65.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="12.0" />
+                        <Slider fx:id="trimHead" layoutX="597.0" layoutY="65.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="263.0" showTickMarks="true" value="12.0" />
                         <Label fx:id="min_read_length_label" layoutX="23.0" layoutY="105.0" text="Minimal trimmed read length of 36 bases" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="minTrim" layoutX="540.0" layoutY="105.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="36.0" />
+                        <Slider fx:id="minTrim" layoutX="597.0" layoutY="105.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="263.0" showTickMarks="true" value="36.0" />
                         <TextArea fx:id="artificialFasta" layoutX="408.0" layoutY="222.0" prefHeight="32.0" prefWidth="445.0" promptText="Artificial sequences file">
                            <tooltip>
                               <Tooltip text="A FASTA file containign artificial sequences.  These will be trimmed from the reads by the Trimmomatic program." />
@@ -322,13 +322,13 @@
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="three_prime_trim_slide" layoutX="540.0" layoutY="185.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="36.0" />
+                        <Slider fx:id="three_prime_trim_slide" layoutX="597.0" layoutY="185.0" majorTickUnit="1.0" max="75.0" minorTickCount="0" prefHeight="24.0" prefWidth="263.0" showTickMarks="true" value="36.0" />
                         <Label fx:id="three_prime_trim_text" layoutX="23.0" layoutY="185.0" text="Size of the sliding window for 3'-end trimming" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Slider fx:id="min_avg_qual_slide" layoutX="540.0" layoutY="145.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="300.0" showTickMarks="true" value="12.0" />
+                        <Slider fx:id="min_avg_qual_slide" layoutX="597.0" layoutY="145.0" majorTickUnit="1.0" max="25.0" minorTickCount="0" prefHeight="24.0" prefWidth="263.0" showTickMarks="true" value="12.0" />
                         <Label fx:id="min_avg_qual_text" layoutX="23.0" layoutY="145.0" prefHeight="27.0" prefWidth="600.0" text="Minimal average base calling quality within the sliding window" textFill="WHITE">
                            <font>
                               <Font size="18.0" />

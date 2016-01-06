@@ -212,10 +212,10 @@ public final class MainPageController extends MainPageItems implements
 				@Override
 				public void changed(ObservableValue<? extends String> arg0,
 						String arg1, String arg2) {
-					File dest = new File(fileName.getText());
+					File dest = new File(arg2);
 					// Red if it can't be written to.
 					String color = "red";
-					if (dest.isDirectory()) {
+					if (dest.isDirectory() || dest.exists()) {
 						// If you can write to, makes it green.
 						color = "green";
 					}
@@ -817,7 +817,7 @@ public final class MainPageController extends MainPageItems implements
 
 	private BooleanBinding textAlphanumeric(TextArea run_name) {
 		BooleanBinding binding = Bindings.createBooleanBinding(() -> (!run_name
-				.getText().matches("^.*[^a-zA-Z0-9].*$")), run_name
+				.getText().matches("^.*[^a-zA-Z0-9_].*$")), run_name
 				.textProperty());
 		return binding;
 	}
