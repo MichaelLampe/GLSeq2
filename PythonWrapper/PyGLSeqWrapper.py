@@ -70,21 +70,21 @@ command = {
 
 # Based on the command line args, fill the command fields.
 try:
-    command["glseq_path"] = sys.argv[1]
-    command["update_database"] = sys.argv[2]
-    command["prepare"] = sys.argv[3]
-    command["align"] = sys.argv[4]
-    command["count"] = sys.argv[5]
-    command["collect"] = sys.argv[6]
+    command["glseq_path"] = sys.argv[0].split("PyGLSeqWrapper.py")[0] + "GLSeq.top.R"
+    command["update_database"] = sys.argv[1]
+    command["prepare"] = sys.argv[2]
+    command["align"] = sys.argv[3]
+    command["count"] = sys.argv[4]
+    command["collect"] = sys.argv[5]
 
-    if len(sys.argv) < 10:
+    if len(sys.argv) < 9:
         # We can exclude run name in directory runs.
-        command["attribute_file_path"] = sys.argv[8]
-        command["protocol_id"] = sys.argv[7]
+        command["attribute_file_path"] = sys.argv[7]
+        command["protocol_id"] = sys.argv[6]
     else:
-        command["attribute_file_path"] = sys.argv[9]
-        command["run_name"] = sys.argv[7]
-        command["protocol_id"] = sys.argv[8]
+        command["attribute_file_path"] = sys.argv[8]
+        command["run_name"] = sys.argv[6]
+        command["protocol_id"] = sys.argv[7]
 except IndexError:
     print_message()
     print("There was an error in your commands.  Please check your command string")
