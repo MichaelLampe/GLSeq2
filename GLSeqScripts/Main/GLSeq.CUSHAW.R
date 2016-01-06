@@ -71,8 +71,7 @@ if (aAlgor == "Cushaw_GPU"){
       #
       ############
       if (nCores > 6) {
-        nCores <- 6
-        warning("Too many cores can slow alignment.  Adjusting maximum cores to 6.")
+        warning("Too many cores can slow alignment.  Best results have been seen at 6 cores.")
       }
       if (paired.end)  create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,refFASTAname,sep=""), "-q", fq.right, fq.left, "-o", unsorted.sam,"-t", nCores)
       if (!(paired.end)) create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,refFASTAname,sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
@@ -130,14 +129,15 @@ for (zz in 1:nStreams) {
     ###################
     sorted <- paste(this.resName,"sorted",sep=".")
     unsorted.bam <- paste(this.resName,"unsorted.bam",sep=".")
-    sorted <- paste(this.resName, "sorted", sep=".")
+    sorted <- paste(this.resName,"sorted",sep=".")
     bam.create <- paste("samtools view",unsorted.sam,"-uS -o",unsorted.bam)
     if (Condor){
       bam.sort <- paste("samtools sort -@ 6 -m 32G -n ",unsorted.bam,sorted)
     } else{
       bam.sort <- paste("samtools sort -n ",unsorted.bam,sorted)
     }
-    bam.index <- paste("samtools index", sorted) # System command #7
+    sorted.bam <- paste(this.resName,"sorted.bam",sep=".")
+    bam.index <- paste("samtools index", sorted.bam) # System command #7
     ###################
     # Convert back to SAM file
     ###################
@@ -147,7 +147,6 @@ for (zz in 1:nStreams) {
     # This is only needed when using paired.ended data, so you can see we avoid that pipe when
     # we are utilizing SE data.
     # Shell script made from a comment found at https://www.biostars.org/p/108702/
-    sorted.bam <- paste(this.resName,"sorted.bam",sep=".")
     unclean.sam <- paste(this.resName,"unclean.sam",sep=".")
     if(paired.end) {
       convert.to.sam <- paste ("samtools view -h",sorted.bam,">",unclean.sam)

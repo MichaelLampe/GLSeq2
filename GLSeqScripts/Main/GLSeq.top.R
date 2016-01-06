@@ -60,7 +60,6 @@ Condor <- as.logical(args[9])
 # this log type in the cattribute file by assigning it.
 destDirTest <- NULL
 #
-#
 source(attrPath)
 # Allows us to run the top script from anywhere instead of having to be within the RScript folder
 setwd(base.dir)

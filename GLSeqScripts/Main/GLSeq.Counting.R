@@ -80,7 +80,15 @@ if ("FeatureCounts" %in% cAlgor){
   #
   countfile <- paste(this.resName,"FeatureCounts","counts", sep=".")
   # Feature counts is actually an RScript.  So instead of sourcing it, we simply prepare the program to run another R command.
-  script <- paste("Rscript",paste(base.dir,"GLSeq.FeatureCounts.R",sep=""),countable.sam,destDirFeatureCountsCount,refGFFname,dest.dir,this.resName,paired.end,idAttr)
+  script <- paste("Rscript",
+                  paste(base.dir,"GLSeq.FeatureCounts.R",sep=""),
+                  countable.sam,destDirFeatureCountsCount,
+                  refGFFname,dest.dir,
+                  this.resName,
+                  paired.end,
+                  idAttr,
+                  FeatureCountsSpecialOptions)
+
   counts.summary <- paste(this.resName,".FeatureCounts.summary.txt",sep="")
   counts.data <- paste(this.resName,".FeatureCounts.counts.csv",sep="")
   counts.stats <- paste(this.resName,".FeatureCounts.stats.csv",sep="")

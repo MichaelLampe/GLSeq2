@@ -23,7 +23,7 @@ for (zz in 1:nStreams) {
     if (paired.end) fq.right <- paste(dest.dir,fqfiles.table[i,2],sep="")
     name <- assign.name(fq.left,paired.end)
     this.resName <- assign.resName(name,text.add)
-    countable.sam <- countable.sam.name(this.resName)
+    countable.sam <- paste(this.resName,"countable","sam",sep=".")
     ###################
     # Alignment
     ###################
