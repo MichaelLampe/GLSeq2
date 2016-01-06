@@ -63,28 +63,32 @@ public class TreeViewOptionsLoader {
 			if (!optionsNode.getChildNodes().item(i).getNodeName()
 					.equals("#text")) {
 				optionsHead.getChildren().add(
-						parseSingleOption(optionsNode.getChildNodes().item(i)));
+						parseSingleOption(itemName, optionsNode.getChildNodes().item(i)));
 			}
 		}
 		return optionsHead;
 	}
 
-	private TreeItem<String> parseSingleOption(Node optionXml) {
+	private TreeItem<String> parseSingleOption(String itemName, Node optionXml) {
 		// Every option has three properties:
 
 		// Command
 		// Input Type
 		// Default Value
+		String name = itemName + "_" + optionXml.getNodeName();
+		
 		CheckBoxTreeItem<String> option = new CheckBoxTreeItem<String>(
-				optionXml.getNodeName());
+				name);
+
 		String input_type = optionXml.getAttributes()
 				.getNamedItem("input_type").getNodeValue();
 		String default_value = optionXml.getAttributes()
 				.getNamedItem("default_value").getNodeValue();
 		
-		// We'll use this later as we don't necessarily want to display this.
-		getCommandMap().put(optionXml.getNodeName(), optionXml.getAttributes().getNamedItem("command").getNodeValue());
+
 		
+		// We'll use this later as we don't necessarily want to display this.
+		getCommandMap().put(name, optionXml.getAttributes().getNamedItem("command").getNodeValue());
 		if (!input_type.equals("add")) {
 			option.getChildren()
 					.add(new SpecialInputTreeItem<String>(input_type,

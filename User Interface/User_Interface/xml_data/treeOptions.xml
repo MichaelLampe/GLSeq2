@@ -22,7 +22,7 @@
 		<Bowtie>
 			<Options>
 					<SkipFirstNReads command="-s" input_type="int" default_value="0"></SkipFirstNReads>
-					<StopAfterFirstNReads command="u" input_type="int" default_value="0"></StopAfterFirstNReads>
+					<StopAfterFirstNReads command="-u" input_type="int" default_value="0"></StopAfterFirstNReads>
 					<TrimNBasesFromFivePrime command="--trim5" input_type="int" default_value="0"></TrimNBasesFromFivePrime>
 					<TrimNBasesFromThreePrime command="--trim3" input_type="int" default_value="0"></TrimNBasesFromThreePrime>				
 					<ReportEndToEndHits command="-v" input_type="int" default_value="0"></ReportEndToEndHits>
@@ -92,7 +92,7 @@
 					<MinimalOptimalLocalAlignmentScoreDividedBymatchingScore command="-min_score" input_type="int" default_value="30"></MinimalOptimalLocalAlignmentScoreDividedBymatchingScore>
 					<MinimalIdentityOfOptimalLocalAlignments command="-min_id" input_type="float" default_value="0.90"></MinimalIdentityOfOptimalLocalAlignments>
 					<MinimalRatioOfReadsInOptimalLocalAlignments command="-min_ratio" input_type="float" default_value="0.80"></MinimalRatioOfReadsInOptimalLocalAlignments>
-					<TopNumberOfReadPairsForInsertSizeEstimation command="ins_npairs" input_type="int" default_value="1"></TopNumberOfReadPairsForInsertSizeEstimation>
+					<TopNumberOfReadPairsForInsertSizeEstimation command="-ins_npairs" input_type="int" default_value="1"></TopNumberOfReadPairsForInsertSizeEstimation>
 					<MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate command="-ins_mapq" input_type="int" default_value="20"></MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate>
 					<MaxNumberOfSeedPairsPerReadPair command="-max_seedpairs" input_type="int" default_value="10000000"></MaxNumberOfSeedPairsPerReadPair>
 					<NoRescue command="-no_rescue" input_type="add" default_value="no_add"></NoRescue>
@@ -110,7 +110,7 @@
 					<MinimalOptimalLocalAlignmentScoreDividedBymatchingScore command="-min_score" input_type="int" default_value="30"></MinimalOptimalLocalAlignmentScoreDividedBymatchingScore>
 					<MinimalIdentityOfOptimalLocalAlignments command="-min_id" input_type="float" default_value="0.90"></MinimalIdentityOfOptimalLocalAlignments>
 					<MinimalRatioOfReadsInOptimalLocalAlignments command="-min_ratio" input_type="float" default_value="0.80"></MinimalRatioOfReadsInOptimalLocalAlignments>
-					<TopNumberOfReadPairsForInsertSizeEstimation command="ins_npairs" input_type="int" default_value="1"></TopNumberOfReadPairsForInsertSizeEstimation>
+					<TopNumberOfReadPairsForInsertSizeEstimation command="-ins_npairs" input_type="int" default_value="1"></TopNumberOfReadPairsForInsertSizeEstimation>
 					<MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate command="-ins_mapq" input_type="int" default_value="20"></MinimalMappingQualityScoreOfSEAlignmentForInsertSizeEstimate>
 					<MaxNumberOfSeedPairsPerReadPair command="-max_seedpairs" input_type="int" default_value="10000000"></MaxNumberOfSeedPairsPerReadPair>
 					<NoRescue command="-no_rescue" input_type="add" default_value="no_add"></NoRescue>
@@ -218,23 +218,23 @@
 		</RSEM>
 		<Cufflinks>
 			<Options>
-				<ExpectedMeanLengthofFragment command="-frag-len-mean" input_type="int" default_value="200"></ExpectedMeanLengthofFragment>
-				<ExpectedStdOfFragment command="-frag-len-std-dev" input_type="int" default_value="80"></ExpectedStdOfFragment>
-				<NormalizeByUpperQuartile command="-upper-quartile-norm" input_type="add" default_value="no_add"></NormalizeByUpperQuartile>
-				<NormalizeByTotalhits command="-total-hits-norm" input_type="add" default_value="no_add"></NormalizeByTotalhits>
-				<NormalizeByCompatibleHits command="-compatible-hits-norm" input_type="add" default_value="no_add"></NormalizeByCompatibleHits>
-				<MaxLocusFragments command="-max-bundle-frags" input_type="int" default_value="1000000"></MaxLocusFragments>
-				<DisableEffectiveLengthCorrection command="-no-effective-length-correction" input_type="add" default_value="no_add"></DisableEffectiveLengthCorrection>
-				<NoLengthCorrection command="-no-length-correction" input_type="add" default_value="no_add"></NoLengthCorrection>
-				<MinIsoformFraction command="-min-isoform-fraction" input_type="float" default_value="0.1"></MinIsoformFraction>
+				<ExpectedMeanLengthofFragment command="--frag-len-mean" input_type="int" default_value="200"></ExpectedMeanLengthofFragment>
+				<ExpectedStdOfFragment command="--frag-len-std-dev" input_type="int" default_value="80"></ExpectedStdOfFragment>
+				<NormalizeByUpperQuartile command="--upper-quartile-norm" input_type="add" default_value="no_add"></NormalizeByUpperQuartile>
+				<NormalizeByTotalhits command="--total-hits-norm" input_type="add" default_value="no_add"></NormalizeByTotalhits>
+				<NormalizeByCompatibleHits command="--compatible-hits-norm" input_type="add" default_value="no_add"></NormalizeByCompatibleHits>
+				<MaxLocusFragments command="--max-bundle-frags" input_type="int" default_value="1000000"></MaxLocusFragments>
+				<DisableEffectiveLengthCorrection command="--no-effective-length-correction" input_type="add" default_value="no_add"></DisableEffectiveLengthCorrection>
+				<NoLengthCorrection command="--no-length-correction" input_type="add" default_value="no_add"></NoLengthCorrection>
+				<MinIsoformFraction command="--min-isoform-fraction" input_type="float" default_value="0.1"></MinIsoformFraction>
 				<PreMRnaFraction command="-pre-mrna-fraction" input_type="float" default_value="0.15"></PreMRnaFraction>
-				<MinIntronLength command="min-intron-length" input_type="int" default_value="50"></MinIntronLength>
-				<MaxIntronLength command="-max-intron-length" input_type="int" default_value="300000"></MaxIntronLength>
-				<AlphaValueForSplicedAlignmentFiltering command="-junc-alpha" input_type="float" default_value="0.001"></AlphaValueForSplicedAlignmentFiltering>
-				<SmallAnchorFilterFraction command="-small-anchor-fraction" input_type="float" default_value="0.09"></SmallAnchorFilterFraction>
+				<MinIntronLength command="-min-intron-length" input_type="int" default_value="50"></MinIntronLength>
+				<MaxIntronLength command="--max-intron-length" input_type="int" default_value="300000"></MaxIntronLength>
+				<AlphaValueForSplicedAlignmentFiltering command="--junc-alpha" input_type="float" default_value="0.001"></AlphaValueForSplicedAlignmentFiltering>
+				<SmallAnchorFilterFraction command="--small-anchor-fraction" input_type="float" default_value="0.09"></SmallAnchorFilterFraction>
 				<MinFragsPerTransfrag command="-min-frags-per-transfrag" input_type="int" default_value="10"></MinFragsPerTransfrag>
-				<NBPOverhangTolerance command="-overhang-tolerance" input_type="int" default_value="8"></NBPOverhangTolerance>
-				<MaxBundleLength command="-max-bundle-length" input_type="int" default_value="3500000"></MaxBundleLength>		
+				<NBPOverhangTolerance command="--overhang-tolerance" input_type="int" default_value="8"></NBPOverhangTolerance>
+				<MaxBundleLength command="--max-bundle-length" input_type="int" default_value="3500000"></MaxBundleLength>		
 			</Options>
 		</Cufflinks>
 	</Counters>

@@ -195,7 +195,6 @@ public class AttributeActions {
 		try {
 			Integer.valueOf(value);
 		} catch (NumberFormatException e) {
-			System.out.println(attribute.getName());
 			value = checkValue(value);
 		}
 		line += attribute.getName() + " <- " + value + "\n";
@@ -214,7 +213,6 @@ public class AttributeActions {
 	private String checkValue(String value) {
 		// Check for null pointers
 		if (value == null){
-			System.out.println("WAS NULL");
 			return "\"\"";
 		}
 		// if list don't add the quotes

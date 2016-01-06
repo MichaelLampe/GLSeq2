@@ -756,7 +756,6 @@ public final class MainPageController extends MainPageItems implements
 						attributeFileLocation = action.writeAttributesFile(
 								run_name.getText(), null);
 					}
-					System.out.println(attributeFileLocation);
 					action.saveConfigFile("AttributesConfig.txt");
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -808,7 +807,20 @@ public final class MainPageController extends MainPageItems implements
 														.selectedProperty()))))
 						.then(false).otherwise(true));
 	}
-
+	
+	private String checkSlash(String file_name) {
+		if (file_name.length() >= 1) {
+			if (file_name.substring(file_name.length() - 1).equals("/")) {
+				return file_name;
+			} else {
+				file_name = file_name + "/";
+				return file_name;
+			}
+		} else{
+			return "";
+		}
+	}
+	
 	private BooleanBinding textCountLimit(TextArea run_name, int char_count) {
 		BooleanBinding binding = Bindings.createBooleanBinding(() -> (run_name
 				.getText().length() <= char_count), run_name.textProperty());
@@ -817,7 +829,7 @@ public final class MainPageController extends MainPageItems implements
 
 	private BooleanBinding textAlphanumeric(TextArea run_name) {
 		BooleanBinding binding = Bindings.createBooleanBinding(() -> (!run_name
-				.getText().matches("^.*[^a-zA-Z0-9_].*$")), run_name
+				.getText().matches("^.*[^a-zA-Z0-9_ ].*$")), run_name
 				.textProperty());
 		return binding;
 	}
@@ -825,8 +837,9 @@ public final class MainPageController extends MainPageItems implements
 	private BooleanBinding noExistRun(TextArea run_name) {
 		// Update on run name change
 		BooleanBinding bindingRun = Bindings.createBooleanBinding(
-				() -> (!new File(scriptDirectory.getText() + run_name.getText()
-						+ ".RData").exists()), run_name.textProperty());
+				() -> (
+						!new File(checkSlash(destinationDirectory.getText()) +  run_name.getText()).isDirectory()),
+				run_name.textProperty());
 		return bindingRun;
 	}
 

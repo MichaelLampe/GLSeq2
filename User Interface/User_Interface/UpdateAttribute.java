@@ -90,7 +90,6 @@ public class UpdateAttribute {
 			if (checkVariant.isSelected()) {
 				String optionName = options.getChildren().get(i).getValue();
 				String command = TreeViewOptionsLoader.getCommandMap().get(optionName);
-
 				alignSpecialOptions.append(command);
 				alignSpecialOptions.append(" ");
 
