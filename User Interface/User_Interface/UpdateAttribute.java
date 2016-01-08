@@ -8,6 +8,7 @@ import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 
@@ -52,6 +53,9 @@ public class UpdateAttribute {
 				attribute.setValue(String.valueOf(Integer
 						.valueOf((int) ((Slider) currentData).getValue())));
 				// Combo boxes we just want the selected item.
+			}else if (currentData instanceof Spinner){
+				Spinner<Integer> s = (Spinner<Integer>) currentData;
+				attribute.setValue(String.valueOf(s.getValue()));
 			} else if (currentData instanceof ComboBox<?>) {
 				attribute.setValue(String.valueOf(((ComboBox<?>) currentData)
 						.getSelectionModel().getSelectedItem().toString()));

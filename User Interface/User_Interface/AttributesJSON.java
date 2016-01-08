@@ -192,5 +192,4 @@ public enum AttributesJSON {
     this.defaultVal = defaultVal;
     this.description = description;
   } 
-  
 }

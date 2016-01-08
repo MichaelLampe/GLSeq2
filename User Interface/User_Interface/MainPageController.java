@@ -32,6 +32,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -103,8 +104,28 @@ public final class MainPageController extends MainPageItems implements
 		appendTooltips();
 
 		fileSelectTree();
+		
+		addSpinners();
 	}
-
+	
+	private void addSpinners(){
+		SpinnerValueFactory<Integer> trimHeadFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+		trimHead.setValueFactory(trimHeadFactory);
+		trimHead.getValueFactory().setValue(12);
+		
+		SpinnerValueFactory<Integer> minTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+		minTrim.setValueFactory(minTrimFactory);
+		minTrim.getValueFactory().setValue(36);
+		
+		SpinnerValueFactory<Integer> threePrimeTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+		three_prime_trim_slide.setValueFactory(threePrimeTrimFactory);
+		three_prime_trim_slide.getValueFactory().setValue(3);
+		
+		SpinnerValueFactory<Integer> minAvgQualFactory= new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+		min_avg_qual_slide.setValueFactory(minAvgQualFactory);
+		min_avg_qual_slide.getValueFactory().setValue(30);;
+	}
+	
 	private void constructRadioButtons() {
 		// Setup the alignment button group
 		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw,
@@ -117,7 +138,7 @@ public final class MainPageController extends MainPageItems implements
 		toggleCountingDep(group);
 
 		// Setup the type of run button group
-		RadioButton[] tempTypeOfRun = { indic_man, from_glow, de_novo };
+		RadioButton[] tempTypeOfRun = {indic_man, from_glow, de_novo};
 		List<RadioButton> typeOfRun = Arrays.asList(tempTypeOfRun);
 		typeOfRun.forEach((radioButton) -> {
 			radioButton.setToggleGroup(referenceGroup);
@@ -157,6 +178,36 @@ public final class MainPageController extends MainPageItems implements
 		});
 		glow.get(0).setSelected(true);
 
+		
+		
+		
+		workingDirectoryPicker.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0){
+				DirectoryChooser fileChooser = new DirectoryChooser();
+				fileChooser.setTitle("Working Directory Picker");
+				File selectedDirectory = fileChooser.showDialog(null);
+				if (selectedDirectory != null) {
+					destinationDirectory.setText(selectedDirectory.getAbsolutePath());
+				}
+			}
+		});
+		
+		destinationDirectoryPicker.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0){
+				DirectoryChooser fileChooser = new DirectoryChooser();
+				fileChooser.setTitle("Destination Directory Picker");
+				File selectedDirectory = fileChooser.showDialog(null);
+				if (selectedDirectory != null) {
+					storageDestination.setText(selectedDirectory.getAbsolutePath());
+				}
+			}
+		});
+		
+		
+		
+		
 		// If you add more items here, you need to add more cases for
 		// "requestFor"
 		// in the lambda function below
@@ -167,29 +218,44 @@ public final class MainPageController extends MainPageItems implements
 				final TextArea requestFor;
 				if (button.equals(ref_request_glow)) {
 					requestFor = genom_ref_id;
+					button.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent arg0) {
+							if (request == null) {
+								// Log the user in and change the button name
+								createLoginDialog();
+							} else {
+								Task<Object> refReq = new GlowReferenceRequest(
+										request, requestFor.getText());
+								// Run on a different thread so it doesn't lock up
+								// the
+								// UI.
+								new Thread(refReq).start();
+							}
+						}
+					});
 				} else if (button.equals(data_request_glow)) {
 					requestFor = experiment_id;
+					button.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent arg0) {
+							if (request == null) {
+								// Log the user in and change the button name
+								createLoginDialog();
+							} else {
+								Task<Object> dataReq = new GlowDataRequest(
+										request, requestFor.getText());
+								// Run on a different thread so it doesn't lock up
+								// the
+								// UI.
+								new Thread(dataReq).start();
+							}
+						}
+					});
 				} else {
 					// Only would get here if more items are added above.
 					requestFor = null;
 				}
-
-				button.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent arg0) {
-						if (request == null) {
-							// Log the user in and change the button name
-							createLoginDialog();
-						} else {
-							Task<Object> refReq = new GlowReferenceRequest(
-									request, requestFor.getText());
-							// Run on a different thread so it doesn't lock up
-							// the
-							// UI.
-							new Thread(refReq).start();
-						}
-					}
-				});
 			});
 	}
 
@@ -255,7 +321,6 @@ public final class MainPageController extends MainPageItems implements
 				}
 			});
 		});
-
 	}
 
 	private void fileSelectTree() {
@@ -478,10 +543,6 @@ public final class MainPageController extends MainPageItems implements
 				"Start run from previously generated countable.sam files.");
 		countableSamDir.setTooltip(countableToolTip);
 
-		// Data characteristics
-		Tooltip strainToolTip = new Tooltip("Strain name of the organism");
-		strain.setTooltip(strainToolTip);
-
 		Tooltip libTooltip = new Tooltip(
 				"\"F\" if mRNA sequence corresponds to strandedness of the reads (Single End libraries) or the first read in the pair (Paired End libraries). \"R\" in the opposite case.");
 		libStrands.setTooltip(libTooltip);
@@ -516,51 +577,11 @@ public final class MainPageController extends MainPageItems implements
 				int cores = (int) numberCores.getValue();
 				String message;
 				if (cores > 1) {
-					message = "You are now using " + cores + " cores";
+					message = cores + " cores used for a single sample processing";
 				} else {
-					message = "You are now using " + cores + " core";
+					message = cores + " core used for a single sample processing";
 				}
 				cores_label.textProperty().setValue(message);
-				// Update dataprep
-				int streams = (int) numberStreamsDataPrep.getValue();
-				if (streams > 1) {
-					message = streams
-							+ " computational streams during alignment. "
-							+ streams * cores + " cores will be used in total.";
-				} else {
-					if (numberCores.getValue() > 1) {
-						message = streams
-								+ " computational stream during alignment. "
-								+ streams * cores
-								+ " cores will be used in total.";
-					} else {
-						message = streams
-								+ " computational stream during alignment. "
-								+ streams * cores
-								+ " core will be used in total.";
-					}
-				}
-				dataprep_streams_label.textProperty().setValue(message);
-				// Update number
-				streams = (int) numberStreams.getValue();
-				if (streams > 1) {
-					message = streams
-							+ " computational streams during alignment. "
-							+ streams * cores + " cores will be used in total.";
-				} else {
-					if (numberCores.getValue() > 1) {
-						message = streams
-								+ " computational stream during alignment. "
-								+ streams * cores
-								+ " cores will be used in total.";
-					} else {
-						message = streams
-								+ " computational stream during alignment. "
-								+ streams * cores
-								+ " core will be used in total.";
-					}
-				}
-				alignment_streams_label.textProperty().setValue(message);
 			}
 		});
 
@@ -575,18 +596,18 @@ public final class MainPageController extends MainPageItems implements
 						int cores = (int) numberCores.getValue();
 						if (streams > 1) {
 							message = streams
-									+ " computational streams during data preparation. "
+									+ " samples processed in parallel during data preparation. "
 									+ streams * cores
 									+ " cores will be used in total.";
 						} else {
 							if (numberCores.getValue() > 1) {
 								message = streams
-										+ " computational stream during data preparation. "
+										+ " sample processed in parallel during data preparation. "
 										+ streams * cores
 										+ " cores will be used in total.";
 							} else {
 								message = streams
-										+ " computational stream during data preparation. "
+										+ " sample processed in parallel during data preparation. "
 										+ streams * cores
 										+ " core will be used in total.";
 							}
@@ -605,17 +626,17 @@ public final class MainPageController extends MainPageItems implements
 				String message;
 				if (streams > 1) {
 					message = streams
-							+ " computational streams during alignment. "
+							+ " samples processed in parallel during alignment. "
 							+ streams * cores + " cores will be used in total.";
 				} else {
 					if (numberCores.getValue() > 1) {
 						message = streams
-								+ " computational stream during alignment. "
+								+ " sample processed in parallel during alignment. "
 								+ streams * cores
 								+ " cores will be used in total.";
 					} else {
 						message = streams
-								+ " computational stream during alignment. "
+								+ " sample processed in parallel during alignment. "
 								+ streams * cores
 								+ " core will be used in total.";
 					}
@@ -623,69 +644,6 @@ public final class MainPageController extends MainPageItems implements
 				alignment_streams_label.textProperty().setValue(message);
 			}
 		});
-
-		// Trim Head
-		trimHead.valueProperty().addListener(new ChangeListener<Object>() {
-			@Override
-			public void changed(ObservableValue<?> arg0, Object arg1,
-					Object arg2) {
-				int trim = (int) trimHead.getValue();
-				String message;
-				if (trim > 1) {
-					message = "Head trim, " + trim + " bases";
-				} else {
-					message = "Head trim, " + trim + " base";
-				}
-				trim_head_label.textProperty().setValue(message);
-			}
-		});
-
-		// Min Read Length
-		minTrim.valueProperty().addListener(new ChangeListener<Object>() {
-			@Override
-			public void changed(ObservableValue<?> arg0, Object arg1,
-					Object arg2) {
-				int read = (int) minTrim.getValue();
-				String message;
-				if (read > 1) {
-					message = "Min trimmed read length of " + read
-							+ " bases";
-				} else {
-					message = "Min trimmed read length of " + read
-							+ " base";
-				}
-				min_read_length_label.textProperty().setValue(message);
-			}
-		});
-		
-		// Min Avg Qual Text
-		int read = (int) min_avg_qual_slide.getValue();
-		String message = "Min average base calling quality within sliding window is " + read;
-		min_avg_qual_text.textProperty().setValue(message);
-		min_avg_qual_slide.valueProperty().addListener(new ChangeListener<Object>() {
-			@Override
-			public void changed(ObservableValue<?> arg0, Object arg1,
-					Object arg2) {
-				int read = (int) min_avg_qual_slide.getValue();
-				String message = "Min average base calling quality within sliding window is " + read;
-				min_avg_qual_text.textProperty().setValue(message);
-			}
-		});
-		
-		// Three Prime Trim
-		int r = (int) three_prime_trim_slide.getValue();
-		String m = "Sliding window for 3'end trimming is " + r;
-		three_prime_trim_text.textProperty().setValue(m);
-		three_prime_trim_slide.valueProperty().addListener(new ChangeListener<Object>() {
-			@Override
-			public void changed(ObservableValue<?> arg0, Object arg1,
-					Object arg2) {
-				int read = (int) three_prime_trim_slide.getValue();
-				String message = "Sliding window for 3'end trimming is " + read;
-				three_prime_trim_text.textProperty().setValue(message);
-			}
-		});
-		
 	}
 
 	/*
@@ -829,7 +787,7 @@ public final class MainPageController extends MainPageItems implements
 
 	private BooleanBinding textAlphanumeric(TextArea run_name) {
 		BooleanBinding binding = Bindings.createBooleanBinding(() -> (!run_name
-				.getText().matches("^.*[^a-zA-Z0-9_ ].*$")), run_name
+				.getText().matches("^.*[^a-zA-Z0-9_].*$")), run_name
 				.textProperty());
 		return binding;
 	}
@@ -1010,6 +968,7 @@ public final class MainPageController extends MainPageItems implements
 		save_curr.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				UpdateAttribute.getInstance().updateAttributes();
 				DirectoryChooser dc = new DirectoryChooser();
 				dc.setTitle("Save attribute file");
 				File directory = dc.showDialog(Main.stage);

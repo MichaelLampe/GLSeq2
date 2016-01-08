@@ -96,7 +96,6 @@ public class GlowRequest extends Task<Object> {
       String line = null;
       while ((line = bufferedReader.readLine()) != null) {
         response += line;
-        System.out.println(line);
       }
       process.waitFor();
       return response.contains("Ping saved");
@@ -125,9 +124,6 @@ public class GlowRequest extends Task<Object> {
     // TO DO
   }
 
-  private void runCommand(String command) {
-    // Process builder
-  }
   */
 
   public void logout() {

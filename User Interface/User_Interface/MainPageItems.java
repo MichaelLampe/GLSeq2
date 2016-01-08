@@ -9,6 +9,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -31,6 +33,15 @@ class MainPageItems {
   protected Label cores_label;
 
   @FXML
+  protected Spinner<Integer> trimHead;
+  @FXML
+  protected Spinner<Integer> minTrim;
+  @FXML
+  protected Spinner<Integer> three_prime_trim_slide;
+  @FXML
+  protected Spinner<Integer> min_avg_qual_slide;
+  
+  @FXML
   protected Slider ciMem;
   @FXML
   protected Label max_buffer_label;
@@ -44,26 +55,6 @@ class MainPageItems {
   protected Slider numberStreams;
   @FXML
   protected Label alignment_streams_label;
-
-  @FXML
-  protected Slider trimHead;
-  @FXML
-  protected Label trim_head_label;
-
-  @FXML
-  protected Slider minTrim;
-  @FXML
-  protected Label min_read_length_label;
-  
-  @FXML
-  protected Slider min_avg_qual_slide;
-  @FXML
-  protected Label min_avg_qual_text;
-  
-  @FXML
-  protected Slider three_prime_trim_slide;
-  @FXML
-  protected Label three_prime_trim_text;
 
   @FXML
   protected ComboBox<String> readTrim;
@@ -93,8 +84,6 @@ class MainPageItems {
   protected TextArea prevRunDirectory;
   @FXML
   protected TextArea prevRunName;
-  @FXML
-  protected TextArea strain;
   @FXML
   protected TextArea referenceGenome;
   @FXML
@@ -226,6 +215,11 @@ class MainPageItems {
   @FXML
   protected Button ref_request_glow;
 
+  @FXML
+  protected Button workingDirectoryPicker;
+  @FXML
+  protected Button destinationDirectoryPicker;
+  
   @FXML
   protected Button data_request_glow;
   @FXML
