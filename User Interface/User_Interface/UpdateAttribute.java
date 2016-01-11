@@ -54,6 +54,7 @@ public class UpdateAttribute {
 						.valueOf((int) ((Slider) currentData).getValue())));
 				// Combo boxes we just want the selected item.
 			}else if (currentData instanceof Spinner){
+				@SuppressWarnings("unchecked")
 				Spinner<Integer> s = (Spinner<Integer>) currentData;
 				attribute.setValue(String.valueOf(s.getValue()));
 			} else if (currentData instanceof ComboBox<?>) {

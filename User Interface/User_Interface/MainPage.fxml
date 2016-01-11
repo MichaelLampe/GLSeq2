@@ -251,7 +251,7 @@
                <content>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="tab_pane">
                      <children>
-                        <ComboBox fx:id="readTrim" layoutX="585.0" layoutY="224.0" prefHeight="34.0" prefWidth="264.0" promptText="Would you like to trim your raw reads?">
+                        <ComboBox fx:id="readTrim" layoutX="63.0" layoutY="128.0" prefHeight="34.0" prefWidth="132.0">
                            <tooltip>
                               <Tooltip text="Trimming will remove some sections of the reads (As indicated by you) during the data preparation stage." />
                            </tooltip></ComboBox>
@@ -260,7 +260,7 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="artificialFasta" layoutX="17.0" layoutY="222.0" prefHeight="38.0" prefWidth="498.0" promptText="Artificial sequences file" text="JGI.clean2.fa">
+                        <TextArea fx:id="artificialFasta" layoutX="17.0" layoutY="222.0" prefHeight="38.0" prefWidth="836.0" promptText="Artificial sequences file" text="JGI.clean2.fa">
                            <tooltip>
                               <Tooltip text="A FASTA file containign artificial sequences.  These will be trimmed from the reads by the Trimmomatic program." />
                            </tooltip></TextArea>
@@ -356,21 +356,21 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="587.0" layoutY="189.0" text="Trim Raw Reads" textFill="WHITE">
+                        <Label layoutX="64.0" layoutY="94.0" text="Trim Raw Reads" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Spinner fx:id="min_avg_qual_slide" editable="true" layoutX="450.0" layoutY="101.0" prefHeight="25.0" prefWidth="400.0" />
-                        <Spinner fx:id="trimHead" editable="true" layoutX="19.0" layoutY="101.0" prefHeight="25.0" prefWidth="279.0" />
-                        <Spinner fx:id="minTrim" editable="true" layoutX="16.0" layoutY="159.0" prefHeight="25.0" prefWidth="286.0" />
-                        <Spinner fx:id="three_prime_trim_slide" editable="true" layoutX="450.0" layoutY="159.0" prefHeight="25.0" prefWidth="400.0" />
-                        <Label layoutX="17.0" layoutY="73.0" text="Head Trim Amount" textFill="WHITE">
+                        <Spinner fx:id="min_avg_qual_slide" editable="true" layoutX="539.0" layoutY="103.0" prefHeight="25.0" prefWidth="313.0" />
+                        <Spinner fx:id="trimHead" editable="true" layoutX="239.0" layoutY="103.0" prefHeight="25.0" prefWidth="286.0" />
+                        <Spinner fx:id="minTrim" editable="true" layoutX="239.0" layoutY="178.0" prefHeight="25.0" prefWidth="286.0" />
+                        <Spinner fx:id="three_prime_trim_slide" editable="true" layoutX="539.0" layoutY="178.0" prefHeight="25.0" prefWidth="313.0" />
+                        <Label layoutX="237.0" layoutY="75.0" text="Head Trim Amount" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="15.0" layoutY="132.0" text="Minimum Trimmed Read" textFill="WHITE">
+                        <Label layoutX="238.0" layoutY="151.0" text="Minimum Trimmed Read" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -380,12 +380,12 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="448.0" layoutY="73.0" text="Minimum Base Calling Quality" textFill="WHITE">
+                        <Label layoutX="548.0" layoutY="73.0" text="Minimum Base Calling Quality" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="448.0" layoutY="132.0" text="Sliding Window for 3' End Trimming" textFill="WHITE">
+                        <Label layoutX="544.0" layoutY="146.0" text="Sliding Window for 3' End Trimming" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>

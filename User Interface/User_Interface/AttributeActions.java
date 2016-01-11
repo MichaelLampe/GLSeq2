@@ -227,6 +227,10 @@ public class AttributeActions {
 		case "NULL":
 			return value;
 		default:
+			// Escape a trailing \
+			if (value.endsWith("\\")){
+				return ("\"" + value + "\\\"");
+			}
 			return ("\"" + value + "\"");
 		}
 	}

@@ -22,6 +22,8 @@ import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -84,13 +86,13 @@ public final class MainPageController extends MainPageItems implements
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		addListeners();
-		
+
 		addScrollbarListeners();
-		
+
 		progressBarListener();
-		
+
 		alignAndCountingOptions();
-		
+
 		constructRadioButtons();
 
 		setupComboBoxes();
@@ -104,28 +106,33 @@ public final class MainPageController extends MainPageItems implements
 		appendTooltips();
 
 		fileSelectTree();
-		
+
 		addSpinners();
 	}
-	
-	private void addSpinners(){
-		SpinnerValueFactory<Integer> trimHeadFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+
+	private void addSpinners() {
+		SpinnerValueFactory<Integer> trimHeadFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+				0, 100);
 		trimHead.setValueFactory(trimHeadFactory);
 		trimHead.getValueFactory().setValue(12);
-		
-		SpinnerValueFactory<Integer> minTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+
+		SpinnerValueFactory<Integer> minTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+				0, 100);
 		minTrim.setValueFactory(minTrimFactory);
 		minTrim.getValueFactory().setValue(36);
-		
-		SpinnerValueFactory<Integer> threePrimeTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+
+		SpinnerValueFactory<Integer> threePrimeTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+				0, 100);
 		three_prime_trim_slide.setValueFactory(threePrimeTrimFactory);
 		three_prime_trim_slide.getValueFactory().setValue(3);
-		
-		SpinnerValueFactory<Integer> minAvgQualFactory= new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
+
+		SpinnerValueFactory<Integer> minAvgQualFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+				0, 100);
 		min_avg_qual_slide.setValueFactory(minAvgQualFactory);
-		min_avg_qual_slide.getValueFactory().setValue(30);;
+		min_avg_qual_slide.getValueFactory().setValue(30);
+		;
 	}
-	
+
 	private void constructRadioButtons() {
 		// Setup the alignment button group
 		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw,
@@ -138,7 +145,7 @@ public final class MainPageController extends MainPageItems implements
 		toggleCountingDep(group);
 
 		// Setup the type of run button group
-		RadioButton[] tempTypeOfRun = {indic_man, from_glow, de_novo};
+		RadioButton[] tempTypeOfRun = { indic_man, from_glow, de_novo };
 		List<RadioButton> typeOfRun = Arrays.asList(tempTypeOfRun);
 		typeOfRun.forEach((radioButton) -> {
 			radioButton.setToggleGroup(referenceGroup);
@@ -178,36 +185,32 @@ public final class MainPageController extends MainPageItems implements
 		});
 		glow.get(0).setSelected(true);
 
-		
-		
-		
 		workingDirectoryPicker.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent arg0){
+			public void handle(ActionEvent arg0) {
 				DirectoryChooser fileChooser = new DirectoryChooser();
 				fileChooser.setTitle("Working Directory Picker");
 				File selectedDirectory = fileChooser.showDialog(null);
 				if (selectedDirectory != null) {
-					destinationDirectory.setText(selectedDirectory.getAbsolutePath());
+					destinationDirectory.setText(selectedDirectory
+							.getAbsolutePath());
 				}
 			}
 		});
-		
+
 		destinationDirectoryPicker.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void handle(ActionEvent arg0){
+			public void handle(ActionEvent arg0) {
 				DirectoryChooser fileChooser = new DirectoryChooser();
 				fileChooser.setTitle("Destination Directory Picker");
 				File selectedDirectory = fileChooser.showDialog(null);
 				if (selectedDirectory != null) {
-					storageDestination.setText(selectedDirectory.getAbsolutePath());
+					storageDestination.setText(selectedDirectory
+							.getAbsolutePath());
 				}
 			}
 		});
-		
-		
-		
-		
+
 		// If you add more items here, you need to add more cases for
 		// "requestFor"
 		// in the lambda function below
@@ -227,7 +230,8 @@ public final class MainPageController extends MainPageItems implements
 							} else {
 								Task<Object> refReq = new GlowReferenceRequest(
 										request, requestFor.getText());
-								// Run on a different thread so it doesn't lock up
+								// Run on a different thread so it doesn't lock
+								// up
 								// the
 								// UI.
 								new Thread(refReq).start();
@@ -245,7 +249,8 @@ public final class MainPageController extends MainPageItems implements
 							} else {
 								Task<Object> dataReq = new GlowDataRequest(
 										request, requestFor.getText());
-								// Run on a different thread so it doesn't lock up
+								// Run on a different thread so it doesn't lock
+								// up
 								// the
 								// UI.
 								new Thread(dataReq).start();
@@ -269,10 +274,10 @@ public final class MainPageController extends MainPageItems implements
 				fastqcPath, picardToolsPath, bwaPath, bam2wigPath,
 				rockhopperPath, cushawGpuPath, topHatPath, cushawPath,
 				cushawIndexPath, hisatPath, starPath };
-		
+
 		List<TextArea> directoriesMayExist = Arrays
 				.asList(tempDirectoriesMayExist);
-		
+
 		directoriesMayExist.parallelStream().forEach((fileName) -> {
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
@@ -290,6 +295,65 @@ public final class MainPageController extends MainPageItems implements
 							+ " ; -fx-border-width: 2px ;");
 				}
 			});
+		});
+
+		/*
+		 * Adds the files in the given directory to the select file.
+		 */
+		dataDirectory.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> arg0,
+					String oldValue, String newValue) {
+				File folder = new File(newValue);
+				File[] files = folder.listFiles();
+
+				// Ensure file is not null
+				if (files == null) {
+					return;
+				}
+
+				// Add directory to the head.
+				String directory = folder.getName();
+				TreeItem<String> itemDirectory = new TreeItem<String>(directory);
+
+				// Add each file to the directory.
+				for (File file : files) {
+					if (file.isFile()) {
+						if (file.getName().endsWith(".fq")
+								|| file.getName().endsWith(".fastq")
+								|| file.getName().endsWith(".gz")) {
+							CheckBoxTreeItem<String> checkbox = new CheckBoxTreeItem<String>(
+									file.getName());
+							checkbox.selectedProperty().addListener(
+									new ChangeListener<Boolean>() {
+										@Override
+										public void changed(
+												ObservableValue<? extends Boolean> arg0,
+												Boolean oldValue,
+												Boolean newValue) {
+											// Add and remove the string
+											// depending on if it is checked
+											// or not
+											if (newValue) {
+												MainPageController.liblistData.add(checkbox
+														.getParent().getValue()
+														+ checkbox.getValue());
+											} else {
+												MainPageController.liblistData.remove(checkbox
+														.getParent().getValue()
+														+ checkbox.getValue());
+											}
+										}
+									});
+							itemDirectory.getChildren().add(checkbox);
+						}
+					}
+				}
+				// Reset the file select tree as we are going to add a new set
+				// of items.
+				fileSelectTree();
+				selectedDataFiles.getRoot().getChildren().add(itemDirectory);
+			}
 		});
 
 		/*
@@ -324,6 +388,10 @@ public final class MainPageController extends MainPageItems implements
 	}
 
 	private void fileSelectTree() {
+		// Remove all the items if there are any inside.
+		for (String value : liblistData) {
+			liblistData.remove(value);
+		}
 		data = new CheckBoxTreeItem<String>("Retrieved Files");
 		selectedDataFiles
 				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
@@ -409,7 +477,7 @@ public final class MainPageController extends MainPageItems implements
 				Cushaw_Gpu, TopHat, star, hisat, Rockhopper };
 		List<RadioButton> modifyAlignOptions = Arrays
 				.asList(tempModifyAlignOptions);
-		
+
 		modifyAlignOptions.parallelStream().forEach((radioButton) -> {
 			// Then add listeners to everything
 				radioButton.selectedProperty().addListener(
@@ -444,10 +512,8 @@ public final class MainPageController extends MainPageItems implements
 			});
 
 		// Counting CheckBoxes
-		CheckBox[] tempModifyCountOptions = {RSEM,
-				HTseq,
-				FeatureCounts,
-				Cufflinks};
+		CheckBox[] tempModifyCountOptions = { RSEM, HTseq, FeatureCounts,
+				Cufflinks };
 		List<CheckBox> modifyCountOptions = Arrays
 				.asList(tempModifyCountOptions);
 		modifyCountOptions.parallelStream().forEach(
@@ -459,14 +525,18 @@ public final class MainPageController extends MainPageItems implements
 										ObservableValue<? extends Boolean> arg0,
 										Boolean arg1, Boolean arg2) {
 									String countOptionName = checkBox.getText();
-									// Feature counts has a space, so remove the space
-									countOptionName = countOptionName.replace(" ", "");
+									// Feature counts has a space, so remove the
+									// space
+									countOptionName = countOptionName.replace(
+											" ", "");
 									if (checkBox.isSelected()) {
 										counting.getChildren().add(
-												countOptions.get(countOptionName));
+												countOptions
+														.get(countOptionName));
 									} else {
 										counting.getChildren().remove(
-												countOptions.get(countOptionName));
+												countOptions
+														.get(countOptionName));
 									}
 								}
 							});
@@ -492,7 +562,8 @@ public final class MainPageController extends MainPageItems implements
 		alignOptions.put("TopHat", new TreeItem<String>("TopHat"));
 		// Counting
 		countOptions.put("Cufflinks", new TreeItem<String>("Cufflinks"));
-		countOptions.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
+		countOptions
+				.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
 		countOptions.put("HTSeq", new TreeItem<String>("HTSeq"));
 		countOptions.put("RSEM", new TreeItem<String>("RSEM"));
 	}
@@ -506,6 +577,7 @@ public final class MainPageController extends MainPageItems implements
 				e.printStackTrace();
 			}
 		}
+
 		for (String keys : countOptions.keySet()) {
 			try {
 				countOptions.get(keys).getChildren()
@@ -577,9 +649,11 @@ public final class MainPageController extends MainPageItems implements
 				int cores = (int) numberCores.getValue();
 				String message;
 				if (cores > 1) {
-					message = cores + " cores used for a single sample processing";
+					message = cores
+							+ " cores used for a single sample processing";
 				} else {
-					message = cores + " core used for a single sample processing";
+					message = cores
+							+ " core used for a single sample processing";
 				}
 				cores_label.textProperty().setValue(message);
 			}
@@ -652,7 +726,29 @@ public final class MainPageController extends MainPageItems implements
 	private void setupComboBoxes() {
 		// Trim Reads
 		readTrim.getItems().addAll("TRUE", "FALSE");
-		readTrim.setValue("TRUE");
+		readTrim.setValue("FALSE");
+		artificialFasta.disableProperty().set(true);
+		minTrim.disableProperty().set(true);
+		three_prime_trim_slide.disableProperty().set(true);
+		trimHead.disableProperty().set(true);
+		min_avg_qual_slide.disableProperty().set(true);
+		readTrim.valueProperty().addListener(new ChangeListener<String>() {
+			@Override public void changed(ObservableValue<? extends String> ov, String oldValue, String newValue){
+				if (newValue.equals("TRUE")){
+					artificialFasta.disableProperty().set(false);
+					minTrim.disableProperty().set(false);
+					three_prime_trim_slide.disableProperty().set(false);
+					trimHead.disableProperty().set(false);
+					min_avg_qual_slide.disableProperty().set(false);
+				} else{
+					artificialFasta.disableProperty().set(true);
+					minTrim.disableProperty().set(true);
+					three_prime_trim_slide.disableProperty().set(true);
+					trimHead.disableProperty().set(true);
+					min_avg_qual_slide.disableProperty().set(true);
+				}
+			}
+		});
 		// Strandedness
 		libStrands.getItems().addAll("R", "F", "NULL");
 		libStrands.setValue("R");
@@ -682,8 +778,7 @@ public final class MainPageController extends MainPageItems implements
 		start_run.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-
-				if (load_glow.isSelected()) {
+				if (liblistData.size() > 0) {
 					String rList = "c(";
 					for (int i = 0; i < liblistData.size(); i++) {
 						if (i == liblistData.size() - 1) {
@@ -723,7 +818,8 @@ public final class MainPageController extends MainPageItems implements
 				// Grabs the args from that instance
 				// If true, run on HTcondor, else do not
 				List<String> args = currentRun.constructArgs(
-						htcondor_check.isSelected(), attributeFileLocation, scriptDirectory.getText());
+						htcondor_check.isSelected(), attributeFileLocation,
+						scriptDirectory.getText());
 				if (args != null) {
 					// Might add some logic in the future that starts an SSH on
 					// windows/mac
@@ -765,7 +861,7 @@ public final class MainPageController extends MainPageItems implements
 														.selectedProperty()))))
 						.then(false).otherwise(true));
 	}
-	
+
 	private String checkSlash(String file_name) {
 		if (file_name.length() >= 1) {
 			if (file_name.substring(file_name.length() - 1).equals("/")) {
@@ -774,11 +870,11 @@ public final class MainPageController extends MainPageItems implements
 				file_name = file_name + "/";
 				return file_name;
 			}
-		} else{
+		} else {
 			return "";
 		}
 	}
-	
+
 	private BooleanBinding textCountLimit(TextArea run_name, int char_count) {
 		BooleanBinding binding = Bindings.createBooleanBinding(() -> (run_name
 				.getText().length() <= char_count), run_name.textProperty());
@@ -795,8 +891,8 @@ public final class MainPageController extends MainPageItems implements
 	private BooleanBinding noExistRun(TextArea run_name) {
 		// Update on run name change
 		BooleanBinding bindingRun = Bindings.createBooleanBinding(
-				() -> (
-						!new File(checkSlash(destinationDirectory.getText()) +  run_name.getText()).isDirectory()),
+				() -> (!new File(checkSlash(destinationDirectory.getText())
+						+ run_name.getText()).isDirectory()),
 				run_name.textProperty());
 		return bindingRun;
 	}
@@ -862,6 +958,12 @@ public final class MainPageController extends MainPageItems implements
 		request.logout();
 		Main.stage
 				.setTitle("|   GLSeq2 User Interface   -   Not logged into GLOW   |");
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Logged out");
+		alert.setHeaderText("Logged out");
+		alert.setHeaderText("You have logged out of your GLOW session.");
+		
+		alert.showAndWait();
 	}
 
 	/*
@@ -968,6 +1070,21 @@ public final class MainPageController extends MainPageItems implements
 		save_curr.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				if (liblistData.size() > 0) {
+					String rList = "c(";
+					for (int i = 0; i < liblistData.size(); i++) {
+						if (i == liblistData.size() - 1) {
+							rList += "\"" + liblistData.get(i) + "\")";
+						} else {
+							rList += "\"" + liblistData.get(i) + "\", ";
+						}
+					}
+					Attributes.getInstance().attributesCollection.get(
+							AttributesJSON.libList.field_name).setValue(rList);
+				} else {
+					Attributes.getInstance().attributesCollection.get(
+							AttributesJSON.libList.field_name).setValue("NULL");
+				}
 				UpdateAttribute.getInstance().updateAttributes();
 				DirectoryChooser dc = new DirectoryChooser();
 				dc.setTitle("Save attribute file");
@@ -1060,7 +1177,12 @@ public final class MainPageController extends MainPageItems implements
 						Main.stage
 								.setTitle("|   GLSeq2 User Interface   -  Currently logged in as "
 										+ username.getText() + "   |");
-
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Logged in");
+						alert.setHeaderText("You've been logged into GLOW!");
+						alert.setContentText("You will be connected to the GLOW server through this client until you either log off explicitly or close the application.");
+						
+						alert.showAndWait();
 						/*
 						 * If the user has logged in and not entered a
 						 * destination directory, we'll just auto-populate this
