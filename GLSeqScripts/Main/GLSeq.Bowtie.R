@@ -66,9 +66,9 @@ for (zz in 1:nStreams) {
         # This is under the assumption that any leftover cores would be able to be used by other processes while running in parallel.
         # Thus, we'll be able to fill up the servers as efficiently as posible with the LCD, which is 4.
         # Based on https://www.biostars.org/p/92366/ as well showing a non-linear speedup of runs. (4 -> 8 is not half time)
-        Bowtie2Options <- paste("-t","-p 4","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1", alignmentSpecialOptions)
+        Bowtie2Options <- paste("-t","-p 4","-q", alignmentSpecialOptions)
       } else{
-        Bowtie2Options <- paste("-t","-q","--sensitive","--dpad 0","--gbar 99999999","--mp 1,1","--score-min L,0,-0.1", alignmentSpecialOptions)
+        Bowtie2Options <- paste("-t","-q", alignmentSpecialOptions)
       }
       if (paired.end){
         # These are options normally used by the RSEM peeps, see the same link as above for documentation on this.

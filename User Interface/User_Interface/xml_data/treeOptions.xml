@@ -79,7 +79,17 @@
 					<PrintTimeTakenBySearchPhases command="--time" input_type="add" default_value="no_add"></PrintTimeTakenBySearchPhases>
 					<QuietOutputMode command="--quiet" input_type="add" default_value="no_add"></QuietOutputMode>
 					<FilterOutReadsThatAreBadAccordingToQSEQfilter command="--qc-filter" input_type="add" default_value="no_add"></FilterOutReadsThatAreBadAccordingToQSEQfilter>
-			</Options>
+					<DisallowGapsWithinIntOfEnds command="--gbar" input_type="int" default_value="4"></DisallowGapsWithinIntOfEnds>
+					<PadDynamicByNColumns command="--dpad" input_type="int" default_value="0"></PadDynamicByNColumns>
+					<VeryFastEndToEnd command="--very-fast" input_type="add" default_value="no_add"></VeryFastEndToEnd>
+					<FastEndToEnd command="--fast" input_type="add" default_value="no_add"></FastEndToEnd>
+					<SensitiveEndToEnd command="--sensitive" input_type="add" default_value="no_add"></SensitiveEndToEnd>
+					<VerySensitiveEndToEnd command="--very-sensitive" input_type="add" default_value="no_add"></VerySensitiveEndToEnd>
+					<VeryFastLocal command="--very-fast-local" input_type="add" default_value="no_add"></VeryFastLocal>
+					<FastLocal command="--fast-local" input_type="add" default_value="no_add"></FastLocal>
+					<SensitiveLocal command="--sensitive-local" input_type="add" default_value="no_add"></SensitiveLocal>
+					<VerySensitiveLocal command="--very-sensitive-local" input_type="add" default_value="no_add"></VerySensitiveLocal>
+				</Options>
 		</Bowtie2>
 		<Cushaw>
 			<Options>
