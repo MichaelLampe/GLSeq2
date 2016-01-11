@@ -100,7 +100,7 @@ public final class MainPageController extends MainPageItems implements
 		setupStartRun();
 
 		runBindings();
-		
+
 		menuListeners();
 
 		appendTooltips();
@@ -313,7 +313,7 @@ public final class MainPageController extends MainPageItems implements
 				}
 
 				// Add directory to the head.
-				String directory = folder.getName();
+				String directory = folder.getAbsolutePath();
 				TreeItem<String> itemDirectory = new TreeItem<String>(directory);
 
 				// Add each file to the directory.
@@ -334,13 +334,16 @@ public final class MainPageController extends MainPageItems implements
 											// Add and remove the string
 											// depending on if it is checked
 											// or not
+											String directoryValue = checkbox.getParent().getValue();
+											if (!directoryValue.endsWith("/")){
+												directoryValue += "/";
+											}
 											if (newValue) {
-												MainPageController.liblistData.add(checkbox
-														.getParent().getValue()
+												MainPageController.liblistData.add(directoryValue
 														+ checkbox.getValue());
 											} else {
-												MainPageController.liblistData.remove(checkbox
-														.getParent().getValue()
+												MainPageController.liblistData.remove(directoryValue
+														
 														+ checkbox.getValue());
 											}
 										}
@@ -992,8 +995,12 @@ public final class MainPageController extends MainPageItems implements
 				if (request == null) {
 					createLoginDialog();
 				} else {
-					logoutGlow();
-					createLoginDialog();
+					if (!request.getUsername().equals("")){
+						logoutGlow();
+						createLoginDialog();
+					} else{
+						createLoginDialog();
+					}
 				}
 			}
 		});
