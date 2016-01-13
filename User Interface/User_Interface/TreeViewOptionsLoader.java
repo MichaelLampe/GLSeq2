@@ -46,14 +46,14 @@ public class TreeViewOptionsLoader {
 	}
 
 	public TreeItem<String> createTreeElementfromXml(String itemName)
-			throws DuplicateElementsInXmlError {
+			throws DuplicateElementsInXmlException {
 		TreeItem<String> optionsHead = new TreeItem<String>("Options");
 
 		// This is here because we could get some hidden bugs if we don't notice
 		// that we are grabbing multiple XML elements, invalidating a key
 		// assumption that this code has.
 		if (myOptions.getElementsByTagName(itemName).getLength() > 1) {
-			throw new DuplicateElementsInXmlError();
+			throw new DuplicateElementsInXmlException();
 		}
 		Node itemNode = myOptions.getElementsByTagName(itemName).item(0);
 		Node optionsNode = itemNode.getChildNodes().item(1);

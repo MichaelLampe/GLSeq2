@@ -40,7 +40,7 @@ public class GlowDataRequest extends GlowRequest {
 	@SuppressWarnings("unchecked")
 	private ArrayList<CheckBoxTreeItem<String>> addFilesToUi(List<String> files) {
 		try {
-			TreeView<String> fileView = (TreeView<String>) UpdateUI.getInstance().findById("selectedDataFiles");
+			TreeView<String> fileView = (TreeView<String>) UpdateUserInterfaceSingleton.getInstance().findById("selectedDataFiles");
 			for (String file : files) {
 				int i = file.lastIndexOf("/");
 				String filePath = file.substring(0, i + 1);
@@ -169,7 +169,7 @@ public class GlowDataRequest extends GlowRequest {
 			ArrayList<CheckBoxTreeItem<String>> fileBoxes = addFilesToUi(foundFiles);
 			addBoxListeners(fileBoxes);
 			Platform.runLater(() -> {
-				UpdateUI.getInstance().updateDefaults();
+				UpdateUserInterfaceSingleton.getInstance().updateDefaults();
 			});
 		} else {
 			System.out.println("Did not run because no connection to glow was established.");

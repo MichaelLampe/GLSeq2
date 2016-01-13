@@ -20,6 +20,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
@@ -29,13 +30,19 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
@@ -52,8 +59,205 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
-public final class MainPageController extends MainPageItems implements
-		Initializable {
+public final class MainPageController implements Initializable {
+
+	/*
+	 * All of our FXML elements
+	 */
+	@FXML
+	protected Slider gtfFeatureColumn;
+	@FXML
+	protected Label gtf_column_label;
+	@FXML
+	protected Slider fragMaxLength;
+	@FXML
+	protected Label max_fragment_length_label;
+	@FXML
+	protected Slider numberCores;
+	@FXML
+	protected Label cores_label;
+	@FXML
+	protected Spinner<Integer> trimHead;
+	@FXML
+	protected Spinner<Integer> minTrim;
+	@FXML
+	protected Spinner<Integer> three_prime_trim_slide;
+	@FXML
+	protected Spinner<Integer> min_avg_qual_slide;
+	@FXML
+	protected Slider ciMem;
+	@FXML
+	protected Label max_buffer_label;
+	@FXML
+	protected Slider numberStreamsDataPrep;
+	@FXML
+	protected Label dataprep_streams_label;
+	@FXML
+	protected Slider numberStreams;
+	@FXML
+	protected Label alignment_streams_label;
+	@FXML
+	protected ComboBox<String> readTrim;
+	@FXML
+	protected ComboBox<String> aAlgor;
+	@FXML
+	protected ComboBox<String> libStrands;
+	@FXML
+	protected ComboBox<String> seqPlatform;
+	@FXML
+	protected ComboBox<String> qualityScores;
+	@FXML
+	protected ComboBox<String> unzipped;
+	@FXML
+	protected ComboBox<String> pairedEnd;
+	@FXML
+	protected ComboBox<String> presplit;
+	@FXML
+	protected TextArea dataDirectory;
+	@FXML
+	protected TextArea destinationDirectory;
+	@FXML
+	protected TextArea countableSamDir;
+	@FXML
+	protected TextArea prevRunDirectory;
+	@FXML
+	protected TextArea prevRunName;
+	@FXML
+	protected TextArea referenceGenome;
+	@FXML
+	protected TextArea referencFasta;
+	@FXML
+	protected TextArea referenceGff;
+	@FXML
+	protected TextArea idAttr;
+	@FXML
+	protected TextArea artificialFasta;
+	@FXML
+	protected TextArea scriptDirectory;
+	@FXML
+	protected TextArea trimPath;
+	@FXML
+	protected TextArea fastqcPath;
+	@FXML
+	protected TextArea picardToolsPath;
+	@FXML
+	protected TextArea bwaPath;
+	@FXML
+	protected TextArea bam2wigPath;
+	@FXML
+	protected TextArea rockhopperPath;
+	@FXML
+	protected TextArea cushawGpuPath;
+	@FXML
+	protected TextArea topHatPath;
+	@FXML
+	protected TextArea cushawPath;
+	@FXML
+	protected TextArea cushawIndexPath;
+	@FXML
+	protected TextArea destDirTest;
+	@FXML
+	protected TextArea hisatPath;
+	@FXML
+	protected TextArea starPath;
+	@FXML
+	protected TextArea storageDestination;
+	@FXML
+	protected TextArea run_name;
+	@FXML
+	protected CheckBox data_prep_check;
+	@FXML
+	protected CheckBox alignment_check;
+	@FXML
+	protected CheckBox counting_check;
+	@FXML
+	protected CheckBox collect_check;
+	@FXML
+	protected CheckBox htcondor_check;
+	@FXML
+	protected CheckBox RSEM;
+	@FXML
+	protected CheckBox HTseq;
+	@FXML
+	protected CheckBox FeatureCounts;
+	@FXML
+	protected CheckBox Cufflinks;
+	@FXML
+	protected Button start_run;
+	@FXML
+	protected RadioButton BWA;
+	@FXML
+	protected RadioButton Bowtie;
+	@FXML
+	protected RadioButton Bowtie2;
+	@FXML
+	protected RadioButton Cushaw;
+	@FXML
+	protected RadioButton Cushaw_Gpu;
+	@FXML
+	protected RadioButton TopHat;
+	@FXML
+	protected RadioButton Rockhopper;
+	@FXML
+	protected RadioButton star;
+	@FXML
+	protected RadioButton hisat;
+	@FXML
+	protected RadioButton load_prev;
+	@FXML
+	protected RadioButton man_sam;
+	@FXML
+	protected TabPane tab_check;
+	@FXML
+	protected ProgressBar footer_progress;
+	@FXML
+	protected MenuItem toggle_advanced;
+	@FXML
+	protected MenuItem close_program;
+	@FXML
+	protected MenuItem open_att;
+	@FXML
+	protected MenuItem template_att;
+	@FXML
+	protected MenuItem save_curr;
+	@FXML
+	protected MenuItem show_hide;
+	@FXML
+	protected Tab adv_opts;
+	@FXML
+	protected TextArea run_id;
+	@FXML
+	protected TreeView<String> alignmentOptions;
+	@FXML
+	protected TreeView<String> countingOptions;
+	@FXML
+	protected RadioButton from_glow;
+	@FXML
+	protected RadioButton indic_man;
+	@FXML
+	protected RadioButton de_novo;
+	@FXML
+	protected TextArea genom_ref_id;
+	@FXML
+	protected Button ref_request_glow;
+	@FXML
+	protected Button workingDirectoryPicker;
+	@FXML
+	protected Button destinationDirectoryPicker;
+	@FXML
+	protected Button data_request_glow;
+	@FXML
+	protected RadioButton load_glow;
+	@FXML
+	protected RadioButton man_fastq;
+	@FXML
+	protected TextArea experiment_id;
+	@FXML
+	protected TreeView<String> selectedDataFiles;
+	@FXML
+	protected MenuItem login_menu;
+	@FXML
+	protected MenuItem logout_menu;
 
 	// Toggle groups to keep radio buttons together
 	public static final ToggleGroup group = new ToggleGroup();
@@ -75,6 +279,9 @@ public final class MainPageController extends MainPageItems implements
 	// A single glow server request with username and password per UI open
 	private static GlowRequest request = null;
 
+	/*
+	 * This is only public to handle the async callback in GlowDataRequest.
+	 */
 	public final static ArrayList<String> liblistData = new ArrayList<String>();
 
 	private final static TreeViewOptionsLoader load = new TreeViewOptionsLoader();
@@ -334,16 +541,18 @@ public final class MainPageController extends MainPageItems implements
 											// Add and remove the string
 											// depending on if it is checked
 											// or not
-											String directoryValue = checkbox.getParent().getValue();
-											if (!directoryValue.endsWith("/")){
+											String directoryValue = checkbox
+													.getParent().getValue();
+											if (!directoryValue.endsWith("/")) {
 												directoryValue += "/";
 											}
 											if (newValue) {
 												MainPageController.liblistData.add(directoryValue
 														+ checkbox.getValue());
 											} else {
-												MainPageController.liblistData.remove(directoryValue
-														
+												MainPageController.liblistData
+														.remove(directoryValue
+
 														+ checkbox.getValue());
 											}
 										}
@@ -576,7 +785,7 @@ public final class MainPageController extends MainPageItems implements
 			try {
 				alignOptions.get(keys).getChildren()
 						.add(load.createTreeElementfromXml(keys));
-			} catch (DuplicateElementsInXmlError e) {
+			} catch (DuplicateElementsInXmlException e) {
 				e.printStackTrace();
 			}
 		}
@@ -585,7 +794,7 @@ public final class MainPageController extends MainPageItems implements
 			try {
 				countOptions.get(keys).getChildren()
 						.add(load.createTreeElementfromXml(keys));
-			} catch (DuplicateElementsInXmlError e) {
+			} catch (DuplicateElementsInXmlException e) {
 				e.printStackTrace();
 			}
 		}
@@ -736,14 +945,16 @@ public final class MainPageController extends MainPageItems implements
 		trimHead.disableProperty().set(true);
 		min_avg_qual_slide.disableProperty().set(true);
 		readTrim.valueProperty().addListener(new ChangeListener<String>() {
-			@Override public void changed(ObservableValue<? extends String> ov, String oldValue, String newValue){
-				if (newValue.equals("TRUE")){
+			@Override
+			public void changed(ObservableValue<? extends String> ov,
+					String oldValue, String newValue) {
+				if (newValue.equals("TRUE")) {
 					artificialFasta.disableProperty().set(false);
 					minTrim.disableProperty().set(false);
 					three_prime_trim_slide.disableProperty().set(false);
 					trimHead.disableProperty().set(false);
 					min_avg_qual_slide.disableProperty().set(false);
-				} else{
+				} else {
 					artificialFasta.disableProperty().set(true);
 					minTrim.disableProperty().set(true);
 					three_prime_trim_slide.disableProperty().set(true);
@@ -781,28 +992,14 @@ public final class MainPageController extends MainPageItems implements
 		start_run.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-				if (liblistData.size() > 0) {
-					String rList = "c(";
-					for (int i = 0; i < liblistData.size(); i++) {
-						if (i == liblistData.size() - 1) {
-							rList += "\"" + liblistData.get(i) + "\")";
-						} else {
-							rList += "\"" + liblistData.get(i) + "\", ";
-						}
-					}
-					Attributes.getInstance().attributesCollection.get(
-							AttributesJSON.libList.field_name).setValue(rList);
-				} else {
-					Attributes.getInstance().attributesCollection.get(
-							AttributesJSON.libList.field_name).setValue("NULL");
-				}
 
-				// Make it work
-				UpdateAttribute.getInstance().addSpecialArgs(alignment,
-						counting, load);
+				/*
+				 * Update absolutely everything.
+				 */
+				UpdateAttributeSingleton.getInstance().updateAllAttributes(
+						alignment, counting, load, liblistData);
 
-				AttributeActionsUI action = new AttributeActionsUI();
-				UpdateAttribute.getInstance().updateAttributes();
+				AttributeConfigurationFile action = new AttributeConfigurationFile();
 				String attributeFileLocation = null;
 				try {
 					if (run_name.getText().equals("")) {
@@ -959,13 +1156,12 @@ public final class MainPageController extends MainPageItems implements
 
 	private void logoutGlow() {
 		request.logout();
-		Main.stage
-				.setTitle("|   GLSeq2 User Interface   -   Not logged into GLOW   |");
+		Main.setStageTitleDefault();
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Logged out");
 		alert.setHeaderText("Logged out");
 		alert.setHeaderText("You have logged out of your GLOW session.");
-		
+
 		alert.showAndWait();
 	}
 
@@ -995,10 +1191,10 @@ public final class MainPageController extends MainPageItems implements
 				if (request == null) {
 					createLoginDialog();
 				} else {
-					if (!request.getUsername().equals("")){
+					if (!request.getUsername().equals("")) {
 						logoutGlow();
 						createLoginDialog();
-					} else{
+					} else {
 						createLoginDialog();
 					}
 				}
@@ -1024,7 +1220,7 @@ public final class MainPageController extends MainPageItems implements
 				fc.getExtensionFilters().add(R);
 				fc.setSelectedExtensionFilter(R);
 				fc.setTitle("Open attribute file");
-				File att_file = fc.showOpenDialog(Main.stage);
+				File att_file = Main.openFileChooser(fc);
 				if (att_file != null) {
 					AttributeActions action = new AttributeActions();
 					try {
@@ -1051,7 +1247,7 @@ public final class MainPageController extends MainPageItems implements
 				fc.getExtensionFilters().add(R);
 				fc.setSelectedExtensionFilter(R);
 				fc.setTitle("Open attribute file");
-				File att_file = fc.showOpenDialog(Main.stage);
+				File att_file = Main.openFileChooser(fc);
 				try {
 					AttributeActions action = new AttributeActions();
 					action.setAttributesAttributeFile(att_file);
@@ -1077,25 +1273,15 @@ public final class MainPageController extends MainPageItems implements
 		save_curr.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (liblistData.size() > 0) {
-					String rList = "c(";
-					for (int i = 0; i < liblistData.size(); i++) {
-						if (i == liblistData.size() - 1) {
-							rList += "\"" + liblistData.get(i) + "\")";
-						} else {
-							rList += "\"" + liblistData.get(i) + "\", ";
-						}
-					}
-					Attributes.getInstance().attributesCollection.get(
-							AttributesJSON.libList.field_name).setValue(rList);
-				} else {
-					Attributes.getInstance().attributesCollection.get(
-							AttributesJSON.libList.field_name).setValue("NULL");
-				}
-				UpdateAttribute.getInstance().updateAttributes();
+
+				/*
+				 * Update absolutely everything.
+				 */
+				UpdateAttributeSingleton.getInstance().updateAllAttributes(
+						alignment, counting, load, liblistData);
 				DirectoryChooser dc = new DirectoryChooser();
 				dc.setTitle("Save attribute file");
-				File directory = dc.showDialog(Main.stage);
+				File directory = Main.openDirectoryChooser(dc);
 				if (directory != null) {
 					AttributeActions action = new AttributeActions();
 					try {
@@ -1113,6 +1299,9 @@ public final class MainPageController extends MainPageItems implements
 	 * Creates a login dialog
 	 */
 	private void createLoginDialog() {
+		final String GLOW_USERNAME_PROMPT = "GLOW Username:";
+		final String GLOW_PASSWORD_PROMPT = "GLOW Password:";
+
 		// Creates a new dialog which is just a popup
 		Dialog<Pair<String, String>> login = new Dialog<>();
 		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
@@ -1128,13 +1317,13 @@ public final class MainPageController extends MainPageItems implements
 		grid.setPadding(new Insets(20, 150, 10, 10));
 
 		TextField username = new TextField();
-		username.setPromptText("GLOW Username");
+		username.setPromptText(GLOW_USERNAME_PROMPT);
 		PasswordField password = new PasswordField();
-		password.setPromptText("GLOW Password");
+		password.setPromptText(GLOW_PASSWORD_PROMPT);
 
-		grid.add(new Label("GLOW Username:"), 0, 0);
+		grid.add(new Label(GLOW_USERNAME_PROMPT), 0, 0);
 		grid.add(username, 1, 0);
-		grid.add(new Label("GLOW Password:"), 0, 1);
+		grid.add(new Label(GLOW_PASSWORD_PROMPT), 0, 1);
 		grid.add(password, 1, 1);
 
 		// Add everything to the dialog page
@@ -1172,24 +1361,24 @@ public final class MainPageController extends MainPageItems implements
 						// Pings the server to verify connection
 						new Thread(t).start();
 
-						// Give a visual clue at the top of the UI that they are
-						// currently
-						// logged into the server. They are actually never
-						// really
-						// "logged in",
-						// we just keep using their initial credentials to send
-						// further
-						// requests and automatically renew the credentials as
-						// necessary.
-						Main.stage
-								.setTitle("|   GLSeq2 User Interface   -  Currently logged in as "
-										+ username.getText() + "   |");
+						/*
+						 * Give a visual clue at the top of the UI that they are
+						 * currently logged into the server. They are actually
+						 * never really "logged in", we just keep using their
+						 * initial credentials to send further requests and
+						 * automatically renew the credentials as necessary.
+						 */
+						String loggedInHeaderString = "|   GLSeq2 User Interface   -  Currently logged in as "
+								+ username.getText() + "   |";
+
+						Main.setStageTitle(loggedInHeaderString);
 						Alert alert = new Alert(AlertType.INFORMATION);
 						alert.setTitle("Logged in");
 						alert.setHeaderText("You've been logged into GLOW!");
 						alert.setContentText("You will be connected to the GLOW server through this client until you either log off explicitly or close the application.");
-						
+
 						alert.showAndWait();
+
 						/*
 						 * If the user has logged in and not entered a
 						 * destination directory, we'll just auto-populate this

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Attributes>
+	<storageDestination name="storage.destination" category="data" options="" default_value="/mnt/bigdata/" description="This should be a parent directory to store the final result long-term (i.e. project folder on a bigdata volume); the actual directory will be a subfolder named after the run ID"></storageDestination>
+	<dataDirectory name="data.directory" category="data" options='' default_value='' description="The directory containing FASTQ files (either compressed or uncompressed; please select the compression options in the Algorithms > Pre-processing accordingly"></dataDirectory>
+	<libList name="libList" category="data" options="" default_value="NULL" description='A list of absolute file paths to run.'></libList>
+	<unzipped name="unzipped" category="data" options='\"TRUE\",\"FALSE\"' default_value="TRUE" description="If the unprocessed data files are zipped (.gz) or not (.fq or .fastq)"></unzipped>
+	<pairedEnd name="paired.end" category="data" options='\"TRUE\",\"FALSE\"' default_value="TRUE" description="If the data is paired or single ended"></pairedEnd>
+	<seqPlatform name="seqPlatform" category="data" options='\"illumina\",\"capillary\", \"ls454\", \"solid\", \"helicos\", \"iontorrent\",\"pacbio\"' default_value="illumina" description="The sequencing machine that was used"></seqPlatform>
+	<qualityScores name="qScores" category="data" options='\"phred33\",\"phred64\"' default_value="phred33" description="How the quality of base identification was calculated"></qualityScores>
+	<libStrands name="libstrand" category="data" options="NULL,F,R" default_value="R" description="The strandedness of the library"></libStrands>
+	<libNchar name="libNchar" category="data" options="" default_value="" description="The number of unique characters at the beginning of each file's name"></libNchar>
+	<countableSamDir name="countable.sams.dir" category="data" options="" default_value="" description="The directory containing already aligned SAM files that can be counted"></countableSamDir>
+	<presplit name="presplit" category="data" options='\"TRUE\",\"FALSE\"' default_value="TRUE" description="If the paired ended data is split into two files or not.  If your data is single ended you can ignore this option"></presplit>
+	<prevRunDirectory name="previous.dir" category="data" options="" default_value="" description="If just collecting data, this is the previous folder that was created when the run started"></prevRunDirectory>
+	<prevRunName name="previous.run.name" category="data" options="" default_value="" description="If collecting data from a previous run, this is the name that was used for that run"></prevRunName>
+	
+	<referenceGenome name="rGenome" category="reference" options="" default_value="" description="The reference genome will be used to index certain methods such as RSEM or BWA. Should be located in the script folder. The name contains no file extension"></referenceGenome>
+	<referenceFasta name="refFASTAname" category="reference" options="" default_value="" description='Name of the reference FASTA file'></referenceFasta>
+	<referenceGff name="refGFFname" category="reference" options="" default_value="" description="Name of the reference genomic features file.  Gtf or Gff files are able to be used here. Located in the same folder as the reference genome"></referenceGff>
+	<gtfFeatureColumn name="gtfFeatureColumn" category="reference" options="" default_value="9" description="The number of columns in the GTF file with the gene / other IDs character string"></gtfFeatureColumn>
+	<idAttr name="idAttr" category="reference" options="" default_value="gene_id" description="GFF attribute to be used as feature ID"></idAttr>
+	
+	<destinationDirectory name="dest.dir.base" category="run" options="" default_value="/home/GLBRCORG/" description="This should be a directory on a fast-access volume (Such as your home directory on the scarcity server system)"></destinationDirectory>
+	<FeatureCounts name="FeatureCounts" category="run" options='\"Feature Counts\",\"\"' default_value="" description="Select to run the Feature Counts counting protocol"></FeatureCounts>
+	<RSEM name="RSEM" category="run" options='\"RSEM\",\"\"' default_value="" description="Select to run the RSEM counting protocol. This protocol does not work with gapped aligners"></RSEM>
+	<HTseq name="HTSeq" category="run" options='\"HTseq\",\"\"' default_value="" description="Select to run the HTSeq counting protocol"></HTseq>
+	<rockhopperCount name="rockhopperCount" category="run" options='\"Rockhopper\",\"\"' default_value="" description="Select to run the Rockhopper counting protocol"></rockhopperCount>
+	<Cufflinks name="Cufflinks" category="run" options='\"Cufflinks\",\"\"' default_value="" description="Select to run the Cufflinks counting protocol"></Cufflinks>
+	<aAlgor name="aAlgor" category="run" options='\"BWA\",\"Bowtie\",\"Bowtie2\",\"Cushaw\",\"Cushaw_GPU\",\"TopHat\",\"Rockhopper\",\"STAR\",\"HISAT\"' default_value="BWA" description="The aligner you would like to use to align your reads"></aAlgor>
+	<numberCores name="nCores" category="run" options="" default_value="1" description="The number of cores that your alignment should use"></numberCores>
+	<numberStreams name="nStreams" category="run" options="" default_value="1" description="The number of parallel alignment streams that should happen"></numberStreams>
+	<numberStreamsDataPrep name="nStreamsDataPrep" category="run" options="" default_value="1" description="The number of parallel data preparation streams that should happen"></numberStreamsDataPrep>
+	<readTrim name="readTrim" category="preprocess" options='\"TRUE\",\"FALSE\"' default_value="FALSE" description="Trim reads during preprocessing. This removes some parts of the sequence prior to alignment"></readTrim>
+	<trimHead name="trimhead" category="preprocess" options="" default_value="12" description="Automatic headcrop for trimmomatic"></trimHead>
+	<minTrim name="trimMin" category="preprocess" options="" default_value="36" description="The minimum length of a trimmed read"></minTrim>
+	<artificialFasta name="artificial.fq" category="preprocess" options="" default_value="JGI.clean2.fa" description="Name of the FASTA file with artificial sequences (Adapters, primers, etc.).  Located in the script directory"></artificialFasta>
+	
+	<fragMaxLength name="fragMaxLength" category="rsem" options="" default_value="1000" description="Maximal length of a fragment in a paired-end library"></fragMaxLength>
+	<ciMem name="ciMem" category="rsem" options="" default_value="4096" description="Maximum size (MB) of the auxiliary buffer used to compute confidence intervals"></ciMem>
+	
+	<scriptDirectory name="base.dir" category="environment" options="" default_value="" description="The location of the R Script Files. (GLSeq.Top.R)"></scriptDirectory>
+	<trimPath name="trimPath" category="environment" options="" default_value="/opt/bifxapps/Trimmomatic-0.30/trimmomatic-0.30.jar" description="Path to the Trimmomatic"></trimPath>
+	<picardToolsPath name="picardToolsPath" category="environment" options="" default_value="/opt/bifxapps/picard-tools/" description="Path to the PIcardTools jar directory"></picardToolsPath>
+	<fastqcPath name="fastqcPath" category="environment" options="" default_value="/opt/bifxapps/bin/fastqc" description="Path to the FastQC"></fastqcPath>
+	<bwaPath name="bwaPath" category="environment" options="" default_value="/opt/bifxapps/bin/bwa" description="Path to BWA Aligner"></bwaPath>
+	<bam2wigPath name="bam2wigPath" category="environment" options="" default_value="/home/GLBRCORG/omoskvin/run/bam2wig.sh" description="Path to the shell script that converts Bam to Wig"></bam2wigPath>
+	<cushawPath name="CUSHAW.path" category="environment" options="" default_value="/opt/bifxapps/cushaw2-v2.1.11/cushaw2" description="Path to the CUSHAW Aligner"></cushawPath>
+	<cushawGpuPath name="CUSHAW.GPU.path" category="environment" options="" default_value="/opt/bifxapps/cushaw2-gpu-2.1.8-r16/cushaw2-gpu" description="Path to the Cushaw-GPU Aligner"></cushawGpuPath>
+	<cushawIndexPath name="CUSHAW.index.path" category="environment" options="" default_value="/opt/bifxapps/cushaw2-v2.1.11/cushaw2_index/cushaw2_index" description="Path to the CUSHAW Indexer"></cushawIndexPath>
+	<topHatPath name="TopHat.path" category="environment" options="" default_value="/opt/bifxapps/tophat-2.0.11.Linux_x86_64/tophat2" description="Path to the Tophat Aligner"></topHatPath>
+	<rockhopperPath name="Rockhopper.path" category="environment" options="" default_value="" description="Path to the Rockhopper Aligner"></rockhopperPath>
+	<destDirTest name="destDirTest" category="environment" options="" default_value="" description="Path to a logging file.  This will create general logs and put them in this directory"></destDirTest>
+	<starPath name="star.path" category="environment" options="" default_value="" description="Path to a logging file.  This will create general logs and put them in this directory"></starPath>
+	<hisatPath name="hisat.path" category="environment" options="" default_value="" description="Path to the folder containing the hisat-build and hisat files"></hisatPath>
+	
+	<uiDivider name="uiDivider" category="script" options="" default_value="" description="Divider for Glow"></uiDivider>
+	
+	<Update name="Updating" category="script" options="noupdate,update" default_value="noupdate" description="If to update from glow"></Update>
+	<DataPrep name="Data Preparation" category="script" options="dataprep,nodataprep" default_value="nodataprep" description="If to prepare raw data"></DataPrep>
+	<Alignment name="Alignment" category="script" options="alignment,noalignment" default_value="noalignment" description="If to align data"></Alignment>
+	<Counting name="Counting" category="script" options="counting,nocounting" default_value="nocounting" description="If to count data"></Counting>
+	<Collect name="Collect" category="script" options="collect,nocollect" default_value="nocollect" description="If to collect results summary"></Collect>
+	<RunName name="Run Name" category="script" options="" default_value="" description="The name of the run to be started"></RunName>
+</Attributes>
+
+
