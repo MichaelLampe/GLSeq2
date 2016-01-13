@@ -78,9 +78,9 @@ public class UpdateUserInterfaceSingleton {
 							.getValue()));
 				}
 
-				/*
-				 * Type Spinner
-				 */
+			/*
+			 * Type Spinner
+			 */
 			} else if (currentData instanceof Spinner) {
 				if (!attribute.getValue().equals("NULL")) {
 					Spinner<Integer> s = (Spinner<Integer>) currentData;

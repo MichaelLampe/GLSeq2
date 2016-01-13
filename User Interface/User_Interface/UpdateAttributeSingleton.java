@@ -46,6 +46,7 @@ public class UpdateAttributeSingleton {
 			 * Grab the correct node in the Fxml file by name
 			 */
 			Node currentData;
+			String updateValue = "";
 			try {
 				currentData = findById(attribute.getUiName());
 
@@ -62,7 +63,7 @@ public class UpdateAttributeSingleton {
 			 * trailing 0s) and then strings
 			 */
 			if (currentData instanceof Slider) {
-				attribute.setValue(String.valueOf(Integer
+				updateValue = (String.valueOf(Integer
 						.valueOf((int) ((Slider) currentData).getValue())));
 
 				/*
@@ -71,18 +72,18 @@ public class UpdateAttributeSingleton {
 			} else if (currentData instanceof Spinner) {
 				@SuppressWarnings("unchecked")
 				Spinner<Integer> s = (Spinner<Integer>) currentData;
-				attribute.setValue(String.valueOf(s.getValue()));
+				updateValue = String.valueOf(s.getValue());
 
 				/*
 				 * Select the the selected item from teh combo box.
 				 */
 			} else if (currentData instanceof ComboBox<?>) {
-				attribute.setValue(String.valueOf(((ComboBox<?>) currentData)
-						.getSelectionModel().getSelectedItem().toString()));
+				updateValue = String.valueOf(((ComboBox<?>) currentData)
+						.getSelectionModel().getSelectedItem().toString());
 
 				// Just grab the text from a text area
 			} else if (currentData instanceof TextArea) {
-				attribute.setValue(((TextArea) currentData).getText());
+				updateValue = ((TextArea) currentData).getText();
 
 				/*
 				 * Check boxes are only used currently for the counting and run
@@ -91,9 +92,7 @@ public class UpdateAttributeSingleton {
 				 */
 			} else if (currentData instanceof CheckBox) {
 				if (((CheckBox) currentData).isSelected()) {
-					attribute.setValue(attribute.getName());
-				} else {
-					attribute.setValue("");
+					updateValue = attribute.getName();
 				}
 
 				/*
@@ -103,7 +102,15 @@ public class UpdateAttributeSingleton {
 			} else if (attribute.getName().equals("aAlgor")) {
 				RadioButton selectedButton = (RadioButton) MainPageController.group
 						.getSelectedToggle();
-				attribute.setValue(selectedButton.getText());
+				updateValue = selectedButton.getText();
+			}
+
+			try {
+				AttributeFactorySingleton.getInstance().setAttributeValue(
+						attribute.getUiName(), updateValue);
+			} catch (NoSuchKeyInAttributeFactoryException e) {
+				System.out.println("Double check");
+				// Only iterating over elements that are within the attributes.
 			}
 		}
 	}

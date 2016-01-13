@@ -15,6 +15,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+/*
+ * Produces Attributes and stores them.
+ */
 public class AttributeFactorySingleton {
 
 	/*
@@ -24,7 +27,7 @@ public class AttributeFactorySingleton {
 	/*
 	 * Contains the attributes
 	 */
-	
+
 	private static final String ATTRIBUTES_XML_ROOT_NAME = "Attributes";
 	private static final String ATTRIBUTES_XML = "xml_data/Attributes.xml";
 	private static final String ATTRIBUTES_XML_FIELD_NAME_ATTRIBUTE = "name";
@@ -32,13 +35,13 @@ public class AttributeFactorySingleton {
 	private static final String ATTRIBUTES_XML_OPTIONS_ATTRIBUTE = "options";
 	private static final String ATTRIBUTES_XML_DEFAULT_VALUE_ATTRIBUTE = "default_value";
 	private static final String ATTRIBUTES_XML_DESCRIPTION_ATTRIBUTE = "description";
-	
+
 	public static final String ALIGNMENT_SPECIAL_OPTIONS_NAME = "alignmentSpecialOptions";
-	public static final String HTSEQ_SPECIAL_OPTIONS_NAME ="HtSeqSpecialOptions";
-	public static final String RSEM_SPECIAL_OPTIONS_NAME ="RsemSpecialOptions";
-	public static final String FEATURE_COUNTS_SPECIAL_OPTIONS_NAME ="FeatureCountsSpecialOptions";
-	public static final String CUFFLINKS_SPECIAL_OPTIONS_NAME ="CufflinksSpecialOptions";
-	
+	public static final String HTSEQ_SPECIAL_OPTIONS_NAME = "HtSeqSpecialOptions";
+	public static final String RSEM_SPECIAL_OPTIONS_NAME = "RsemSpecialOptions";
+	public static final String FEATURE_COUNTS_SPECIAL_OPTIONS_NAME = "FeatureCountsSpecialOptions";
+	public static final String CUFFLINKS_SPECIAL_OPTIONS_NAME = "CufflinksSpecialOptions";
+
 	private static AttributeFactorySingleton instance = null;
 
 	protected AttributeFactorySingleton() {
@@ -69,10 +72,24 @@ public class AttributeFactorySingleton {
 		return instance;
 	}
 
-	public Attribute getAttribute(String attributeName) throws NoSuchKeyInAttributeFactoryException {
+	public Attribute getAttribute(String attributeName)
+			throws NoSuchKeyInAttributeFactoryException {
+		if (containsAttributeKey(attributeName)) {
+			try {
+				return attributesCollection.get(attributeName).clone();
+			} catch (CloneNotSupportedException e) {
+				return null;
+			}
+		} else {
+			throw new NoSuchKeyInAttributeFactoryException();
+		}
+	}
+
+	private Attribute getAttributeNotClone(String attributeName)
+			throws NoSuchKeyInAttributeFactoryException {
 		if (containsAttributeKey(attributeName)) {
 			return attributesCollection.get(attributeName);
-		} else{
+		} else {
 			throw new NoSuchKeyInAttributeFactoryException();
 		}
 	}
@@ -81,8 +98,9 @@ public class AttributeFactorySingleton {
 		return new ArrayList<Attribute>(attributesCollection.values());
 	}
 
-	public void setAttributeValue(String attributeName, String value) throws NoSuchKeyInAttributeFactoryException {
-		Attribute attributeToChange = getAttribute(attributeName);
+	public void setAttributeValue(String attributeName, String value)
+			throws NoSuchKeyInAttributeFactoryException {
+		Attribute attributeToChange = getAttributeNotClone(attributeName);
 		attributeToChange.setValue(value);
 	}
 
@@ -97,13 +115,14 @@ public class AttributeFactorySingleton {
 	private void setupSpecialOptionFields() {
 		// This is a special field we will only allow in the UI
 		Attribute alignmentSpecialOptions = new Attribute(
-				ALIGNMENT_SPECIAL_OPTIONS_NAME, ALIGNMENT_SPECIAL_OPTIONS_NAME, "", "",
-				"", "");
+				ALIGNMENT_SPECIAL_OPTIONS_NAME, ALIGNMENT_SPECIAL_OPTIONS_NAME,
+				"", "", "", "");
 		attributesCollection.put(alignmentSpecialOptions.getName(),
 				alignmentSpecialOptions);
 
-		Attribute htSeqSpecialOptions = new Attribute(HTSEQ_SPECIAL_OPTIONS_NAME,
-				HTSEQ_SPECIAL_OPTIONS_NAME, "", "", "", "");
+		Attribute htSeqSpecialOptions = new Attribute(
+				HTSEQ_SPECIAL_OPTIONS_NAME, HTSEQ_SPECIAL_OPTIONS_NAME, "", "",
+				"", "");
 		attributesCollection.put(htSeqSpecialOptions.getName(),
 				htSeqSpecialOptions);
 
@@ -113,14 +132,14 @@ public class AttributeFactorySingleton {
 				rsemSpecialOptions);
 
 		Attribute featureCountsSpecialOptions = new Attribute(
-				FEATURE_COUNTS_SPECIAL_OPTIONS_NAME, FEATURE_COUNTS_SPECIAL_OPTIONS_NAME,
-				"", "", "", "");
+				FEATURE_COUNTS_SPECIAL_OPTIONS_NAME,
+				FEATURE_COUNTS_SPECIAL_OPTIONS_NAME, "", "", "", "");
 		attributesCollection.put(featureCountsSpecialOptions.getName(),
 				featureCountsSpecialOptions);
 
 		Attribute cufflinksSpecialOptions = new Attribute(
-				CUFFLINKS_SPECIAL_OPTIONS_NAME, CUFFLINKS_SPECIAL_OPTIONS_NAME, "", "",
-				"", "");
+				CUFFLINKS_SPECIAL_OPTIONS_NAME, CUFFLINKS_SPECIAL_OPTIONS_NAME,
+				"", "", "", "");
 		attributesCollection.put(cufflinksSpecialOptions.getName(),
 				cufflinksSpecialOptions);
 	}
@@ -143,8 +162,8 @@ public class AttributeFactorySingleton {
 		/*
 		 * Go through the XML document loaded in via xmlPath
 		 */
-		Node attributeNode = attributes.getElementsByTagName(ATTRIBUTES_XML_ROOT_NAME)
-				.item(0);
+		Node attributeNode = attributes.getElementsByTagName(
+				ATTRIBUTES_XML_ROOT_NAME).item(0);
 		for (int i = 0; i < attributeNode.getChildNodes().getLength(); i++) {
 
 			// Grab the current xml element
@@ -164,35 +183,42 @@ public class AttributeFactorySingleton {
 
 				try {
 					field_name = xmlAttribute.getAttributes()
-							.getNamedItem(ATTRIBUTES_XML_FIELD_NAME_ATTRIBUTE).getNodeValue();
+							.getNamedItem(ATTRIBUTES_XML_FIELD_NAME_ATTRIBUTE)
+							.getNodeValue();
 				} catch (NullPointerException e) {
 					// No field name value in XML node
 				}
 
 				try {
 					category = xmlAttribute.getAttributes()
-							.getNamedItem(ATTRIBUTES_XML_CATEGORY_ATTRIBUTE).getNodeValue();
+							.getNamedItem(ATTRIBUTES_XML_CATEGORY_ATTRIBUTE)
+							.getNodeValue();
 				} catch (NullPointerException e) {
 					// No category value in XML node
 				}
 
 				try {
 					options = xmlAttribute.getAttributes()
-							.getNamedItem(ATTRIBUTES_XML_OPTIONS_ATTRIBUTE).getNodeValue();
+							.getNamedItem(ATTRIBUTES_XML_OPTIONS_ATTRIBUTE)
+							.getNodeValue();
 				} catch (NullPointerException e) {
 					// No options value in XML node
 				}
 
 				try {
-					default_value = xmlAttribute.getAttributes()
-							.getNamedItem(ATTRIBUTES_XML_DEFAULT_VALUE_ATTRIBUTE).getNodeValue();
+					default_value = xmlAttribute
+							.getAttributes()
+							.getNamedItem(
+									ATTRIBUTES_XML_DEFAULT_VALUE_ATTRIBUTE)
+							.getNodeValue();
 				} catch (NullPointerException e) {
 					// No default value in XML node
 				}
 
 				try {
 					description = xmlAttribute.getAttributes()
-							.getNamedItem(ATTRIBUTES_XML_DESCRIPTION_ATTRIBUTE).getNodeValue();
+							.getNamedItem(ATTRIBUTES_XML_DESCRIPTION_ATTRIBUTE)
+							.getNodeValue();
 				} catch (NullPointerException e) {
 					// No description value in XML node
 				}
@@ -215,7 +241,7 @@ public class AttributeFactorySingleton {
 	/*
 	 * AttributeFactory defines what an attribute is
 	 */
-	class Attribute {
+	class Attribute implements Cloneable {
 		private final String name;
 		private final String uiname;
 		private final String toolTip;
@@ -245,6 +271,10 @@ public class AttributeFactorySingleton {
 			 * end.
 			 */
 			this.optionsPresplit = options;
+		}
+
+		public Attribute clone() throws CloneNotSupportedException {
+			return (Attribute) super.clone();
 		}
 
 		public String[] getOptions() {

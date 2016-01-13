@@ -322,22 +322,47 @@ public final class MainPageController implements Initializable {
 				0, 100);
 		trimHead.setValueFactory(trimHeadFactory);
 		trimHead.getValueFactory().setValue(12);
+		
+		/*
+		 * Fixes a bug where JavaFX Spinner doesn't update when edited manually.
+		 */
+		trimHead.focusedProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					trimHead.getValueFactory().setValue(
+							Integer.valueOf(trimHead.getEditor().getText()));
+				});
 
 		SpinnerValueFactory<Integer> minTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
 				0, 100);
 		minTrim.setValueFactory(minTrimFactory);
 		minTrim.getValueFactory().setValue(36);
+		minTrim.focusedProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					minTrim.getValueFactory().setValue(
+							Integer.valueOf(minTrim.getEditor().getText()));
+				});
 
 		SpinnerValueFactory<Integer> threePrimeTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
 				0, 100);
 		three_prime_trim_slide.setValueFactory(threePrimeTrimFactory);
 		three_prime_trim_slide.getValueFactory().setValue(3);
+		three_prime_trim_slide.focusedProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					three_prime_trim_slide.getValueFactory().setValue(
+							Integer.valueOf(three_prime_trim_slide.getEditor()
+									.getText()));
+				});
 
 		SpinnerValueFactory<Integer> minAvgQualFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
 				0, 100);
 		min_avg_qual_slide.setValueFactory(minAvgQualFactory);
 		min_avg_qual_slide.getValueFactory().setValue(30);
-		;
+		min_avg_qual_slide.focusedProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					min_avg_qual_slide.getValueFactory().setValue(
+							Integer.valueOf(min_avg_qual_slide.getEditor()
+									.getText()));
+				});
 	}
 
 	private void constructRadioButtons() {
