@@ -3,7 +3,9 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Run {
+import javafx.concurrent.Task;
+
+public class RunInstantiator {
 	// Static keep count stuff
 	private static int runs_count = 0;
 	// Table Data
@@ -12,8 +14,9 @@ public class Run {
 	private final boolean alignment;
 	private final boolean counting;
 	private final boolean collect;
+	private List<String> args = new ArrayList<String>();
 
-	public Run(boolean dataprep, boolean alignment, boolean counting,
+	public RunInstantiator(boolean dataprep, boolean alignment, boolean counting,
 			boolean collect, String run_name) {
 		this.run_name = run_name;
 		this.dataprep = dataprep;
@@ -27,10 +30,10 @@ public class Run {
 		return runs_count;
 	}
 
-	public List<String> constructArgs(boolean Condor, String attribute_file, String scriptsDirectory) {
-		List<String> args = new ArrayList<String>();
+	public void constructArgs(boolean Condor, String attribute_file,
+			String scriptsDirectory) {
 		// Condor Wrapper to run via Condor
-		if (!scriptsDirectory.endsWith("/")){
+		if (!scriptsDirectory.endsWith("/")) {
 			scriptsDirectory = scriptsDirectory + "/";
 		}
 		if (Condor) {
@@ -43,7 +46,7 @@ public class Run {
 		}
 		// Where update was, might add to here later
 		args.add("Placeholder");
-		
+
 		// Dataprep
 		if (dataprep)
 			args.add("dataprep");
@@ -78,7 +81,19 @@ public class Run {
 
 		// Attribute File
 		args.add(attribute_file);
+	}
 
-		return args;
+	public void start() {
+		if (args != null) {
+			/*
+			 * Might add some logic in the future that starts an SSH on
+			 * windows/mac
+			 */
+			Task<Object> task = new GlSeqRunWorker(args);
+			// Run on a different thread so it doesn't lock up the UI.
+			new Thread(task).start();
+		} else {
+			System.out.println("Please select something for the script to do.");
+		}
 	}
 }

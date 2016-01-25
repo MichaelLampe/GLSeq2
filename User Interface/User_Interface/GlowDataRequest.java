@@ -40,14 +40,16 @@ public class GlowDataRequest extends GlowRequest {
 	@SuppressWarnings("unchecked")
 	private ArrayList<CheckBoxTreeItem<String>> addFilesToUi(List<String> files) {
 		try {
-			TreeView<String> fileView = (TreeView<String>) UpdateUserInterfaceSingleton.getInstance().findById("selectedDataFiles");
+			TreeView<String> fileView = (TreeView<String>) UpdateUserInterfaceSingleton
+					.getInstance().findById("selectedDataFiles");
 			for (String file : files) {
 				int i = file.lastIndexOf("/");
 				String filePath = file.substring(0, i + 1);
 				String fileName = file.substring(i + 1);
 
 				CheckBoxTreeItem<String> filePathBranch = null;
-				CheckBoxTreeItem<String> fileNameBranch = new CheckBoxTreeItem<String>(fileName);
+				CheckBoxTreeItem<String> fileNameBranch = new CheckBoxTreeItem<String>(
+						fileName);
 				for (TreeItem<String> path : fileView.getRoot().getChildren()) {
 					if (path.getValue().equals(filePath)) {
 						filePathBranch = (CheckBoxTreeItem<String>) path;
@@ -66,13 +68,15 @@ public class GlowDataRequest extends GlowRequest {
 				// Final reference for the listener
 				final CheckBoxTreeItem<String> b = filePathBranch;
 
-				// If we want to check the selected property we'll need to make
-				// it into
-				// a check box tree item
-
+				/*
+				 * If we want to check the selected property we'll need to make
+				 * it into a check box tree item
+				 */
 				b.selectedProperty().addListener(new ChangeListener<Boolean>() {
 					@Override
-					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+					public void changed(
+							ObservableValue<? extends Boolean> arg0,
+							Boolean oldValue, Boolean newValue) {
 
 						/*
 						 * This gets activated when a change happens Changes all
@@ -107,13 +111,16 @@ public class GlowDataRequest extends GlowRequest {
 		for (CheckBoxTreeItem<String> file : files) {
 			file.selectedProperty().addListener(new ChangeListener<Boolean>() {
 				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
+				public void changed(ObservableValue<? extends Boolean> arg0,
+						Boolean oldValue, Boolean newValue) {
 					// Add and remove the string depending on if it is checked
 					// or not
 					if (newValue) {
-						MainPageController.liblistData.add(file.getParent().getValue() + file.getValue());
+						MainPageController.liblistData.add(file.getParent()
+								.getValue() + file.getValue());
 					} else {
-						MainPageController.liblistData.remove(file.getParent().getValue() + file.getValue());
+						MainPageController.liblistData.remove(file.getParent()
+								.getValue() + file.getValue());
 					}
 				}
 			});
@@ -131,7 +138,8 @@ public class GlowDataRequest extends GlowRequest {
 			}
 			String response = "";
 			String line = null;
-			try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			try (BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()))) {
 				while ((line = bufferedReader.readLine()) != null) {
 					response += line;
 				}
@@ -172,7 +180,8 @@ public class GlowDataRequest extends GlowRequest {
 				UpdateUserInterfaceSingleton.getInstance().updateDefaults();
 			});
 		} else {
-			System.out.println("Did not run because no connection to glow was established.");
+			System.out
+					.println("Did not run because no connection to glow was established.");
 		}
 		return null;
 	}

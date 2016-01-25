@@ -2,7 +2,7 @@ package application;
 
 import java.util.ArrayList;
 
-public final class AttributeActionsCommandLine extends AttributeActions {
+public final class AttributeActionsCommandLine extends AttributeFileWriter {
 
 	public void setAttributes(String[] inputArgs) {
 		ArrayList<AttributeFactorySingleton.Attribute> attributeArray = AttributeFactorySingleton

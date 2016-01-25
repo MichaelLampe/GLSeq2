@@ -6,7 +6,7 @@ import javafx.scene.control.TreeItem;
 public class SpecialInputTreeItem<T> extends TreeItem<String> {
 	private String input_type;
 	private String default_value;
-	private MyTreeCell watcher;
+	private AdvancedOptionsTreeCell watcher;
 
 	public SpecialInputTreeItem(String input_type, String default_value) {
 		super();
@@ -26,11 +26,11 @@ public class SpecialInputTreeItem<T> extends TreeItem<String> {
 		return null;
 	}
 
-	public MyTreeCell getWatchingTreeCell() {
+	public AdvancedOptionsTreeCell getWatchingTreeCell() {
 		return watcher;
 	}
 
-	public void setWatchingTreeCell(MyTreeCell watch) {
+	public void setWatchingTreeCell(AdvancedOptionsTreeCell watch) {
 		this.watcher = watch;
 	}
 	

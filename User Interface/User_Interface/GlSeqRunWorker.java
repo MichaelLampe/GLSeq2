@@ -5,19 +5,21 @@ import java.util.List;
 
 import javafx.concurrent.Task;
 
-public class RunWorker extends Task<Object> {
+public class GlSeqRunWorker extends Task<Object> {
 
 	private List<String> args;
 
-	public RunWorker(List<String> args) {
+	public GlSeqRunWorker(List<String> args) {
 		this.args = args;
 	}
 
 	@Override
 	protected Object call() throws Exception {
-		// Script generated based on arguments from the RunOptions class.
-		// It calls the R script with the correct user parameters
-		// Build process w/ args again
+		/*
+		 * Script generated based on arguments from the RunOptions class. It
+		 * calls the R script with the correct user parameters Build process w/
+		 * args again
+		 */
 		String scriptDirectory = AttributeFactorySingleton.getInstance()
 				.getAttribute("base.dir").getValue();
 		Process process = null;

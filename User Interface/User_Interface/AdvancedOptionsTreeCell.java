@@ -9,8 +9,8 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.control.cell.CheckBoxTreeCell;
 
-public class MyTreeCell extends CheckBoxTreeCell<String> {
-	public MyTreeCell() {
+public class AdvancedOptionsTreeCell extends CheckBoxTreeCell<String> {
+	public AdvancedOptionsTreeCell() {
 		// instantiate the root context menu
 	}
 
@@ -21,10 +21,14 @@ public class MyTreeCell extends CheckBoxTreeCell<String> {
 		if (item != null) {
 			setText(item);
 			if (getTreeItem() instanceof SpecialInputTreeItem) {
+				// I don't know why this is here, but I'm worried about removing
+				// it.
 				setText("Hello");
 			}
-			// If this item happens to not be a checkbox, let's remove the check
-			// box graphic here.
+			/*
+			 * If this item happens to not be a checkbox, let's remove the check
+			 * box graphic here.
+			 */
 			if (!(getTreeItem() instanceof CheckBoxTreeItem)) {
 				setGraphic(null);
 			}
@@ -60,8 +64,7 @@ public class MyTreeCell extends CheckBoxTreeCell<String> {
 						intSpinner.focusedProperty().addListener(
 								(s, ov, nv) -> (intSpinner.getValueFactory()
 										.setValue(Integer.valueOf(intSpinner
-												.getEditor().getText()))
-								));
+												.getEditor().getText()))));
 						intSpinner.focusedProperty().addListener(
 								(s, ov, nv) -> (treeItem
 										.setDefaultValue(intSpinner.getEditor()

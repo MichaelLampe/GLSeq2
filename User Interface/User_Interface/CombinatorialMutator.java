@@ -186,7 +186,7 @@ public class CombinatorialMutator {
 	 * Sets a given value to attribute files.
 	 */
 	private static boolean loadAttributeFile(String file_name) {
-		AttributeActions action = new AttributeActions();
+		AttributeAndConfigFileHandler action = new AttributeAndConfigFileHandler();
 		File att_file = new File(file_name);
 
 		try {

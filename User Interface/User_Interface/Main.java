@@ -19,7 +19,7 @@ public class Main extends Application {
 	private static final String ATTRIBUTES_CONFIG_FILE = "AttributesConfig.txt";
 	private static Scene scene;
 	private static Stage stage;
-	private static final AttributeConfigurationFile att = new AttributeConfigurationFile();
+	private static final AttributeAndConfigFileHandler configFileHandler = new AttributeAndConfigFileHandler();
 
 	/*
 	 * Sets the stage title
@@ -49,7 +49,8 @@ public class Main extends Application {
 		return directoryChooser.showDialog(stage);
 	}
 
-	public static Node lookupObjectById(String id) throws SceneNotYetReadyException {
+	public static Node lookupObjectById(String id)
+			throws SceneNotYetReadyException {
 		if (scene == null) {
 			throw new SceneNotYetReadyException();
 		}
@@ -83,10 +84,14 @@ public class Main extends Application {
 		primaryStage.show();
 
 		try {
-			att.setAttributesTextConfig(new File(ATTRIBUTES_CONFIG_FILE));
+			configFileHandler.setAttributesTextConfig(new File(
+					ATTRIBUTES_CONFIG_FILE));
 		} catch (FileNotFoundException e) {
-			// Just move on.
+			// Just move on if there is no file locally.
 		}
+
+		// Makes sure to remove the cookie when the application is closed.
+		stage.setOnCloseRequest(e -> MainPageController.logoutFromGlow());
 	}
 
 	public static void main(String[] args) {

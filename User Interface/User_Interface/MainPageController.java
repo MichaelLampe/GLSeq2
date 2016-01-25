@@ -290,11 +290,17 @@ public final class MainPageController implements Initializable {
 	private final String LOGIN_GLOW = "Login to GLOW";
 	private final String REQUEST_GLOW = "Request from GLOW";
 
+	public static void logoutFromGlow() {
+		if (request != null) {
+			request.logout();
+		}
+	}
+
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		addListeners();
+		addTextAreaListeners();
 
-		addScrollbarListeners();
+		appendSliderListeners();
 
 		progressBarListener();
 
@@ -310,19 +316,26 @@ public final class MainPageController implements Initializable {
 
 		menuListeners();
 
-		appendTooltips();
+		appendTooltipsElements();
 
 		fileSelectTree();
 
-		addSpinners();
+		instantiateUISpinnersWithValuesAndRanges();
 	}
 
-	private void addSpinners() {
+	/*
+	 * This deals with settings up all the spinners. Spinners require
+	 * IntegerSpinnerValueFactories to work, which also require an input range.
+	 * 
+	 * As of 1/25 there is also a bug fix I apply here so that if a user edits
+	 * manually (Clicks and edits) the update will be tracked
+	 */
+	private void instantiateUISpinnersWithValuesAndRanges() {
 		SpinnerValueFactory<Integer> trimHeadFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
 				0, 100);
 		trimHead.setValueFactory(trimHeadFactory);
 		trimHead.getValueFactory().setValue(12);
-		
+
 		/*
 		 * Fixes a bug where JavaFX Spinner doesn't update when edited manually.
 		 */
@@ -366,7 +379,9 @@ public final class MainPageController implements Initializable {
 	}
 
 	private void constructRadioButtons() {
-		// Setup the alignment button group
+		/*
+		 * Alignment group button
+		 */
 		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw,
 				Cushaw_Gpu, TopHat, Rockhopper, star, hisat, BWA };
 		List<RadioButton> alignmentGroup = Arrays.asList(tempAlignmentGroup);
@@ -376,7 +391,9 @@ public final class MainPageController implements Initializable {
 		alignmentGroup.get(0).setSelected(true);
 		toggleCountingDep(group);
 
-		// Setup the type of run button group
+		/*
+		 * Setup the type of run button group
+		 */
 		RadioButton[] tempTypeOfRun = { indic_man, from_glow, de_novo };
 		List<RadioButton> typeOfRun = Arrays.asList(tempTypeOfRun);
 		typeOfRun.forEach((radioButton) -> {
@@ -384,7 +401,9 @@ public final class MainPageController implements Initializable {
 		});
 		typeOfRun.get(0).setSelected(true);
 
-		// Sam File Choice
+		/*
+		 * Setup different SAM file choices
+		 */
 		RadioButton[] tempSamSource = { man_sam, load_prev };
 		List<RadioButton> samSource = Arrays.asList(tempSamSource);
 		samSource.forEach((radioButton) -> {
@@ -392,13 +411,14 @@ public final class MainPageController implements Initializable {
 		});
 		samSource.get(0).setSelected(true);
 
-		// Bind the GLOW button so that it is only enabled when GLOW is
-		// selected.
+		/*
+		 * A custom binding so that the request button responds to the radio
+		 * button
+		 */
 		if (request == null) {
 			ref_request_glow.setText(LOGIN_GLOW);
 			data_request_glow.setText(LOGIN_GLOW);
 		}
-
 		ref_request_glow.disableProperty().bind(
 				Bindings.when(from_glow.selectedProperty()).then(false)
 						.otherwise(true));
@@ -409,7 +429,9 @@ public final class MainPageController implements Initializable {
 				Bindings.when(load_glow.selectedProperty()).then(false)
 						.otherwise(true));
 
-		// Setup where to get the data from
+		/*
+		 * Setup where to get the data from
+		 */
 		RadioButton[] tempGlow = { man_fastq, load_glow };
 		List<RadioButton> glow = Arrays.asList(tempGlow);
 		glow.forEach((radioButton) -> {
@@ -443,11 +465,14 @@ public final class MainPageController implements Initializable {
 			}
 		});
 
-		// If you add more items here, you need to add more cases for
-		// "requestFor"
-		// in the lambda function below
+		/*
+		 * If you add more items here, you need to add more cases for
+		 * "requestFor" in the lambda function below
+		 */
 		Button[] tempButtonAction = { ref_request_glow, data_request_glow };
 		List<Button> buttonAction = Arrays.asList(tempButtonAction);
+
+		// Add more cases here
 		buttonAction.parallelStream().forEach((button) -> {
 			// Make sure this has a TextArea assigned to it!
 				final TextArea requestFor;
@@ -462,10 +487,10 @@ public final class MainPageController implements Initializable {
 							} else {
 								Task<Object> refReq = new GlowReferenceRequest(
 										request, requestFor.getText());
-								// Run on a different thread so it doesn't lock
-								// up
-								// the
-								// UI.
+								/*
+								 * Run on a different thread so it doesn't lock
+								 * up the UI.
+								 */
 								new Thread(refReq).start();
 							}
 						}
@@ -481,10 +506,10 @@ public final class MainPageController implements Initializable {
 							} else {
 								Task<Object> dataReq = new GlowDataRequest(
 										request, requestFor.getText());
-								// Run on a different thread so it doesn't lock
-								// up
-								// the
-								// UI.
+								/*
+								 * Run on a different thread so it doesn't lock
+								 * up the UI.
+								 */
 								new Thread(dataReq).start();
 							}
 						}
@@ -496,7 +521,7 @@ public final class MainPageController implements Initializable {
 			});
 	}
 
-	private void addListeners() {
+	private void addTextAreaListeners() {
 		/*
 		 * Creates a list of all the directories that need to be checked to see
 		 * if they exist as the user types in the directory. Then iterates over
@@ -514,12 +539,11 @@ public final class MainPageController implements Initializable {
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> arg0,
-						String arg1, String arg2) {
-					File dest = new File(arg2);
-					// Red if it can't be written to.
+						String arg1, String new_file) {
+
+					File dest = new File(new_file);
 					String color = "red";
 					if (dest.isDirectory() || dest.exists()) {
-						// If you can write to, makes it green.
 						color = "green";
 					}
 					// Just a nice little border
@@ -563,9 +587,11 @@ public final class MainPageController implements Initializable {
 												ObservableValue<? extends Boolean> arg0,
 												Boolean oldValue,
 												Boolean newValue) {
-											// Add and remove the string
-											// depending on if it is checked
-											// or not
+											/*
+											 * Add and remove the string
+											 * depending on if it is checked or
+											 * not
+											 */
 											String directoryValue = checkbox
 													.getParent().getValue();
 											if (!directoryValue.endsWith("/")) {
@@ -609,10 +635,8 @@ public final class MainPageController implements Initializable {
 				public void changed(ObservableValue<? extends String> arg0,
 						String arg1, String arg2) {
 					File dest = new File(fileName.getText());
-					// Red if it can't be written to.
 					String color = "red";
 					if (dest.canWrite()) {
-						// If you can write to, makes it green.
 						color = "green";
 					}
 
@@ -668,7 +692,7 @@ public final class MainPageController implements Initializable {
 		 * options are selected.
 		 */
 		addAlignmentAndCountingListeners();
-		constructOptionsMap();
+		constructAlignmentAndCountingOptionsTreeItemMap();
 		appendOptionsToTreeItems();
 		/*
 		 * The head of the alignment tree
@@ -680,7 +704,7 @@ public final class MainPageController implements Initializable {
 				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
 					@Override
 					public TreeCell<String> call(TreeView<String> param) {
-						return new MyTreeCell();
+						return new AdvancedOptionsTreeCell();
 					}
 				});
 		// This is just the "alignment" option we see at the head of the field.
@@ -694,19 +718,15 @@ public final class MainPageController implements Initializable {
 				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
 					@Override
 					public TreeCell<String> call(TreeView<String> param) {
-						return new MyTreeCell();
+						return new AdvancedOptionsTreeCell();
 					}
 				});
 		countingOptions.setShowRoot(true);
 	}
 
 	/*
-	 * METHOD
-	 * 
-	 * Goal: Setup the alignment and counting selector listeners to properly
-	 * append and remove alignment and counting options from the tree views.
-	 * 
-	 * Result: A dynamic and responsive tree view to edit advanced options.
+	 * Adds various listeners to the alignment and coutning options so they are
+	 * responsive to what is actually available.
 	 */
 	private void addAlignmentAndCountingListeners() {
 		// Alignment RadioButton
@@ -781,13 +801,12 @@ public final class MainPageController implements Initializable {
 	}
 
 	/*
-	 * METHOD
-	 * 
-	 * Goal: Construct two Hash maps that hash the String keywords to TreeItems
-	 * that contain all the important options of a given protocol
+	 * Codes in the hash of all the options
 	 */
-	private void constructOptionsMap() {
-		// Aligners
+	private void constructAlignmentAndCountingOptionsTreeItemMap() {
+		/*
+		 * Aligners
+		 */
 		alignOptions.put("Bowtie", new TreeItem<String>("Bowtie"));
 		alignOptions.put("Bowtie2", new TreeItem<String>("Bowtie2"));
 		alignOptions.put("BWA", new TreeItem<String>("BWA"));
@@ -797,7 +816,10 @@ public final class MainPageController implements Initializable {
 		alignOptions.put("Rockhopper", new TreeItem<String>("Rockhopper"));
 		alignOptions.put("STAR", new TreeItem<String>("STAR"));
 		alignOptions.put("TopHat", new TreeItem<String>("TopHat"));
-		// Counting
+
+		/*
+		 * Counting
+		 */
 		countOptions.put("Cufflinks", new TreeItem<String>("Cufflinks"));
 		countOptions
 				.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
@@ -826,11 +848,9 @@ public final class MainPageController implements Initializable {
 	}
 
 	/*
-	 * METHOD
-	 * 
-	 * Goal: Adds tool tips to a number of the fields.
+	
 	 */
-	private void appendTooltips() {
+	private void appendTooltipsElements() {
 		// Data tab tool tips
 
 		// Common options
@@ -877,7 +897,7 @@ public final class MainPageController implements Initializable {
 	 * All scroll bars have listeners that allow for dynamic text update to
 	 * their associated labels. Those are all created here.
 	 */
-	private void addScrollbarListeners() {
+	private void appendSliderListeners() {
 		// Number of Cores
 		numberCores.valueProperty().addListener(new ChangeListener<Object>() {
 			@Override
@@ -1024,37 +1044,42 @@ public final class MainPageController implements Initializable {
 				UpdateAttributeSingleton.getInstance().updateAllAttributes(
 						alignment, counting, load, liblistData);
 
-				AttributeConfigurationFile action = new AttributeConfigurationFile();
+				AttributeFileWriter attributeFileWriter = new AttributeFileWriter();
+
+				/*
+				 * Writes the attribute file in
+				 */
 				String attributeFileLocation = null;
 				try {
 					if (run_name.getText().equals("")) {
-						attributeFileLocation = action.writeAttributesFile(
-								null, null);
+						attributeFileLocation = attributeFileWriter
+								.writeAttributesFile(null, null);
 					} else {
-						attributeFileLocation = action.writeAttributesFile(
-								run_name.getText(), null);
+						attributeFileLocation = attributeFileWriter
+								.writeAttributesFile(run_name.getText(), null);
 					}
-					action.saveConfigFile("AttributesConfig.txt");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				// Creates a run instance
-				Run currentRun = constructRun();
-				// Grabs the args from that instance
-				// If true, run on HTcondor, else do not
-				List<String> args = currentRun.constructArgs(
-						htcondor_check.isSelected(), attributeFileLocation,
-						scriptDirectory.getText());
-				if (args != null) {
-					// Might add some logic in the future that starts an SSH on
-					// windows/mac
-					Task<Object> task = new RunWorker(args);
-					// Run on a different thread so it doesn't lock up the UI.
-					new Thread(task).start();
-				} else {
-					System.out
-							.println("Please select something for the script to do.");
+
+				/*
+				 * Saves config file
+				 */
+				AttributeAndConfigFileHandler configFileSaver = new AttributeAndConfigFileHandler();
+				try {
+					configFileSaver.saveConfigFile("AttributesConfig.txt");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+
+				/*
+				 * Creates a run instance
+				 */
+				RunInstantiator currentRun = constructRun();
+				currentRun.constructArgs(htcondor_check.isSelected(),
+						attributeFileLocation, scriptDirectory.getText());
+				currentRun.start();
 			}
 		});
 	}
@@ -1067,16 +1092,19 @@ public final class MainPageController implements Initializable {
 								// There is some text
 								.isNotEqualTo("")
 								.and(
-								// 45 char names max
-								// Just makes the table easier to
-								// handle.
+								/*
+								 * 45 char names max Just makes the table easier
+								 * to handle.
+								 */
 								textCountLimit(run_name, 45))
 								.and(textAlphanumeric(run_name))
 								.and(noExistRun(run_name))
 								.and(noExistScript(run_name))
 								.and(
-								// One of the boxes must be check to do
-								// something.
+								/*
+								 * One of the boxes must be check to do
+								 * something
+								 */
 								alignment_check.selectedProperty().or(
 										data_prep_check
 												.selectedProperty()
@@ -1130,13 +1158,13 @@ public final class MainPageController implements Initializable {
 		return bindingScript;
 	}
 
-	private Run constructRun() {
+	private RunInstantiator constructRun() {
 		// Update no longer in use.
 		boolean data_prep = data_prep_check.isSelected();
 		boolean alignment = alignment_check.isSelected();
 		boolean counting = counting_check.isSelected();
 		boolean collect = collect_check.isSelected();
-		return new Run(data_prep, alignment, counting, collect,
+		return new RunInstantiator(data_prep, alignment, counting, collect,
 				run_name.getText());
 	}
 
@@ -1241,24 +1269,30 @@ public final class MainPageController implements Initializable {
 		open_att.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fc = new FileChooser();
-				fc.getExtensionFilters().add(R);
-				fc.setSelectedExtensionFilter(R);
-				fc.setTitle("Open attribute file");
-				File att_file = Main.openFileChooser(fc);
-				if (att_file != null) {
-					AttributeActions action = new AttributeActions();
+				FileChooser fileChooser = new FileChooser();
+				/*
+				 * Only looks for R files
+				 */
+				fileChooser.getExtensionFilters().add(R);
+				fileChooser.setSelectedExtensionFilter(R);
+				fileChooser.setTitle("Open attribute file");
+				File attributeFile = Main.openFileChooser(fileChooser);
+				if (attributeFile != null) {
+					AttributeAndConfigFileHandler configLoader = new AttributeAndConfigFileHandler();
 					try {
-						action.setAttributesAttributeFile(att_file);
+						configLoader.setAttributesAttributeFile(attributeFile);
 					} catch (FileNotFoundException e) {
 						System.out.println("Attribute File not found!");
 					}
-					String name = att_file.getName().split(".R")[0];
+					String name = attributeFile.getName().split(".R")[0];
 					run_name.setText(name);
 					run_name.setDisable(true);
-					// Remove binding and make sure the start button is active
-					// Need to remove binding to directly set the button as not
-					// disabled.
+
+					/*
+					 * Remove binding and make sure the start button is active
+					 * Need to remove binding to directly set the button as not
+					 * disabled.
+					 */
 					start_run.disableProperty().unbind();
 					start_run.setDisable(false);
 				}
@@ -1268,14 +1302,14 @@ public final class MainPageController implements Initializable {
 		template_att.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fc = new FileChooser();
-				fc.getExtensionFilters().add(R);
-				fc.setSelectedExtensionFilter(R);
-				fc.setTitle("Open attribute file");
-				File att_file = Main.openFileChooser(fc);
+				FileChooser fileChooser = new FileChooser();
+				fileChooser.getExtensionFilters().add(R);
+				fileChooser.setSelectedExtensionFilter(R);
+				fileChooser.setTitle("Open attribute file");
+				File att_file = Main.openFileChooser(fileChooser);
 				try {
-					AttributeActions action = new AttributeActions();
-					action.setAttributesAttributeFile(att_file);
+					AttributeAndConfigFileHandler configLoader = new AttributeAndConfigFileHandler();
+					configLoader.setAttributesAttributeFile(att_file);
 				} catch (FileNotFoundException e) {
 					System.out.println("Attribute file not found!");
 				}
@@ -1308,7 +1342,7 @@ public final class MainPageController implements Initializable {
 				dc.setTitle("Save attribute file");
 				File directory = Main.openDirectoryChooser(dc);
 				if (directory != null) {
-					AttributeActions action = new AttributeActions();
+					AttributeFileWriter action = new AttributeFileWriter();
 					try {
 						action.writeAttributesFile(null,
 								directory.getAbsolutePath());
