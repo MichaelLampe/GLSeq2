@@ -41,53 +41,56 @@ if (!is.na(countable.sam)) {
   # by splitting on -, each will correspond to a command
   command <- unlist(strsplit(FeatureCountsSpecialOptions, "-"))
   # Iterate through the commands and parse them for values
-  for (commandIndex in 1:length(command)) {
-    # Trim whitespace on the front and end
-    value <- gsub("^\\s+|\\s+$", "",command[commandIndex])
-    if (command[commandIndex] == "B") {
-      requireBothEndsMapped <- TRUE
-    }
-    else if (command[commandIndex] == "C") {
-      countChimericFragments <- TRUE
-    }
-    else if (grepl("d", command[commandIndex])){
-      # Chop off the command and just take the value
-      # Then convert the string to an int
-      value <- unlist(strsplit(command[commandIndex],"d "))[2]
-      minFragLength <- strtoi(value)
-    }
-    else if (grepl("D", command[commandIndex])){
-      # Chop off the command and just take the value
-      # Then convert the string to an int
-      value <- unlist(strsplit(command[commandIndex],"D "))[2]
-      maxFragLength <- strtoi(value)
-    }
-    else if (grepl("Q", command[commandIndex])){
-      # Chop off the command and just take the value
-      # Then convert the string to an int
-      value <- unlist(strsplit(command[commandIndex],"Q "))[2]
-      minMQS <- strtoi(value)
-    }
-    else if ("donotsort" == command[commandIndex]) {
-      autosort <- TRUE
-    }
-    else if ("largestOverlap" == command[commandIndex]) {
-      largestOverlap <- TRUE
-    }
-    else if (grepl("minOverlap", command[commandIndex])) {
-      value <- unlist(strsplit(command[commandIndex],"minOverlap "))[2]
-      minOverlap <- strtoi(value)
-    }
-    else if ("primary" == command[commandIndex]){
-      countPrimaryAlignmentsOnly <- TRUE
-    }
-    else if (grepl("readExtension5", command[commandIndex])) {
-      value <- unlist(strsplit(command[commandIndex],"readExtension5 "))[2]
-      readExtension5 <- strtoi(value)
-    }
-    else if (grepl("readExtension3", command[commandIndex])) {
-      value <- unlist(strsplit(command[commandIndex],"readExtension3 "))[2]
-      readExtension3 <- strtoi(value)
+  # If command is 0 (Aka no command, it will try to make a list 1,0, so we need to exclude that)
+  if (length(command) != 0){
+    for (commandIndex in 1:length(command)) {
+      # Trim whitespace on the front and end
+      value <- gsub("^\\s+|\\s+$", "",command[commandIndex])
+      if (command[commandIndex] == "B") {
+        requireBothEndsMapped <- TRUE
+      }
+      else if (command[commandIndex] == "C") {
+        countChimericFragments <- TRUE
+      }
+      else if (grepl("d", command[commandIndex])){
+        # Chop off the command and just take the value
+        # Then convert the string to an int
+        value <- unlist(strsplit(command[commandIndex],"d "))[2]
+        minFragLength <- strtoi(value)
+      }
+      else if (grepl("D", command[commandIndex])){
+        # Chop off the command and just take the value
+        # Then convert the string to an int
+        value <- unlist(strsplit(command[commandIndex],"D "))[2]
+        maxFragLength <- strtoi(value)
+      }
+      else if (grepl("Q", command[commandIndex])){
+        # Chop off the command and just take the value
+        # Then convert the string to an int
+        value <- unlist(strsplit(command[commandIndex],"Q "))[2]
+        minMQS <- strtoi(value)
+      }
+      else if ("donotsort" == command[commandIndex]) {
+        autosort <- TRUE
+      }
+      else if ("largestOverlap" == command[commandIndex]) {
+        largestOverlap <- TRUE
+      }
+      else if (grepl("minOverlap", command[commandIndex])) {
+        value <- unlist(strsplit(command[commandIndex],"minOverlap "))[2]
+        minOverlap <- strtoi(value)
+      }
+      else if ("primary" == command[commandIndex]){
+        countPrimaryAlignmentsOnly <- TRUE
+      }
+      else if (grepl("readExtension5", command[commandIndex])) {
+        value <- unlist(strsplit(command[commandIndex],"readExtension5 "))[2]
+        readExtension5 <- strtoi(value)
+      }
+      else if (grepl("readExtension3", command[commandIndex])) {
+        value <- unlist(strsplit(command[commandIndex],"readExtension3 "))[2]
+        readExtension3 <- strtoi(value)
+      }
     }
   }
 
