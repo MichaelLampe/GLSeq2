@@ -30,7 +30,7 @@ public class AttributeAndConfigFileHandler {
 		} else {
 			attributeFile = new File(fileName);
 		}
-		
+
 		/*
 		 * Create the file and a file writer to write the upcoming lines.
 		 */
@@ -38,13 +38,13 @@ public class AttributeAndConfigFileHandler {
 
 		// Try w/ resource
 		try (FileWriter writer = new FileWriter(attributeFile)) {
-			
+
 			/*
 			 * Short formatting warning indicating the file format.
 			 */
 			writer.write("READ: Program requires that each config option has one space, and only one space,\n");
 			writer.write("after the equal sign.  If you are editing the options from here, please remember this.\n");
-			
+
 			/*
 			 * Writes all the fields to the text file in the most minimal manner
 			 * possible.
@@ -55,7 +55,7 @@ public class AttributeAndConfigFileHandler {
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates a new or replaces the current attribute file and adds all the
 	 * field data to that attribute file.
@@ -76,8 +76,6 @@ public class AttributeAndConfigFileHandler {
 		 * Tracks if attributes were matched to a value or not (If within this
 		 * list, it was matched)
 		 */
-		ArrayList<AttributeFactorySingleton.Attribute> matchedAttributes = new ArrayList<AttributeFactorySingleton.Attribute>();
-
 		try (Scanner scnr = new Scanner(attributeFile)) {
 			// Looks through the whole document for variables that match field
 			// names
@@ -100,20 +98,17 @@ public class AttributeAndConfigFileHandler {
 
 						try {
 							attributeValue = attributeValue.replace("\"", "");
-							AttributeFactorySingleton.Attribute currentAttribute = AttributeFactorySingleton
-									.getInstance().getAttribute(attributeName);
-							if (currentAttribute != null) {
-								currentAttribute.setValue(attributeValue);
-								matchedAttributes.add(currentAttribute);
-							}
-						} catch (Exception e) {
+							AttributeFactorySingleton.getInstance()
+									.setAttributeValue(attributeName,
+											attributeValue);
+						} catch (NoSuchKeyInAttributeFactoryException e) {
 							continue;
 						}
 					}
 				}
 			}
 		}
-		updateUnmatchedAttributesWithDefault(matchedAttributes);
+		UpdateUserInterfaceSingleton.getInstance().updateDefaults();
 	}
 
 	/**
@@ -135,8 +130,6 @@ public class AttributeAndConfigFileHandler {
 		 * Tracks if attributes were matched to a value or not (If within this
 		 * list, it was matched)
 		 */
-		ArrayList<AttributeFactorySingleton.Attribute> matchedAttributes = new ArrayList<AttributeFactorySingleton.Attribute>();
-
 		try (Scanner scnr = new Scanner(attributeFile)) {
 			// Looks through the whole document for variables that match field
 			// names
@@ -152,39 +145,15 @@ public class AttributeAndConfigFileHandler {
 						String attributeValue = tempArray[1];
 
 						try {
-							tempArray[1] = tempArray[1].replace("\"", "");
+							attributeValue = attributeValue.replace("\"", "");
 							AttributeFactorySingleton.getInstance()
 									.setAttributeValue(attributeName,
 											attributeValue);
-
-							matchedAttributes.add(AttributeFactorySingleton
-									.getInstance().getAttribute(attributeName));
-						} catch (Exception e) {
-							// if doesn't map
+						} catch (NoSuchKeyInAttributeFactoryException e) {
+							continue;
 						}
 					}
 				}
-			}
-		}
-		updateUnmatchedAttributesWithDefault(matchedAttributes);
-	}
-
-	/*
-	 * Takes care of updating any unmatched fields from the config files with
-	 * their default values.
-	 */
-	private void updateUnmatchedAttributesWithDefault(
-			ArrayList<AttributeFactorySingleton.Attribute> matchedAttributes) {
-		ArrayList<AttributeFactorySingleton.Attribute> attributeArray = AttributeFactorySingleton
-				.getInstance().getAllAttributes();
-
-		/*
-		 * For every value that didn't have a matched field, we just set the
-		 * value to the default.
-		 */
-		for (AttributeFactorySingleton.Attribute attribute : attributeArray) {
-			if (!matchedAttributes.contains(attribute)) {
-				attribute.setValue(attribute.getDefault());
 			}
 		}
 		UpdateUserInterfaceSingleton.getInstance().updateDefaults();

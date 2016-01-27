@@ -94,14 +94,40 @@ public class AttributeFactorySingleton {
 		}
 	}
 
+	private Attribute getAttributeNotCloneRScriptName(String attributeName)
+			throws NoSuchKeyInAttributeFactoryException {
+		for (Attribute attribute : attributesCollection.values()) {
+			if (attribute.getName().equals(attributeName)) {
+				return attribute;
+			}
+		}
+		throw new NoSuchKeyInAttributeFactoryException();
+	}
+
 	public ArrayList<Attribute> getAllAttributes() {
 		return new ArrayList<Attribute>(attributesCollection.values());
 	}
 
 	public void setAttributeValue(String attributeName, String value)
 			throws NoSuchKeyInAttributeFactoryException {
-		Attribute attributeToChange = getAttributeNotClone(attributeName);
+		Attribute attributeToChange = null;
+		try {
+			attributeToChange = getAttributeNotClone(attributeName);
+		} catch (NoSuchKeyInAttributeFactoryException e) {
+			/*
+			 * If we don't find it by the expected name, we are probably loading
+			 * it in as an Rscript This is a slower lookup, so we only do this
+			 * if we need to.  If we still don't find it an exception is thrown.
+			 */
+			attributeToChange = getAttributeNotCloneRScriptName(attributeName);
+		}
 		attributeToChange.setValue(value);
+	}
+
+	public void setAttributeDefaultValue(String attributeName)
+			throws NoSuchKeyInAttributeFactoryException {
+		Attribute attributeToChange = getAttributeNotClone(attributeName);
+		attributeToChange.setValue(attributeToChange.getDefault());
 	}
 
 	public boolean containsAttributeKey(String keyName) {

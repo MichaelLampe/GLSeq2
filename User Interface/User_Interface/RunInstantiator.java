@@ -91,7 +91,9 @@ public class RunInstantiator {
 			 */
 			Task<Object> task = new GlSeqRunWorker(args);
 			// Run on a different thread so it doesn't lock up the UI.
-			new Thread(task).start();
+			Thread thread = new Thread(task);
+			thread.setDaemon(true);
+			thread.start();
 		} else {
 			System.out.println("Please select something for the script to do.");
 		}

@@ -261,10 +261,10 @@ public class UpdateAttributeSingleton {
 	public void updateAllAttributes(TreeItem<String> alignment,
 			TreeItem<String> counting, TreeViewOptionsLoader commandHolder,
 			ArrayList<String> libListData) {
+		UpdateAttributeSingleton.getInstance().updateAttributes();
 		UpdateAttributeSingleton.getInstance().updateLiblist(libListData);
 		UpdateAttributeSingleton.getInstance().addSpecialArgs(alignment,
 				counting, commandHolder);
-		UpdateAttributeSingleton.getInstance().updateAttributes();
 
 	}
 }

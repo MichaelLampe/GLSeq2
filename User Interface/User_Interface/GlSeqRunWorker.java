@@ -20,8 +20,13 @@ public class GlSeqRunWorker extends Task<Object> {
 		 * calls the R script with the correct user parameters Build process w/
 		 * args again
 		 */
-		String scriptDirectory = AttributeFactorySingleton.getInstance()
-				.getAttribute("base.dir").getValue();
+		String scriptDirectory = null;
+		try{
+		scriptDirectory = AttributeFactorySingleton.getInstance()
+				.getAttribute("scriptDirectory").getValue();
+		} catch(NoSuchKeyInAttributeFactoryException e){
+			System.out.println("Check the xml, for some reason we cannot find a scriptDirectory");
+		}
 		Process process = null;
 		try {
 			process = new ProcessBuilder(args)

@@ -3,7 +3,7 @@ package application;
 import java.io.IOException;
 
 /*
- * Don't refactor the name, as peopel may utilize it already with GLOW.
+ * Don't refactor the name, as people may utilize it already with GLOW.
  */
 public class AttributeFile {
 

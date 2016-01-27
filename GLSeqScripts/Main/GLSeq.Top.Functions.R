@@ -277,7 +277,7 @@ copy.preprocessed.files.list <- function(libList,dest.dir,Condor=FALSE) {
   fastq.files <- FALSE
   copy.command <- ""
   for (i in 1:length(libList)){
-    copy.fastq <- paste("cp",liblist[i],dest.dir)
+    copy.fastq <- paste("cp",libList[i],dest.dir)
     copy.command <- paste(copy.command,copy.fastq,"&")
     if (grepl(".fastq$",libList[i])){
       fastq.files <- TRUE
@@ -295,9 +295,18 @@ copy.preprocessed.files.list <- function(libList,dest.dir,Condor=FALSE) {
 # Converts the input list of files into a table that can then be understood by
 # The downstream program to either pair files correctly or to
 # Use readyData.dir if we are dealing with nodataprep
-# Use fqFiles if we are dealign with data prep
+# Use fqFiles if we are dealing with data prep
 convert.file.list.to.table <- function(paired.end,readyData.dir,fqfiles) {
   if (is.null(paired.end)) stop("Arguments should not be NULL")
+
+  # Remove absolute paths from fqfiles loaded in via liblist
+  if(!is.null(fqfiles)){
+    for (num in 1:length(fqfiles)){
+      abs.file.path <- fqfiles[num]
+      split.relative.file.path <- strsplit(abs.file.path,"/")
+      fqfiles[num] <- split.relative.file.path[[1]][length(split.relative.file.path[[1]])]
+    }
+  }
   # Paired End
   if (!is.null(readyData.dir)){
     fqfiles <- dir(readyData.dir)
@@ -490,6 +499,7 @@ execute.comm.stack <- function (comm.stack.pool, Condor=FALSE) {
   stack.start.time <- proc.time()
   printOrExecute(comm.stack.pool,Condor)
 }
+
 # Creates the collection directories
 previous.run.directories <- function(previous.dir,previous.run.name){
   if (is.null(previous.dir) || is.null(previous.run.name)) stop("Arguments should not be NULL")

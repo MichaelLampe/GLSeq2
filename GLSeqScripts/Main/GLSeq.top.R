@@ -239,6 +239,10 @@ if (!is.null(comm.stack.pool)){
   execute.comm.stack(comm.stack.pool,Condor)
 }
 
+# Final cleanup of the workspace
+cleanup.script <- "GLSeq.CleanupScript.R"
+source(cleanup.script)
+
 # Creates a memory of a completed run so that the User Interface knows that this run has completed and should not allow any user to overwrite this run.
 run.id.run <- paste(base.dir,paste(expID,"RData",sep="."),sep="")
 save.image(file=run.id.run)

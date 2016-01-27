@@ -59,20 +59,22 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
+
 		/*
 		 * Basic class loading stuff and setting application size.
 		 */
 		VBox root = (VBox) FXMLLoader.load(Main.class
 				.getResource("/application/MainPage.fxml"));
+		
+		
 		String cssFile = this.getClass()
 				.getResource("/application/MainPage.css").toExternalForm();
 		scene = new Scene(root, 873, 770);
-
+		scene.getStylesheets().add(cssFile);
 		/*
 		 * Scene is assigned, update defaults.
 		 */
 		UpdateUserInterfaceSingleton.getInstance().updateDefaults();
-		scene.getStylesheets().add(cssFile);
 		/*
 		 * It doesn't scale relative to the resize, so it doesn't look good when
 		 * it is able to be resized.
@@ -80,6 +82,7 @@ public class Main extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle(INITIAL_TITLE);
+		
 		stage = primaryStage;
 		primaryStage.show();
 

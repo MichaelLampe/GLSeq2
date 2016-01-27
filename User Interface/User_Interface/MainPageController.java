@@ -1037,7 +1037,6 @@ public final class MainPageController implements Initializable {
 		start_run.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
-
 				/*
 				 * Update absolutely everything.
 				 */
@@ -1069,7 +1068,6 @@ public final class MainPageController implements Initializable {
 				try {
 					configFileSaver.saveConfigFile("AttributesConfig.txt");
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -1286,15 +1284,6 @@ public final class MainPageController implements Initializable {
 					}
 					String name = attributeFile.getName().split(".R")[0];
 					run_name.setText(name);
-					run_name.setDisable(true);
-
-					/*
-					 * Remove binding and make sure the start button is active
-					 * Need to remove binding to directly set the button as not
-					 * disabled.
-					 */
-					start_run.disableProperty().unbind();
-					start_run.setDisable(false);
 				}
 			}
 		});

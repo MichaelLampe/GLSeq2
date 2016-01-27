@@ -48,8 +48,6 @@ public class UpdateUserInterfaceSingleton {
 	 */
 	@SuppressWarnings("unchecked")
 	public void updateDefaults() {
-		System.out.print("Updating fields...");
-
 		/*
 		 * Iterate through our Attributes (The values stored by the
 		 * attributesCollection hashmap)
@@ -68,7 +66,7 @@ public class UpdateUserInterfaceSingleton {
 			} catch (SceneNotYetReadyException e) {
 				return;
 			}
-			
+
 			/*
 			 * Type Slider
 			 */
@@ -78,9 +76,9 @@ public class UpdateUserInterfaceSingleton {
 							.getValue()));
 				}
 
-			/*
-			 * Type Spinner
-			 */
+				/*
+				 * Type Spinner
+				 */
 			} else if (currentData instanceof Spinner) {
 				if (!attribute.getValue().equals("NULL")) {
 					Spinner<Integer> s = (Spinner<Integer>) currentData;
@@ -136,6 +134,5 @@ public class UpdateUserInterfaceSingleton {
 			}
 
 		}
-		System.out.println("...Fields updated!");
 	}
 }
