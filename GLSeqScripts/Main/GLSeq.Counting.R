@@ -4,6 +4,7 @@ occured <- FALSE
 # Clears count.comm
 # We'll enclose the counting in paren and then background each counting process to parallelize them
 count.comm <- "("
+
 ################################################
 #RSEM Counting Protocol
 ################################################
@@ -25,6 +26,7 @@ if ("RSEM" %in% cAlgor){
     source ("GLSeq.RsemCount.R")
     count.comm <- paste(count.comm,"&")
 }
+
 ################################################
 #HTSeq Counting Protocol
 #
@@ -43,6 +45,7 @@ if ("HTSeq" %in% cAlgor){
   source ("GLSeq.HTSeq.R")
   count.comm <- paste(count.comm,"&")
 }
+
 ################################################
 #Cufflinks Counting Protocol
 ################################################
@@ -58,6 +61,7 @@ if ("Cufflinks" %in% cAlgor){
   source ("GLSeq.Cufflinks.R")
   count.comm <- paste(count.comm,"&")
 }
+
 ################################################
 #FeatureCounts Counting Protocol
 ################################################
@@ -82,13 +86,14 @@ if ("FeatureCounts" %in% cAlgor){
   # Feature counts is actually an RScript.  So instead of sourcing it, we simply prepare the program to run another R command.
   script <- paste("Rscript",
                   paste(base.dir,"GLSeq.FeatureCounts.R",sep=""),
-                  countable.sam,destDirFeatureCountsCount,
-                  refGFFname,dest.dir,
+                  countable.sam,
+                  destDirFeatureCountsCount,
+                  refGFFname,
+                  dest.dir,
                   this.resName,
                   paired.end,
                   idAttr,
                   FeatureCountsSpecialOptions)
-
   counts.summary <- paste(this.resName,".FeatureCounts.summary.txt",sep="")
   counts.data <- paste(this.resName,".FeatureCounts.counts.csv",sep="")
   counts.stats <- paste(this.resName,".FeatureCounts.stats.csv",sep="")
@@ -102,6 +107,7 @@ if ("FeatureCounts" %in% cAlgor){
   if (count.comm == "(") count.comm <- paste(script,"&&",move.command)
   count.comm <- paste(count.comm,"&")
 }
+
 ################################################
 #Rockhopper Counting Protocol
 ################################################

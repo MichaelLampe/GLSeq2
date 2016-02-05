@@ -150,7 +150,7 @@ if (dataPrepare == "dataprep") {
 # Construct alignment + counting comm stack
 if (alignment == "alignment") {
   if (dataPrepare == "nodataprep") {
-    if (is.null(libList)) {
+    if (is.null(libList) || libList == "") {
       copy.preprocessed.files.dir(readyData.dir,dest.dir,Condor)
       fqfiles.table <- convert.file.list.to.table(paired.end,readyData.dir,NULL)
     } else {
@@ -182,10 +182,26 @@ if (alignment == "noalignment") {
 # Collect results.  We can't really source this, as that doesn't match our data state.
 # We have to know what to collect before we have it to collect or we can just call the function
 # At the time when it is ready with the correct variables by saving the current environment
+# Make the final destination directory
+cleanup.directory <- paste(trailDirCheck(storage.destination),text.add,sep="")
+create.cleanup.directory <- paste("mkdir",cleanup.directory)
+move.files <- paste("cp ", trailDirCheck(dest.dir), "*.countable.sam ", cleanup.directory, sep="")
+move.files <- paste(move.files,";",paste("cp ", trailDirCheck(dest.dir), "*.RData ", cleanup.directory, sep=""))
+move.files <- paste(move.files,";",paste("cp ", trailDirCheck(dest.dir), "*.R ", cleanup.directory, sep=""))
+if (length(cAlgor) > 0){
+  move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "*.Counting ", cleanup.directory, sep=""))
+}
+
+if (aAlgor == "Rockhopper"){
+  move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "ReferenceGenome ", cleanup.directory, sep=""))
+  move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "*RockhopperResults ", cleanup.directory, sep=""))
+}
+
 if (resCollect == "collect"){
   data.file <- paste(dest.dir,"collect.run.status.RData",sep="")
   save.image(file=data.file)
-  collect.command <- ""
+  move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "*.Collect ", cleanup.directory, sep=""))
+
   #
   #############################################################################################
   ###############################          HTSeq             #################################
@@ -236,13 +252,13 @@ if (resCollect == "collect"){
 }
 
 if (!is.null(comm.stack.pool)){
+  comm.stack.pool <- paste(comm.stack.pool,"&& wait")
+  comm.stack.pool <- paste(comm.stack.pool)
   execute.comm.stack(comm.stack.pool,Condor)
 }
-
-# Final cleanup of the workspace
-cleanup.script <- "GLSeq.CleanupScript.R"
-source(cleanup.script)
 
 # Creates a memory of a completed run so that the User Interface knows that this run has completed and should not allow any user to overwrite this run.
 run.id.run <- paste(base.dir,paste(expID,"RData",sep="."),sep="")
 save.image(file=run.id.run)
+
+printOrExecute(paste(create.cleanup.directory,";",move.files), Condor)

@@ -19,7 +19,7 @@ printOrExecute <- function(command,Condor){
   if (Condor){
     print(command)
   } else{
-    system(command)
+    o <- system(command, wait=TRUE, ignore.stdout=TRUE)
   }
 }
 #
