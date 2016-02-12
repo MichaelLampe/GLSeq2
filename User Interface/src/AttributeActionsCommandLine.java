@@ -8,7 +8,12 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 		ArrayList<AttributeFactorySingleton.Attribute> attributeArray = AttributeFactorySingleton
 				.getInstance().getAllAttributes();
 		for (String param : inputArgs) {
-			String[] parts = param.split("=");
+			
+			/*
+			 * Left side is the key, right side is the value.
+			 */
+			String[] parts = param.split("=");		
+			
 			// Complexity is fine when it is cheap.
 			for (AttributeFactorySingleton.Attribute att : attributeArray) {
 				if (att.getUiName().equals(parts[0])) {
@@ -30,6 +35,7 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 		ArrayList<AttributeFactorySingleton.Attribute> attributeArray = AttributeFactorySingleton
 				.getInstance().getAllAttributes();
 		for (int i = attributeArray.size() - 1; i >= 0; i--) {
+			
 			/*
 			 * We want to give them all the categories that are not in the
 			 * script.
@@ -38,9 +44,11 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 				attributeArray.remove(i);
 			}
 		}
+		
 		for (int i = 0; i < attributeArray.size(); i++) {
+			
 			/*
-			 * They have SSH'd into this file, so they can read the system out
+			 * They have SSH'd in, so they can read the system out
 			 * stream.
 			 */
 			try {

@@ -40,16 +40,15 @@ public class GlowDataRequest extends GlowRequest {
 	@SuppressWarnings("unchecked")
 	private ArrayList<CheckBoxTreeItem<String>> addFilesToUi(List<String> files) {
 		try {
-			TreeView<String> fileView = (TreeView<String>) UpdateUserInterfaceSingleton
-					.getInstance().findById("selectedDataFiles");
+			TreeView<String> fileView = (TreeView<String>) UpdateUserInterfaceSingleton.getInstance()
+					.findById("selectedDataFiles");
 			for (String file : files) {
 				int i = file.lastIndexOf("/");
 				String filePath = file.substring(0, i + 1);
 				String fileName = file.substring(i + 1);
 
 				CheckBoxTreeItem<String> filePathBranch = null;
-				CheckBoxTreeItem<String> fileNameBranch = new CheckBoxTreeItem<String>(
-						fileName);
+				CheckBoxTreeItem<String> fileNameBranch = new CheckBoxTreeItem<String>(fileName);
 				for (TreeItem<String> path : fileView.getRoot().getChildren()) {
 					if (path.getValue().equals(filePath)) {
 						filePathBranch = (CheckBoxTreeItem<String>) path;
@@ -74,9 +73,7 @@ public class GlowDataRequest extends GlowRequest {
 				 */
 				b.selectedProperty().addListener(new ChangeListener<Boolean>() {
 					@Override
-					public void changed(
-							ObservableValue<? extends Boolean> arg0,
-							Boolean oldValue, Boolean newValue) {
+					public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
 
 						/*
 						 * This gets activated when a change happens Changes all
@@ -111,16 +108,13 @@ public class GlowDataRequest extends GlowRequest {
 		for (CheckBoxTreeItem<String> file : files) {
 			file.selectedProperty().addListener(new ChangeListener<Boolean>() {
 				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0,
-						Boolean oldValue, Boolean newValue) {
+				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue, Boolean newValue) {
 					// Add and remove the string depending on if it is checked
 					// or not
 					if (newValue) {
-						MainPageController.liblistData.add(file.getParent()
-								.getValue() + file.getValue());
+						MainPageController.liblistData.add(file.getParent().getValue() + file.getValue());
 					} else {
-						MainPageController.liblistData.remove(file.getParent()
-								.getValue() + file.getValue());
+						MainPageController.liblistData.remove(file.getParent().getValue() + file.getValue());
 					}
 				}
 			});
@@ -130,58 +124,59 @@ public class GlowDataRequest extends GlowRequest {
 	@Override
 	protected Object call() {
 		if (renewCookieExpiration()) {
-			Process process = null;
-			try {
-				process = new ProcessBuilder(requestData(glow_id)).start();
-			} catch (IOException e2) {
-				e2.printStackTrace();
-			}
-			String response = "";
-			String line = null;
-			try (BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(process.getInputStream()))) {
-				while ((line = bufferedReader.readLine()) != null) {
-					response += line;
+			if (runningOnLinux) {
+				Process process = null;
+				try {
+					process = new ProcessBuilder(requestData(glow_id)).start();
+				} catch (IOException e2) {
+					e2.printStackTrace();
 				}
-			} catch (IOException e2) {
-				//
-			}
-			try {
-				process.waitFor();
-			} catch (InterruptedException e1) {
-				//
-			}
-			ArrayList<String> foundFiles = new ArrayList<String>();
-			String[] endingSplit = response.split("</file_path>");
-			try {
-				for (String phrase : endingSplit) {
-					// Adds what was between the <file_path> tags
-					String temp = phrase.split("<datafile")[1];
-					try {
-						String file = temp.split("<file_path>")[1];
-						file = file.trim();
-						if (file.endsWith(".gz")) {
-							foundFiles.add(file);
-						} else if (file.endsWith(".fastq")) {
-							foundFiles.add(file);
-						} else if (file.endsWith(".fq")) {
-							foundFiles.add(file);
-						}
-					} catch (IndexOutOfBoundsException e) {
-
+				String response = "";
+				String line = null;
+				try (BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(process.getInputStream()))) {
+					while ((line = bufferedReader.readLine()) != null) {
+						response += line;
 					}
+				} catch (IOException e2) {
+					//
 				}
-			} catch (IndexOutOfBoundsException e) {
-				// Do nothing
+				try {
+					process.waitFor();
+				} catch (InterruptedException e1) {
+					//
+				}
+				ArrayList<String> foundFiles = new ArrayList<String>();
+				String[] endingSplit = response.split("</file_path>");
+				try {
+					for (String phrase : endingSplit) {
+						// Adds what was between the <file_path> tags
+						String temp = phrase.split("<datafile")[1];
+						try {
+							String file = temp.split("<file_path>")[1];
+							file = file.trim();
+							if (file.endsWith(".gz")) {
+								foundFiles.add(file);
+							} else if (file.endsWith(".fastq")) {
+								foundFiles.add(file);
+							} else if (file.endsWith(".fq")) {
+								foundFiles.add(file);
+							}
+						} catch (IndexOutOfBoundsException e) {
+
+						}
+					}
+				} catch (IndexOutOfBoundsException e) {
+					// Do nothing
+				}
+				ArrayList<CheckBoxTreeItem<String>> fileBoxes = addFilesToUi(foundFiles);
+				addBoxListeners(fileBoxes);
+				Platform.runLater(() -> {
+					UpdateUserInterfaceSingleton.getInstance().updateDefaults();
+				});
 			}
-			ArrayList<CheckBoxTreeItem<String>> fileBoxes = addFilesToUi(foundFiles);
-			addBoxListeners(fileBoxes);
-			Platform.runLater(() -> {
-				UpdateUserInterfaceSingleton.getInstance().updateDefaults();
-			});
 		} else {
-			System.out
-					.println("Did not run because no connection to glow was established.");
+			System.out.println("Did not run because no connection to glow was established.");
 		}
 		return null;
 	}

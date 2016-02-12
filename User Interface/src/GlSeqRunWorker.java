@@ -21,12 +21,14 @@ public class GlSeqRunWorker extends Task<Object> {
 		 * args again
 		 */
 		String scriptDirectory = null;
-		try{
-		scriptDirectory = AttributeFactorySingleton.getInstance()
-				.getAttribute("scriptDirectory").getValue();
-		} catch(NoSuchKeyInAttributeFactoryException e){
-			System.out.println("Check the xml, for some reason we cannot find a scriptDirectory");
+		try {
+			scriptDirectory = AttributeFactorySingleton.getInstance()
+					.getAttribute("scriptDirectory").getValue();
+		} catch (NoSuchKeyInAttributeFactoryException e) {
+			System.out
+					.println("Check the xml, for some reason we cannot find a scriptDirectory");
 		}
+
 		Process process = null;
 		try {
 			process = new ProcessBuilder(args)
@@ -38,5 +40,6 @@ public class GlSeqRunWorker extends Task<Object> {
 			process.destroy();
 		}
 		return null;
+
 	}
 }

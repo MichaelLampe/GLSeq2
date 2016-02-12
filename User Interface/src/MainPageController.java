@@ -4,11 +4,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
+
+import com.jcabi.ssh.SSHByPassword;
+import com.jcabi.ssh.SSHD;
+import com.jcabi.ssh.Shell;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -294,6 +300,23 @@ public final class MainPageController implements Initializable {
 		if (request != null) {
 			request.logout();
 		}
+	}
+
+	public String getUsername() {
+		// try to log the user in
+		if (request == null) {
+			createLoginDialog();
+			return request.getUsername();
+		} else{
+			return request.getUsername();
+		}
+	}
+
+	public String getPassword() {
+		if (request == null) {
+			createLoginDialog();
+		}
+		return request.getPassword();
 	}
 
 	@Override
@@ -893,6 +916,67 @@ public final class MainPageController implements Initializable {
 		presplit.setTooltip(presplitToolTip);
 	}
 
+	private void updateSliderFields() {
+		int cores = (int) numberCores.getValue();
+		int dataPrepStreams = (int) numberStreamsDataPrep.getValue();
+		int alignmentStreams = (int) numberStreams.getValue();
+
+		/*
+		 * Cores message
+		 */
+		String coreMessage = "";
+		if (cores > 1) {
+			coreMessage = cores + " cores used for a single sample processing";
+		} else {
+			coreMessage = cores + " core used for a single sample processing";
+		}
+		cores_label.textProperty().setValue(coreMessage);
+
+		/*
+		 * Dataprep stream message
+		 */
+		String dataprepStreamMessage = "";
+		if (dataPrepStreams > 1) {
+			dataprepStreamMessage = dataPrepStreams
+					+ " samples processed in parallel during data preparation. "
+					+ dataPrepStreams * cores + " cores will be used in total.";
+		} else {
+			if (numberCores.getValue() > 1) {
+				dataprepStreamMessage = dataPrepStreams
+						+ " sample processed in parallel during data preparation. "
+						+ dataPrepStreams * cores
+						+ " cores will be used in total.";
+			} else {
+				dataprepStreamMessage = dataPrepStreams
+						+ " sample processed in parallel during data preparation. "
+						+ dataPrepStreams * cores
+						+ " core will be used in total.";
+			}
+		}
+		dataprep_streams_label.textProperty().setValue(dataprepStreamMessage);
+
+		String alignmentStreamMessage = "";
+		if (alignmentStreams > 1) {
+			alignmentStreamMessage = alignmentStreams
+					+ " samples processed in parallel during alignment. "
+					+ alignmentStreams * cores
+					+ " cores will be used in total.";
+		} else {
+			if (numberCores.getValue() > 1) {
+				alignmentStreamMessage = alignmentStreams
+						+ " sample processed in parallel during alignment. "
+						+ alignmentStreams * cores
+						+ " cores will be used in total.";
+			} else {
+				alignmentStreamMessage = alignmentStreams
+						+ " sample processed in parallel during alignment. "
+						+ alignmentStreams * cores
+						+ " core will be used in total.";
+			}
+		}
+		alignment_streams_label.textProperty().setValue(alignmentStreamMessage);
+	}
+
 	/*
 	 * All scroll bars have listeners that allow for dynamic text update to
 	 * their associated labels. Those are all created here.
@@ -903,16 +987,7 @@ public final class MainPageController implements Initializable {
 			@Override
 			public void changed(ObservableValue<?> arg0, Object arg1,
 					Object arg2) {
-				int cores = (int) numberCores.getValue();
-				String message;
-				if (cores > 1) {
-					message = cores
-							+ " cores used for a single sample processing";
-				} else {
-					message = cores
-							+ " core used for a single sample processing";
-				}
-				cores_label.textProperty().setValue(message);
+				updateSliderFields();
 			}
 		});
 
@@ -922,28 +997,7 @@ public final class MainPageController implements Initializable {
 					@Override
 					public void changed(ObservableValue<?> arg0, Object arg1,
 							Object arg2) {
-						int streams = (int) numberStreamsDataPrep.getValue();
-						String message;
-						int cores = (int) numberCores.getValue();
-						if (streams > 1) {
-							message = streams
-									+ " samples processed in parallel during data preparation. "
-									+ streams * cores
-									+ " cores will be used in total.";
-						} else {
-							if (numberCores.getValue() > 1) {
-								message = streams
-										+ " sample processed in parallel during data preparation. "
-										+ streams * cores
-										+ " cores will be used in total.";
-							} else {
-								message = streams
-										+ " sample processed in parallel during data preparation. "
-										+ streams * cores
-										+ " core will be used in total.";
-							}
-						}
-						dataprep_streams_label.textProperty().setValue(message);
+						updateSliderFields();
 					}
 				});
 
@@ -952,27 +1006,7 @@ public final class MainPageController implements Initializable {
 			@Override
 			public void changed(ObservableValue<?> arg0, Object arg1,
 					Object arg2) {
-				int streams = (int) numberStreams.getValue();
-				int cores = (int) numberCores.getValue();
-				String message;
-				if (streams > 1) {
-					message = streams
-							+ " samples processed in parallel during alignment. "
-							+ streams * cores + " cores will be used in total.";
-				} else {
-					if (numberCores.getValue() > 1) {
-						message = streams
-								+ " sample processed in parallel during alignment. "
-								+ streams * cores
-								+ " cores will be used in total.";
-					} else {
-						message = streams
-								+ " sample processed in parallel during alignment. "
-								+ streams * cores
-								+ " core will be used in total.";
-					}
-				}
-				alignment_streams_label.textProperty().setValue(message);
+				updateSliderFields();
 			}
 		});
 	}
@@ -1071,13 +1105,51 @@ public final class MainPageController implements Initializable {
 					e.printStackTrace();
 				}
 
+				String operatingSystem = System.getProperty("os.name",
+						"generic").toLowerCase(Locale.ENGLISH);
+
 				/*
-				 * Creates a run instance
+				 * Running on Linux
 				 */
-				RunInstantiator currentRun = constructRun();
-				currentRun.constructArgs(htcondor_check.isSelected(),
-						attributeFileLocation, scriptDirectory.getText());
-				currentRun.start();
+				if (operatingSystem.indexOf("nux") >= 0) {
+					/*
+					 * Creates a run instance
+					 */
+					RunInstantiator currentRun = constructRun();
+					currentRun.constructArgs(htcondor_check.isSelected(),
+							attributeFileLocation, scriptDirectory.getText());
+					currentRun.start();
+				} else {
+					/*
+					 * Creates a run instance, condor always activated
+					 */
+					RunInstantiator currentRun = constructRun();
+					currentRun.constructArgs(true, attributeFileLocation,
+							scriptDirectory.getText());
+
+					String command = currentRun.returnArgString();
+
+					String condorAddress = "scarcity-cm.glbrc.org";
+					int portNumber = 0;
+					String userName = getUsername();
+					String password = getPassword();
+
+					try {
+						SSHByPassword sshSession = new SSHByPassword(
+								condorAddress, portNumber, userName, password);
+
+						try (SSHD sshd = new SSHD()) {
+							String response = new Shell.Plain(sshSession)
+									.exec(command);
+							System.out.println(response);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+					} catch (UnknownHostException e) {
+						System.out.println("Error connecting to server by SSH");
+					}
+				}
 			}
 		});
 	}
@@ -1393,7 +1465,6 @@ public final class MainPageController implements Initializable {
 		Button login_button = (Button) login.getDialogPane().lookupButton(
 				loginButtonType);
 
-		// Login listener
 		login_button
 				.addEventFilter(EventType.ROOT, e -> {
 					if (e.getEventType().equals(ActionEvent.ACTION)) {

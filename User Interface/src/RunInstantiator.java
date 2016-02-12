@@ -83,6 +83,17 @@ public class RunInstantiator {
 		args.add(attribute_file);
 	}
 
+	public String returnArgString() {
+		StringBuilder command = new StringBuilder("");
+		for (int i = 0; i < args.size(); i++){
+			if (i > 0){
+				command.append(" ");
+			} 
+			command.append(args.get(i));
+		}
+		return command.toString();
+	}
+	
 	public void start() {
 		if (args != null) {
 			/*

@@ -165,12 +165,12 @@
                            </font>
                         </Label>
                         <Line endX="863.0" layoutY="437.0" startX="10.0" stroke="WHITE" />
-                        <Label layoutX="24.0" layoutY="97.0" text="Destination Directory" textFill="WHITE">
+                        <Label layoutX="24.0" layoutY="110.0" text="Destination Directory" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="26.0" layoutY="14.0" text="Working Directory" textFill="WHITE">
+                        <Label layoutX="26.0" layoutY="27.0" text="Working Directory" textFill="WHITE">
                            <font>
                               <Font size="18.0" />
                            </font>
