@@ -133,23 +133,33 @@ public class GlowRequest extends Task<Object> {
 		} else {
 			Shell ssh = establishSsh();
 			ArrayList<String> command = new ArrayList<String>() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
 				{
 					add("curl");
 					add("--cookie-jar");
 					add(cookie);
 					add("--data");
 					add("'user[login]=" + username + "&user[password]=" + password + "&commit=Sign+in'");
-					add(glow_server + "users/sign_in");
+					add(getLoginSite());
 				}
 			};
 			try {
-				String response = new Shell.Plain(ssh).exec(convertCommandToString(command) + " | bash");
-				System.out.println(response);
+				// This keeps the request off the main draw thread and also
+				// makes the request go a lot faster, win win.
+				new Thread(new Shell.Plain(ssh).exec(convertCommandToString(command))).start();
 			} catch (Exception e) {
 				return false;
 			}
 			return true;
 		}
+	}
+
+	String getLoginSite() {
+		return glow_server + "users/sign_in";
 	}
 
 	boolean pingGlow() {
@@ -226,8 +236,13 @@ public class GlowRequest extends Task<Object> {
 		} else {
 			Shell ssh = establishSsh();
 			try {
-				String response = new Shell.Plain(ssh).exec("rm " + cookie);
-				System.out.println(response);
+				try {
+					String response = new Shell.Plain(ssh).exec("rm " + cookie);
+				} catch (NullPointerException e) {
+					// Meh no cookie getting removed because they logged out or
+					// something. Cookie should already be removed if they
+					// logged out too, so this would only trigger on shutdown.
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

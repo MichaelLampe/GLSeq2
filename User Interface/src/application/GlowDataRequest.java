@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jcabi.ssh.Shell;
+
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -124,6 +126,7 @@ public class GlowDataRequest extends GlowRequest {
 	@Override
 	protected Object call() {
 		if (renewCookieExpiration()) {
+			String response = "";
 			if (runningOnLinux) {
 				Process process = null;
 				try {
@@ -131,7 +134,6 @@ public class GlowDataRequest extends GlowRequest {
 				} catch (IOException e2) {
 					e2.printStackTrace();
 				}
-				String response = "";
 				String line = null;
 				try (BufferedReader bufferedReader = new BufferedReader(
 						new InputStreamReader(process.getInputStream()))) {
@@ -146,35 +148,47 @@ public class GlowDataRequest extends GlowRequest {
 				} catch (InterruptedException e1) {
 					//
 				}
-				ArrayList<String> foundFiles = new ArrayList<String>();
-				String[] endingSplit = response.split("</file_path>");
-				try {
-					for (String phrase : endingSplit) {
-						// Adds what was between the <file_path> tags
-						String temp = phrase.split("<datafile")[1];
-						try {
-							String file = temp.split("<file_path>")[1];
-							file = file.trim();
-							if (file.endsWith(".gz")) {
-								foundFiles.add(file);
-							} else if (file.endsWith(".fastq")) {
-								foundFiles.add(file);
-							} else if (file.endsWith(".fq")) {
-								foundFiles.add(file);
-							}
-						} catch (IndexOutOfBoundsException e) {
+			} else {
 
-						}
-					}
-				} catch (IndexOutOfBoundsException e) {
-					// Do nothing
+				Shell ssh = establishSsh();
+
+				try {
+					System.out.println("Looking for files");
+					response = new Shell.Plain(ssh)
+							.exec(convertCommandToString((ArrayList<String>) requestData(glow_id)) + " | bash");
+				} catch (Exception e) {
+					System.out.println("Error");
 				}
-				ArrayList<CheckBoxTreeItem<String>> fileBoxes = addFilesToUi(foundFiles);
-				addBoxListeners(fileBoxes);
-				Platform.runLater(() -> {
-					UpdateUserInterfaceSingleton.getInstance().updateDefaults();
-				});
 			}
+			ArrayList<String> foundFiles = new ArrayList<String>();
+			String[] endingSplit = response.split("</file_path>");
+			try {
+				for (String phrase : endingSplit) {
+					// Adds what was between the <file_path> tags
+					String temp = phrase.split("<datafile")[1];
+					try {
+						String file = temp.split("<file_path>")[1];
+						file = file.trim();
+						if (file.endsWith(".gz")) {
+							foundFiles.add(file);
+						} else if (file.endsWith(".fastq")) {
+							foundFiles.add(file);
+						} else if (file.endsWith(".fq")) {
+							foundFiles.add(file);
+						}
+					} catch (IndexOutOfBoundsException e) {
+
+					}
+				}
+			} catch (IndexOutOfBoundsException e) {
+				// Do nothing
+			}
+			ArrayList<CheckBoxTreeItem<String>> fileBoxes = addFilesToUi(foundFiles);
+			addBoxListeners(fileBoxes);
+			Platform.runLater(() -> {
+				UpdateUserInterfaceSingleton.getInstance().updateDefaults();
+			});
+			// }
 		} else {
 			System.out.println("Did not run because no connection to glow was established.");
 		}

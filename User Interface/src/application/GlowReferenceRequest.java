@@ -2,15 +2,18 @@ package application;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jcabi.ssh.Shell;
+
 import javafx.application.Platform;
 
 public class GlowReferenceRequest extends GlowRequest {
-	
+
 	private String reference_id;
 	/*
 	 * Names of Attribute hashes to assign values.
@@ -75,18 +78,9 @@ public class GlowReferenceRequest extends GlowRequest {
 			 * The reference name is gotten from a .json request of the same
 			 * page as the reference files request.
 			 */
-			Process processFiles = new ProcessBuilder(
-					requestReferenceFiles(reference_id)).start();
-			Process processName = new ProcessBuilder(
-					requestReferenceName(reference_id)).start();
 
-			/*
-			 * Record the values returned via an input stream.
-			 */
-			BufferedReader fileR = new BufferedReader(new InputStreamReader(
-					processFiles.getInputStream()));
-			BufferedReader nameR = new BufferedReader(new InputStreamReader(
-					processName.getInputStream()));
+			BufferedReader fileR = null;
+			BufferedReader nameR = null;
 
 			/*
 			 * We can parse input streams to only add what we want to our list.
@@ -98,30 +92,51 @@ public class GlowReferenceRequest extends GlowRequest {
 			 * contains name we add it to our command line.
 			 */
 			List<String> commands = new ArrayList<String>();
-			commands.addAll(fileR
-					.lines()
-					.filter(line -> (line.contains("<td>GFF</td>"))
-							|| (line.contains("<td>Sequence:FastA</td>")))
+			// Linux version
+			if (runningOnLinux) {
+				Process processFiles = new ProcessBuilder(requestReferenceFiles(reference_id)).start();
+				Process processName = new ProcessBuilder(requestReferenceName(reference_id)).start();
+
+				/*
+				 * Record the values returned via an input stream.
+				 */
+				fileR = new BufferedReader(new InputStreamReader(processFiles.getInputStream()));
+				nameR = new BufferedReader(new InputStreamReader(processName.getInputStream()));
+
+				/*
+				 * Wait for streams to finish.
+				 */
+				processFiles.waitFor();
+				processName.waitFor();
+
+			} else {
+				// Windows
+				Shell ssh = establishSsh();
+				try {
+					System.out.println("Looking for files");
+
+					fileR = new BufferedReader(new StringReader(new Shell.Plain(ssh)
+							.exec(convertCommandToString((ArrayList<String>) requestReferenceFiles(reference_id)))));
+					nameR = new BufferedReader(new StringReader(new Shell.Plain(ssh)
+							.exec(convertCommandToString((ArrayList<String>) requestReferenceName(reference_id)))));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			commands.addAll(fileR.lines()
+					.filter(line -> (line.contains("<td>GFF</td>")) || (line.contains("<td>Sequence:FastA</td>")))
 					.collect(Collectors.toList()));
 
-			commands.addAll(nameR.lines()
-					.map(line -> line.split(","))
+			commands.addAll(nameR.lines().map(line -> line.split(","))
 					// Flat map makes it happy that we split it again.
-					.flatMap(Arrays::stream)
-					.filter(line -> (line.contains("name")))
-					.collect(Collectors.toList()));
-
-			/*
-			 * Wait for streams to finish.
-			 */
-			processFiles.waitFor();
-			processName.waitFor();
-
+					.flatMap(Arrays::stream).filter(line -> (line.contains("name"))).collect(Collectors.toList()));
 			/*
 			 * Update our Attributes based on the values we just had returned
 			 * from GLOW. If this doesn't work, they may have changed the format
 			 * of the response.
 			 */
+
 			for (String line : commands) {
 				if (line.contains("name")) {
 					/*
@@ -131,8 +146,8 @@ public class GlowReferenceRequest extends GlowRequest {
 					String referenceGenomeFileName = temp[3];
 
 					// Updating
-					AttributeFactorySingleton.getInstance().setAttributeValue(
-							REFERENCE_GENOME_NAME, referenceGenomeFileName);
+					AttributeFactorySingleton.getInstance().setAttributeValue(REFERENCE_GENOME_NAME,
+							referenceGenomeFileName);
 				} else if (line.contains("<td>GFF</td>")) {
 					/*
 					 * Parsing
@@ -141,8 +156,7 @@ public class GlowReferenceRequest extends GlowRequest {
 					String gffFileName = temp[1].split("</a>")[0];
 
 					// Updating
-					AttributeFactorySingleton.getInstance().setAttributeValue(
-							REFERENCE_GFF_NAME, gffFileName);
+					AttributeFactorySingleton.getInstance().setAttributeValue(REFERENCE_GFF_NAME, gffFileName);
 				} else {
 					/*
 					 * Parsing
@@ -151,8 +165,7 @@ public class GlowReferenceRequest extends GlowRequest {
 					String fastaFileName = temp[1].split("</a>")[0];
 
 					// Updating
-					AttributeFactorySingleton.getInstance().setAttributeValue(
-							REFERENCE_FASTA_NAME, fastaFileName);
+					AttributeFactorySingleton.getInstance().setAttributeValue(REFERENCE_FASTA_NAME, fastaFileName);
 				}
 			}
 
@@ -165,8 +178,7 @@ public class GlowReferenceRequest extends GlowRequest {
 				UpdateUserInterfaceSingleton.getInstance().updateDefaults();
 			});
 		} else {
-			System.out
-					.println("Did not run because no connection to glow was established.");
+			System.out.println("Did not run because no connection to glow was established.");
 		}
 		return null;
 	}

@@ -18,10 +18,10 @@ public class AttributeFileWriter {
 	/**
 	 * 
 	 * @return AttributeFileLocation - The new attribute file's path
-	 * @throws IOException .
+	 * @throws IOException
+	 *             .
 	 */
-	public String writeAttributesFile(String file_name, String file_location)
-			throws IOException {
+	public String writeAttributesFile(String file_name, String file_location) throws IOException {
 		/*
 		 * Writes a new attribute file based on the current format that we have
 		 * outlined. Saves it as an R file, with the current date. The file to
@@ -33,8 +33,7 @@ public class AttributeFileWriter {
 		Date current = new Date();
 		SimpleDateFormat day = new SimpleDateFormat("yyyy.MM.dd");
 		SimpleDateFormat time = new SimpleDateFormat("HH.mm.ss");
-		String date_time = "_" + day.format(current) + "_"
-				+ time.format(current);
+		String date_time = "_" + day.format(current) + "_" + time.format(current);
 
 		/*
 		 * If null, names file for user
@@ -44,8 +43,7 @@ public class AttributeFileWriter {
 				attributeFile = new File("Attribute_" + date_time + ".R");
 			} else {
 				file_location = checkSlash(file_location);
-				attributeFile = new File(file_location + "Attribute_"
-						+ date_time + ".R");
+				attributeFile = new File(file_location + "Attribute_" + date_time + ".R");
 			}
 		} else {
 			// Custom file name set by the user.
@@ -61,37 +59,45 @@ public class AttributeFileWriter {
 		final String attFileLocation = attributeFile.getAbsolutePath();
 		FileWriter writer = new FileWriter(attributeFile);
 		// The entire attribute file in this format
-		String header = "# Great Lakes Seq package for low-level processing of RNA-Seq data\n # \n";
-		writer.write(header);
+		String[] lines = fullFileAsString().split("\n");
+		for (String line : lines) {
+			line = line + "\n";
+			writer.write(line);
+		}
+		writer.close();
+		return attFileLocation;
+	}
 
-		for (AttributeFactorySingleton.Attribute attribute : AttributeFactorySingleton
-				.getInstance().getAllAttributes()) {
+	public String fullFileAsString() {
+		StringBuilder build = new StringBuilder("");
+
+		String header = "# Great Lakes Seq package for low-level processing of RNA-Seq data\n # \n";
+		build.append(header);
+
+		for (AttributeFactorySingleton.Attribute attribute : AttributeFactorySingleton.getInstance()
+				.getAllAttributes()) {
 			/*
 			 * Script attributes are not used in attribute file, but in other
 			 * instances
 			 */
 			if (!attribute.getCategory().equals("script")) {
-				writer.write(attributeFileGenerateLine(attribute));
+				build.append(attributeFileGenerateLine(attribute));
 			}
 		}
-		
-		/*
-		 * Special code to make the R script's life easier. Add anything to
-		 * further process the data here.
-		 */
 		String footer = "# Collect all the counting algos together \n";
-		footer += "cAlgor <- c(HTSeq,RSEM,FeatureCounts,Cufflinks,rockhopperCount)\n";
+		build.append(footer);
+
+		build.append("cAlgor <- c(HTSeq,RSEM,FeatureCounts,Cufflinks,rockhopperCount)\n");
 
 		/*
 		 * @ DEPRECIATED: We depreciated these two, but it is easier to make
 		 * sure they still run if the user has an older version of the Rscript.
 		 * Very unlikely, but doesn't hurt.
 		 */
-		footer += "raw.dir <- data.directory\n";
-		footer += "readyData.dir <- data.directory\n";
-		writer.write(footer);
-		writer.close();
-		return attFileLocation;
+		build.append("raw.dir <- data.directory\n");
+		build.append("readyData.dir <- data.directory\n");
+
+		return build.toString();
 	}
 
 	private String attributeFileGenerateLine(AttributeFactorySingleton.Attribute attribute) {

@@ -14,7 +14,6 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 			 */
 			String[] parts = param.split("=");		
 			
-			// Complexity is fine when it is cheap.
 			for (AttributeFactorySingleton.Attribute att : attributeArray) {
 				if (att.getUiName().equals(parts[0])) {
 					try {

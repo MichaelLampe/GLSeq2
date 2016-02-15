@@ -295,6 +295,8 @@ public final class MainPageController implements Initializable {
 	// CONSTANTS
 	private final String LOGIN_GLOW = "Login to GLOW";
 	private final String REQUEST_GLOW = "Request from GLOW";
+	// Condor GLBRC "Scarcity-cm.glbrc.org" ip address
+	protected final String condorAddress = "144.92.98.39";
 
 	public static void logoutFromGlow() {
 		if (request != null) {
@@ -307,7 +309,7 @@ public final class MainPageController implements Initializable {
 		if (request == null) {
 			createLoginDialog();
 			return request.getUsername();
-		} else{
+		} else {
 			return request.getUsername();
 		}
 	}
@@ -315,6 +317,7 @@ public final class MainPageController implements Initializable {
 	public String getPassword() {
 		if (request == null) {
 			createLoginDialog();
+			return null;
 		}
 		return request.getPassword();
 	}
@@ -354,59 +357,46 @@ public final class MainPageController implements Initializable {
 	 * manually (Clicks and edits) the update will be tracked
 	 */
 	private void instantiateUISpinnersWithValuesAndRanges() {
-		SpinnerValueFactory<Integer> trimHeadFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-				0, 100);
+		SpinnerValueFactory<Integer> trimHeadFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
 		trimHead.setValueFactory(trimHeadFactory);
 		trimHead.getValueFactory().setValue(12);
 
 		/*
 		 * Fixes a bug where JavaFX Spinner doesn't update when edited manually.
 		 */
-		trimHead.focusedProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					trimHead.getValueFactory().setValue(
-							Integer.valueOf(trimHead.getEditor().getText()));
-				});
+		trimHead.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			trimHead.getValueFactory().setValue(Integer.valueOf(trimHead.getEditor().getText()));
+		});
 
-		SpinnerValueFactory<Integer> minTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-				0, 100);
+		SpinnerValueFactory<Integer> minTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
 		minTrim.setValueFactory(minTrimFactory);
 		minTrim.getValueFactory().setValue(36);
-		minTrim.focusedProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					minTrim.getValueFactory().setValue(
-							Integer.valueOf(minTrim.getEditor().getText()));
-				});
+		minTrim.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			minTrim.getValueFactory().setValue(Integer.valueOf(minTrim.getEditor().getText()));
+		});
 
-		SpinnerValueFactory<Integer> threePrimeTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-				0, 100);
+		SpinnerValueFactory<Integer> threePrimeTrimFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
 		three_prime_trim_slide.setValueFactory(threePrimeTrimFactory);
 		three_prime_trim_slide.getValueFactory().setValue(3);
-		three_prime_trim_slide.focusedProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					three_prime_trim_slide.getValueFactory().setValue(
-							Integer.valueOf(three_prime_trim_slide.getEditor()
-									.getText()));
-				});
+		three_prime_trim_slide.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			three_prime_trim_slide.getValueFactory()
+					.setValue(Integer.valueOf(three_prime_trim_slide.getEditor().getText()));
+		});
 
-		SpinnerValueFactory<Integer> minAvgQualFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-				0, 100);
+		SpinnerValueFactory<Integer> minAvgQualFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100);
 		min_avg_qual_slide.setValueFactory(minAvgQualFactory);
 		min_avg_qual_slide.getValueFactory().setValue(30);
-		min_avg_qual_slide.focusedProperty().addListener(
-				(observable, oldValue, newValue) -> {
-					min_avg_qual_slide.getValueFactory().setValue(
-							Integer.valueOf(min_avg_qual_slide.getEditor()
-									.getText()));
-				});
+		min_avg_qual_slide.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			min_avg_qual_slide.getValueFactory().setValue(Integer.valueOf(min_avg_qual_slide.getEditor().getText()));
+		});
 	}
 
 	private void constructRadioButtons() {
 		/*
 		 * Alignment group button
 		 */
-		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw,
-				Cushaw_Gpu, TopHat, Rockhopper, star, hisat, BWA };
+		RadioButton[] tempAlignmentGroup = { BWA, Bowtie, Bowtie2, Cushaw, Cushaw_Gpu, TopHat, Rockhopper, star, hisat,
+				BWA };
 		List<RadioButton> alignmentGroup = Arrays.asList(tempAlignmentGroup);
 		alignmentGroup.forEach((radioButton) -> {
 			radioButton.setToggleGroup(group);
@@ -442,15 +432,11 @@ public final class MainPageController implements Initializable {
 			ref_request_glow.setText(LOGIN_GLOW);
 			data_request_glow.setText(LOGIN_GLOW);
 		}
-		ref_request_glow.disableProperty().bind(
-				Bindings.when(from_glow.selectedProperty()).then(false)
-						.otherwise(true));
-		data_request_glow.disableProperty().bind(
-				Bindings.when(load_glow.selectedProperty()).then(false)
-						.otherwise(true));
-		experiment_id.disableProperty().bind(
-				Bindings.when(load_glow.selectedProperty()).then(false)
-						.otherwise(true));
+		ref_request_glow.disableProperty()
+				.bind(Bindings.when(from_glow.selectedProperty()).then(false).otherwise(true));
+		data_request_glow.disableProperty()
+				.bind(Bindings.when(load_glow.selectedProperty()).then(false).otherwise(true));
+		experiment_id.disableProperty().bind(Bindings.when(load_glow.selectedProperty()).then(false).otherwise(true));
 
 		/*
 		 * Setup where to get the data from
@@ -469,8 +455,7 @@ public final class MainPageController implements Initializable {
 				fileChooser.setTitle("Working Directory Picker");
 				File selectedDirectory = fileChooser.showDialog(null);
 				if (selectedDirectory != null) {
-					destinationDirectory.setText(selectedDirectory
-							.getAbsolutePath());
+					destinationDirectory.setText(selectedDirectory.getAbsolutePath());
 				}
 			}
 		});
@@ -482,8 +467,7 @@ public final class MainPageController implements Initializable {
 				fileChooser.setTitle("Destination Directory Picker");
 				File selectedDirectory = fileChooser.showDialog(null);
 				if (selectedDirectory != null) {
-					storageDestination.setText(selectedDirectory
-							.getAbsolutePath());
+					storageDestination.setText(selectedDirectory.getAbsolutePath());
 				}
 			}
 		});
@@ -498,50 +482,48 @@ public final class MainPageController implements Initializable {
 		// Add more cases here
 		buttonAction.parallelStream().forEach((button) -> {
 			// Make sure this has a TextArea assigned to it!
-				final TextArea requestFor;
-				if (button.equals(ref_request_glow)) {
-					requestFor = genom_ref_id;
-					button.setOnAction(new EventHandler<ActionEvent>() {
-						@Override
-						public void handle(ActionEvent arg0) {
-							if (request == null) {
-								// Log the user in and change the button name
-								createLoginDialog();
-							} else {
-								Task<Object> refReq = new GlowReferenceRequest(
-										request, requestFor.getText());
-								/*
-								 * Run on a different thread so it doesn't lock
-								 * up the UI.
-								 */
-								new Thread(refReq).start();
-							}
+			final TextArea requestFor;
+			if (button.equals(ref_request_glow)) {
+				requestFor = genom_ref_id;
+				button.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent arg0) {
+						if (request == null) {
+							// Log the user in and change the button name
+							createLoginDialog();
+						} else {
+							Task<Object> refReq = new GlowReferenceRequest(request, requestFor.getText());
+							/*
+							 * Run on a different thread so it doesn't lock up
+							 * the UI.
+							 */
+							new Thread(refReq).start();
 						}
-					});
-				} else if (button.equals(data_request_glow)) {
-					requestFor = experiment_id;
-					button.setOnAction(new EventHandler<ActionEvent>() {
-						@Override
-						public void handle(ActionEvent arg0) {
-							if (request == null) {
-								// Log the user in and change the button name
-								createLoginDialog();
-							} else {
-								Task<Object> dataReq = new GlowDataRequest(
-										request, requestFor.getText());
-								/*
-								 * Run on a different thread so it doesn't lock
-								 * up the UI.
-								 */
-								new Thread(dataReq).start();
-							}
+					}
+				});
+			} else if (button.equals(data_request_glow)) {
+				requestFor = experiment_id;
+				button.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent arg0) {
+						if (request == null) {
+							// Log the user in and change the button name
+							createLoginDialog();
+						} else {
+							Task<Object> dataReq = new GlowDataRequest(request, requestFor.getText());
+							/*
+							 * Run on a different thread so it doesn't lock up
+							 * the UI.
+							 */
+							new Thread(dataReq).start();
 						}
-					});
-				} else {
-					// Only would get here if more items are added above.
-					requestFor = null;
-				}
-			});
+					}
+				});
+			} else {
+				// Only would get here if more items are added above.
+				requestFor = null;
+			}
+		});
 	}
 
 	private void addTextAreaListeners() {
@@ -550,19 +532,16 @@ public final class MainPageController implements Initializable {
 		 * if they exist as the user types in the directory. Then iterates over
 		 * the list in parallel and adds a listener.
 		 */
-		TextArea[] tempDirectoriesMayExist = { scriptDirectory, trimPath,
-				fastqcPath, picardToolsPath, bwaPath, bam2wigPath,
-				rockhopperPath, cushawGpuPath, topHatPath, cushawPath,
-				cushawIndexPath, hisatPath, starPath };
+		TextArea[] tempDirectoriesMayExist = { scriptDirectory, trimPath, fastqcPath, picardToolsPath, bwaPath,
+				bam2wigPath, rockhopperPath, cushawGpuPath, topHatPath, cushawPath, cushawIndexPath, hisatPath,
+				starPath };
 
-		List<TextArea> directoriesMayExist = Arrays
-				.asList(tempDirectoriesMayExist);
+		List<TextArea> directoriesMayExist = Arrays.asList(tempDirectoriesMayExist);
 
 		directoriesMayExist.parallelStream().forEach((fileName) -> {
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(ObservableValue<? extends String> arg0,
-						String arg1, String new_file) {
+				public void changed(ObservableValue<? extends String> arg0, String arg1, String new_file) {
 
 					File dest = new File(new_file);
 					String color = "red";
@@ -570,8 +549,7 @@ public final class MainPageController implements Initializable {
 						color = "green";
 					}
 					// Just a nice little border
-					fileName.setStyle("-fx-border-color: " + color
-							+ " ; -fx-border-width: 2px ;");
+					fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
 				}
 			});
 		});
@@ -581,8 +559,7 @@ public final class MainPageController implements Initializable {
 		 */
 		dataDirectory.textProperty().addListener(new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> arg0,
-					String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> arg0, String oldValue, String newValue) {
 				File folder = new File(newValue);
 				File[] files = folder.listFiles();
 
@@ -598,39 +575,30 @@ public final class MainPageController implements Initializable {
 				// Add each file to the directory.
 				for (File file : files) {
 					if (file.isFile()) {
-						if (file.getName().endsWith(".fq")
-								|| file.getName().endsWith(".fastq")
+						if (file.getName().endsWith(".fq") || file.getName().endsWith(".fastq")
 								|| file.getName().endsWith(".gz")) {
-							CheckBoxTreeItem<String> checkbox = new CheckBoxTreeItem<String>(
-									file.getName());
-							checkbox.selectedProperty().addListener(
-									new ChangeListener<Boolean>() {
-										@Override
-										public void changed(
-												ObservableValue<? extends Boolean> arg0,
-												Boolean oldValue,
-												Boolean newValue) {
-											/*
-											 * Add and remove the string
-											 * depending on if it is checked or
-											 * not
-											 */
-											String directoryValue = checkbox
-													.getParent().getValue();
-											if (!directoryValue.endsWith("/")) {
-												directoryValue += "/";
-											}
-											if (newValue) {
-												MainPageController.liblistData.add(directoryValue
-														+ checkbox.getValue());
-											} else {
-												MainPageController.liblistData
-														.remove(directoryValue
+							CheckBoxTreeItem<String> checkbox = new CheckBoxTreeItem<String>(file.getName());
+							checkbox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+								@Override
+								public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldValue,
+										Boolean newValue) {
+									/*
+									 * Add and remove the string depending on if
+									 * it is checked or not
+									 */
+									String directoryValue = checkbox.getParent().getValue();
+									if (!directoryValue.endsWith("/")) {
+										directoryValue += "/";
+									}
+									if (newValue) {
+										MainPageController.liblistData.add(directoryValue + checkbox.getValue());
+									} else {
+										MainPageController.liblistData.remove(directoryValue
 
-														+ checkbox.getValue());
-											}
-										}
-									});
+												+ checkbox.getValue());
+									}
+								}
+							});
 							itemDirectory.getChildren().add(checkbox);
 						}
 					}
@@ -647,16 +615,13 @@ public final class MainPageController implements Initializable {
 		 * writable. Then iterates over the list in parallel and adds a
 		 * listener.
 		 */
-		TextArea[] tempDirectoryMayBeWritable = { storageDestination,
-				destinationDirectory };
-		List<TextArea> directoryMayBeWritable = Arrays
-				.asList(tempDirectoryMayBeWritable);
+		TextArea[] tempDirectoryMayBeWritable = { storageDestination, destinationDirectory };
+		List<TextArea> directoryMayBeWritable = Arrays.asList(tempDirectoryMayBeWritable);
 
 		directoryMayBeWritable.parallelStream().forEach((fileName) -> {
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
-				public void changed(ObservableValue<? extends String> arg0,
-						String arg1, String arg2) {
+				public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
 					File dest = new File(fileName.getText());
 					String color = "red";
 					if (dest.canWrite()) {
@@ -664,8 +629,7 @@ public final class MainPageController implements Initializable {
 					}
 
 					// Just a nice little border
-					fileName.setStyle("-fx-border-color: " + color
-							+ " ; -fx-border-width: 2px ;");
+					fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
 				}
 			});
 		});
@@ -677,34 +641,32 @@ public final class MainPageController implements Initializable {
 			liblistData.remove(value);
 		}
 		data = new CheckBoxTreeItem<String>("Retrieved Files");
-		selectedDataFiles
-				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+		selectedDataFiles.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+			@Override
+			public TreeCell<String> call(TreeView<String> param) {
+				return new CheckBoxTreeCell<String>() {
 					@Override
-					public TreeCell<String> call(TreeView<String> param) {
-						return new CheckBoxTreeCell<String>() {
-							@Override
-							public void updateItem(String item, boolean empty) {
-								super.updateItem(item, empty);
-								/*
-								 * If there is no information for the Cell, make
-								 * it empty
-								 */
-								if (empty) {
-									setGraphic(null);
-									setText(null);
-									/*
-									 * Otherwise if it's not representation as
-									 * an item of the tree is not a
-									 * CheckBoxTreeItem, remove the checkbox
-									 * item
-									 */
-								} else if (!(getTreeItem() instanceof CheckBoxTreeItem)) {
-									setGraphic(null);
-								}
-							}
-						};
+					public void updateItem(String item, boolean empty) {
+						super.updateItem(item, empty);
+						/*
+						 * If there is no information for the Cell, make it
+						 * empty
+						 */
+						if (empty) {
+							setGraphic(null);
+							setText(null);
+							/*
+							 * Otherwise if it's not representation as an item
+							 * of the tree is not a CheckBoxTreeItem, remove the
+							 * checkbox item
+							 */
+						} else if (!(getTreeItem() instanceof CheckBoxTreeItem)) {
+							setGraphic(null);
+						}
 					}
-				});
+				};
+			}
+		});
 		selectedDataFiles.setRoot(data);
 		selectedDataFiles.setShowRoot(false);
 	}
@@ -723,13 +685,12 @@ public final class MainPageController implements Initializable {
 		alignment = new TreeItem<String>("Alignment");
 		alignmentOptions.setRoot(alignment);
 
-		alignmentOptions
-				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
-					@Override
-					public TreeCell<String> call(TreeView<String> param) {
-						return new AdvancedOptionsTreeCell();
-					}
-				});
+		alignmentOptions.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+			@Override
+			public TreeCell<String> call(TreeView<String> param) {
+				return new AdvancedOptionsTreeCell();
+			}
+		});
 		// This is just the "alignment" option we see at the head of the field.
 		alignmentOptions.setShowRoot(true);
 		/*
@@ -737,13 +698,12 @@ public final class MainPageController implements Initializable {
 		 */
 		counting = new TreeItem<String>("Counting");
 		countingOptions.setRoot(counting);
-		countingOptions
-				.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
-					@Override
-					public TreeCell<String> call(TreeView<String> param) {
-						return new AdvancedOptionsTreeCell();
-					}
-				});
+		countingOptions.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
+			@Override
+			public TreeCell<String> call(TreeView<String> param) {
+				return new AdvancedOptionsTreeCell();
+			}
+		});
 		countingOptions.setShowRoot(true);
 	}
 
@@ -753,74 +713,52 @@ public final class MainPageController implements Initializable {
 	 */
 	private void addAlignmentAndCountingListeners() {
 		// Alignment RadioButton
-		RadioButton[] tempModifyAlignOptions = { Bowtie, Bowtie2, Cushaw, BWA,
-				Cushaw_Gpu, TopHat, star, hisat, Rockhopper };
-		List<RadioButton> modifyAlignOptions = Arrays
-				.asList(tempModifyAlignOptions);
+		RadioButton[] tempModifyAlignOptions = { Bowtie, Bowtie2, Cushaw, BWA, Cushaw_Gpu, TopHat, star, hisat,
+				Rockhopper };
+		List<RadioButton> modifyAlignOptions = Arrays.asList(tempModifyAlignOptions);
 
 		modifyAlignOptions.parallelStream().forEach((radioButton) -> {
 			// Then add listeners to everything
-				radioButton.selectedProperty().addListener(
-						new ChangeListener<Boolean>() {
-							@Override
-							public void changed(
-									ObservableValue<? extends Boolean> arg0,
-									Boolean arg1, Boolean arg2) {
-								if (radioButton.isSelected()) {
-									// Rockhopper is special because it is both
-									// alignment
-									// and counting.
-									alignment.getChildren().clear();
-									alignment.getChildren().add(
-											alignOptions.get(radioButton
-													.getText()));
-									if (!radioButton.getText().equals(
-											Bowtie.getText())) {
-										if (!radioButton.getText().equals(
-												Bowtie2.getText())) {
-											alignment.getChildren().remove(
-													alignOptions.get("RSEM"));
-										}
-									}
-								} else {
-									alignment.getChildren().remove(
-											alignOptions.get(radioButton
-													.getText()));
-								}
+			radioButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+					if (radioButton.isSelected()) {
+						// Rockhopper is special because it is both
+						// alignment
+						// and counting.
+						alignment.getChildren().clear();
+						alignment.getChildren().add(alignOptions.get(radioButton.getText()));
+						if (!radioButton.getText().equals(Bowtie.getText())) {
+							if (!radioButton.getText().equals(Bowtie2.getText())) {
+								alignment.getChildren().remove(alignOptions.get("RSEM"));
 							}
-						});
+						}
+					} else {
+						alignment.getChildren().remove(alignOptions.get(radioButton.getText()));
+					}
+				}
 			});
+		});
 
 		// Counting CheckBoxes
-		CheckBox[] tempModifyCountOptions = { RSEM, HTseq, FeatureCounts,
-				Cufflinks };
-		List<CheckBox> modifyCountOptions = Arrays
-				.asList(tempModifyCountOptions);
-		modifyCountOptions.parallelStream().forEach(
-				(checkBox) -> {
-					checkBox.selectedProperty().addListener(
-							new ChangeListener<Boolean>() {
-								@Override
-								public void changed(
-										ObservableValue<? extends Boolean> arg0,
-										Boolean arg1, Boolean arg2) {
-									String countOptionName = checkBox.getText();
-									// Feature counts has a space, so remove the
-									// space
-									countOptionName = countOptionName.replace(
-											" ", "");
-									if (checkBox.isSelected()) {
-										counting.getChildren().add(
-												countOptions
-														.get(countOptionName));
-									} else {
-										counting.getChildren().remove(
-												countOptions
-														.get(countOptionName));
-									}
-								}
-							});
-				});
+		CheckBox[] tempModifyCountOptions = { RSEM, HTseq, FeatureCounts, Cufflinks };
+		List<CheckBox> modifyCountOptions = Arrays.asList(tempModifyCountOptions);
+		modifyCountOptions.parallelStream().forEach((checkBox) -> {
+			checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+				@Override
+				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+					String countOptionName = checkBox.getText();
+					// Feature counts has a space, so remove the
+					// space
+					countOptionName = countOptionName.replace(" ", "");
+					if (checkBox.isSelected()) {
+						counting.getChildren().add(countOptions.get(countOptionName));
+					} else {
+						counting.getChildren().remove(countOptions.get(countOptionName));
+					}
+				}
+			});
+		});
 	}
 
 	/*
@@ -844,8 +782,7 @@ public final class MainPageController implements Initializable {
 		 * Counting
 		 */
 		countOptions.put("Cufflinks", new TreeItem<String>("Cufflinks"));
-		countOptions
-				.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
+		countOptions.put("FeatureCounts", new TreeItem<String>("FeatureCounts"));
 		countOptions.put("HTSeq", new TreeItem<String>("HTSeq"));
 		countOptions.put("RSEM", new TreeItem<String>("RSEM"));
 	}
@@ -853,8 +790,7 @@ public final class MainPageController implements Initializable {
 	private void appendOptionsToTreeItems() {
 		for (String keys : alignOptions.keySet()) {
 			try {
-				alignOptions.get(keys).getChildren()
-						.add(load.createTreeElementfromXml(keys));
+				alignOptions.get(keys).getChildren().add(load.createTreeElementfromXml(keys));
 			} catch (DuplicateElementsInXmlException e) {
 				e.printStackTrace();
 			}
@@ -862,8 +798,7 @@ public final class MainPageController implements Initializable {
 
 		for (String keys : countOptions.keySet()) {
 			try {
-				countOptions.get(keys).getChildren()
-						.add(load.createTreeElementfromXml(keys));
+				countOptions.get(keys).getChildren().add(load.createTreeElementfromXml(keys));
 			} catch (DuplicateElementsInXmlException e) {
 				e.printStackTrace();
 			}
@@ -891,24 +826,21 @@ public final class MainPageController implements Initializable {
 		dataDirectory.setTooltip(dataToolTip);
 
 		// Continue from pre-aligned reads
-		Tooltip countableToolTip = new Tooltip(
-				"Start run from previously generated countable.sam files.");
+		Tooltip countableToolTip = new Tooltip("Start run from previously generated countable.sam files.");
 		countableSamDir.setTooltip(countableToolTip);
 
 		Tooltip libTooltip = new Tooltip(
 				"\"F\" if mRNA sequence corresponds to strandedness of the reads (Single End libraries) or the first read in the pair (Paired End libraries). \"R\" in the opposite case.");
 		libStrands.setTooltip(libTooltip);
 
-		Tooltip qScoreTooltip = new Tooltip(
-				"Format of the score describing the confidence of base calling");
+		Tooltip qScoreTooltip = new Tooltip("Format of the score describing the confidence of base calling");
 		qualityScores.setTooltip(qScoreTooltip);
 
 		Tooltip zipToolTip = new Tooltip(
 				"Original data is supplied in a compressed (.fastq.gz) format.  Uncompressed data will have .fastq extension (if not, uncompressing at the pre-processing stage is needed)");
 		unzipped.setTooltip(zipToolTip);
 
-		Tooltip pairedToolTip = new Tooltip(
-				"If the reads were constructed in a single- or paired-ended manner.");
+		Tooltip pairedToolTip = new Tooltip("If the reads were constructed in a single- or paired-ended manner.");
 		pairedEnd.setTooltip(pairedToolTip);
 
 		Tooltip presplitToolTip = new Tooltip(
@@ -937,41 +869,30 @@ public final class MainPageController implements Initializable {
 		 */
 		String dataprepStreamMessage = "";
 		if (dataPrepStreams > 1) {
-			dataprepStreamMessage = dataPrepStreams
-					+ " samples processed in parallel during data preparation. "
+			dataprepStreamMessage = dataPrepStreams + " samples processed in parallel during data preparation. "
 					+ dataPrepStreams * cores + " cores will be used in total.";
 		} else {
 			if (numberCores.getValue() > 1) {
-				dataprepStreamMessage = dataPrepStreams
-						+ " sample processed in parallel during data preparation. "
-						+ dataPrepStreams * cores
-						+ " cores will be used in total.";
+				dataprepStreamMessage = dataPrepStreams + " sample processed in parallel during data preparation. "
+						+ dataPrepStreams * cores + " cores will be used in total.";
 			} else {
-				dataprepStreamMessage = dataPrepStreams
-						+ " sample processed in parallel during data preparation. "
-						+ dataPrepStreams * cores
-						+ " core will be used in total.";
+				dataprepStreamMessage = dataPrepStreams + " sample processed in parallel during data preparation. "
+						+ dataPrepStreams * cores + " core will be used in total.";
 			}
 		}
 		dataprep_streams_label.textProperty().setValue(dataprepStreamMessage);
 
 		String alignmentStreamMessage = "";
 		if (alignmentStreams > 1) {
-			alignmentStreamMessage = alignmentStreams
-					+ " samples processed in parallel during alignment. "
-					+ alignmentStreams * cores
-					+ " cores will be used in total.";
+			alignmentStreamMessage = alignmentStreams + " samples processed in parallel during alignment. "
+					+ alignmentStreams * cores + " cores will be used in total.";
 		} else {
 			if (numberCores.getValue() > 1) {
-				alignmentStreamMessage = alignmentStreams
-						+ " sample processed in parallel during alignment. "
-						+ alignmentStreams * cores
-						+ " cores will be used in total.";
+				alignmentStreamMessage = alignmentStreams + " sample processed in parallel during alignment. "
+						+ alignmentStreams * cores + " cores will be used in total.";
 			} else {
-				alignmentStreamMessage = alignmentStreams
-						+ " sample processed in parallel during alignment. "
-						+ alignmentStreams * cores
-						+ " core will be used in total.";
+				alignmentStreamMessage = alignmentStreams + " sample processed in parallel during alignment. "
+						+ alignmentStreams * cores + " core will be used in total.";
 			}
 		}
 		alignment_streams_label.textProperty().setValue(alignmentStreamMessage);
@@ -985,27 +906,23 @@ public final class MainPageController implements Initializable {
 		// Number of Cores
 		numberCores.valueProperty().addListener(new ChangeListener<Object>() {
 			@Override
-			public void changed(ObservableValue<?> arg0, Object arg1,
-					Object arg2) {
+			public void changed(ObservableValue<?> arg0, Object arg1, Object arg2) {
 				updateSliderFields();
 			}
 		});
 
 		// Dataprep Streams
-		numberStreamsDataPrep.valueProperty().addListener(
-				new ChangeListener<Object>() {
-					@Override
-					public void changed(ObservableValue<?> arg0, Object arg1,
-							Object arg2) {
-						updateSliderFields();
-					}
-				});
+		numberStreamsDataPrep.valueProperty().addListener(new ChangeListener<Object>() {
+			@Override
+			public void changed(ObservableValue<?> arg0, Object arg1, Object arg2) {
+				updateSliderFields();
+			}
+		});
 
 		// Alignment Streams
 		numberStreams.valueProperty().addListener(new ChangeListener<Object>() {
 			@Override
-			public void changed(ObservableValue<?> arg0, Object arg1,
-					Object arg2) {
+			public void changed(ObservableValue<?> arg0, Object arg1, Object arg2) {
 				updateSliderFields();
 			}
 		});
@@ -1025,8 +942,7 @@ public final class MainPageController implements Initializable {
 		min_avg_qual_slide.disableProperty().set(true);
 		readTrim.valueProperty().addListener(new ChangeListener<String>() {
 			@Override
-			public void changed(ObservableValue<? extends String> ov,
-					String oldValue, String newValue) {
+			public void changed(ObservableValue<? extends String> ov, String oldValue, String newValue) {
 				if (newValue.equals("TRUE")) {
 					artificialFasta.disableProperty().set(false);
 					minTrim.disableProperty().set(false);
@@ -1046,8 +962,7 @@ public final class MainPageController implements Initializable {
 		libStrands.getItems().addAll("R", "F", "NULL");
 		libStrands.setValue("R");
 		// Sequencing Platforms
-		seqPlatform.getItems().addAll("illumina", "capillary", "ls454",
-				"solid", "helicos", "iontorrent", "pacbio");
+		seqPlatform.getItems().addAll("illumina", "capillary", "ls454", "solid", "helicos", "iontorrent", "pacbio");
 		seqPlatform.setValue("illumina");
 		// Quality Score
 		qualityScores.getItems().addAll("phred33", "phred64");
@@ -1074,8 +989,7 @@ public final class MainPageController implements Initializable {
 				/*
 				 * Update absolutely everything.
 				 */
-				UpdateAttributeSingleton.getInstance().updateAllAttributes(
-						alignment, counting, load, liblistData);
+				UpdateAttributeSingleton.getInstance().updateAllAttributes(alignment, counting, load, liblistData);
 
 				AttributeFileWriter attributeFileWriter = new AttributeFileWriter();
 
@@ -1085,11 +999,9 @@ public final class MainPageController implements Initializable {
 				String attributeFileLocation = null;
 				try {
 					if (run_name.getText().equals("")) {
-						attributeFileLocation = attributeFileWriter
-								.writeAttributesFile(null, null);
+						attributeFileLocation = attributeFileWriter.writeAttributesFile(null, null);
 					} else {
-						attributeFileLocation = attributeFileWriter
-								.writeAttributesFile(run_name.getText(), null);
+						attributeFileLocation = attributeFileWriter.writeAttributesFile(run_name.getText(), null);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -1105,8 +1017,7 @@ public final class MainPageController implements Initializable {
 					e.printStackTrace();
 				}
 
-				String operatingSystem = System.getProperty("os.name",
-						"generic").toLowerCase(Locale.ENGLISH);
+				String operatingSystem = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 
 				/*
 				 * Running on Linux
@@ -1116,38 +1027,69 @@ public final class MainPageController implements Initializable {
 					 * Creates a run instance
 					 */
 					RunInstantiator currentRun = constructRun();
-					currentRun.constructArgs(htcondor_check.isSelected(),
-							attributeFileLocation, scriptDirectory.getText());
+					currentRun.constructArgs(htcondor_check.isSelected(), attributeFileLocation,
+							scriptDirectory.getText());
 					currentRun.start();
 				} else {
 					/*
 					 * Creates a run instance, condor always activated
 					 */
+					String dest = destinationDirectory.getText();
+
+					if (!dest.endsWith("/")) {
+						dest += "/";
+					}
+
+					String attributeFileLocationOnLinux = dest + run_name.getText() + ".R";
+					;
+
 					RunInstantiator currentRun = constructRun();
-					currentRun.constructArgs(true, attributeFileLocation,
-							scriptDirectory.getText());
+					currentRun.constructArgs(true, attributeFileLocationOnLinux, scriptDirectory.getText());
 
 					String command = currentRun.returnArgString();
 
-					String condorAddress = "scarcity-cm.glbrc.org";
-					int portNumber = 0;
+					int portNumber = 22;
+					// This throws a null pointer when you first hit it. Still
+					// working on how I want to resolve it. The application
+					// thread catches the pointer and doesn't crash and then the
+					// user just needs to hit it again after login and it is all
+					// ok, so it isn't that pressing of an issue.
 					String userName = getUsername();
 					String password = getPassword();
-
+					SSHByPassword sshSession;
 					try {
-						SSHByPassword sshSession = new SSHByPassword(
-								condorAddress, portNumber, userName, password);
+						sshSession = new SSHByPassword(condorAddress, portNumber, userName, password);
+						// Transfer attribute file to server
+						System.out.println("Splitting command");
+						String[] attributeFileLines = attributeFileWriter.fullFileAsString().split("\n");
+						System.out.println("Finished splitting");
 
-						try (SSHD sshd = new SSHD()) {
-							String response = new Shell.Plain(sshSession)
-									.exec(command);
-							System.out.println(response);
-						} catch (IOException e) {
-							e.printStackTrace();
+						// Send as one large formatted blob.
+						StringBuilder finalSend = new StringBuilder();
+						for (String line : attributeFileLines) {
+							// Don't send comments
+							if (!line.contains("#")) {
+								// Append to file
+								line += "\n";
+								finalSend.append(line);
+							}
 						}
 
-					} catch (UnknownHostException e) {
-						System.out.println("Error connecting to server by SSH");
+						String toFile = "echo '" + finalSend.toString() + "' >> " + attributeFileLocationOnLinux;
+						System.out.println("Sent to the server: ");
+						System.out.println(toFile);
+						String response = new Shell.Plain(sshSession).exec(toFile);
+						System.out.println("Server responded with: ");
+						System.out.println(response);
+						System.out.println("Finished writing attribute file");
+						new Thread(new Shell.Plain(sshSession).exec(command)).start();
+						System.out.println("Started job");
+					} catch (UnknownHostException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				}
 			}
@@ -1155,34 +1097,29 @@ public final class MainPageController implements Initializable {
 	}
 
 	public void runBindings() {
-		start_run.disableProperty().bind(
-				Bindings.when(
-				// Requires a run name
+		start_run.disableProperty().bind(Bindings
+				.when(
+						// Requires a run name
 						run_name.textProperty()
 								// There is some text
 								.isNotEqualTo("")
 								.and(
-								/*
-								 * 45 char names max Just makes the table easier
-								 * to handle.
-								 */
-								textCountLimit(run_name, 45))
-								.and(textAlphanumeric(run_name))
-								.and(noExistRun(run_name))
-								.and(noExistScript(run_name))
+										/*
+										 * 45 char names max Just makes the
+										 * table easier to handle.
+										 */
+										textCountLimit(run_name, 45))
+								.and(textAlphanumeric(run_name)).and(noExistRun(run_name)).and(noExistScript(run_name))
 								.and(
-								/*
-								 * One of the boxes must be check to do
-								 * something
-								 */
-								alignment_check.selectedProperty().or(
-										data_prep_check
-												.selectedProperty()
-												.or(counting_check
-														.selectedProperty())
-												.or(collect_check
-														.selectedProperty()))))
-						.then(false).otherwise(true));
+										/*
+										 * One of the boxes must be check to do
+										 * something
+										 */
+										alignment_check.selectedProperty()
+												.or(data_prep_check.selectedProperty()
+														.or(counting_check.selectedProperty())
+														.or(collect_check.selectedProperty()))))
+				.then(false).otherwise(true));
 	}
 
 	private String checkSlash(String file_name) {
@@ -1199,23 +1136,21 @@ public final class MainPageController implements Initializable {
 	}
 
 	private BooleanBinding textCountLimit(TextArea run_name, int char_count) {
-		BooleanBinding binding = Bindings.createBooleanBinding(() -> (run_name
-				.getText().length() <= char_count), run_name.textProperty());
+		BooleanBinding binding = Bindings.createBooleanBinding(() -> (run_name.getText().length() <= char_count),
+				run_name.textProperty());
 		return binding;
 	}
 
 	private BooleanBinding textAlphanumeric(TextArea run_name) {
-		BooleanBinding binding = Bindings.createBooleanBinding(() -> (!run_name
-				.getText().matches("^.*[^a-zA-Z0-9_].*$")), run_name
-				.textProperty());
+		BooleanBinding binding = Bindings.createBooleanBinding(
+				() -> (!run_name.getText().matches("^.*[^a-zA-Z0-9_].*$")), run_name.textProperty());
 		return binding;
 	}
 
 	private BooleanBinding noExistRun(TextArea run_name) {
 		// Update on run name change
 		BooleanBinding bindingRun = Bindings.createBooleanBinding(
-				() -> (!new File(checkSlash(destinationDirectory.getText())
-						+ run_name.getText()).isDirectory()),
+				() -> (!new File(checkSlash(destinationDirectory.getText()) + run_name.getText()).isDirectory()),
 				run_name.textProperty());
 		return bindingRun;
 	}
@@ -1223,8 +1158,8 @@ public final class MainPageController implements Initializable {
 	private BooleanBinding noExistScript(TextArea run_name) {
 		// Update on script location change
 		BooleanBinding bindingScript = Bindings.createBooleanBinding(
-				() -> (!new File(scriptDirectory.getText() + run_name.getText()
-						+ ".RData").exists()), scriptDirectory.textProperty());
+				() -> (!new File(scriptDirectory.getText() + run_name.getText() + ".RData").exists()),
+				scriptDirectory.textProperty());
 		return bindingScript;
 	}
 
@@ -1234,27 +1169,20 @@ public final class MainPageController implements Initializable {
 		boolean alignment = alignment_check.isSelected();
 		boolean counting = counting_check.isSelected();
 		boolean collect = collect_check.isSelected();
-		return new RunInstantiator(data_prep, alignment, counting, collect,
-				run_name.getText());
+		return new RunInstantiator(data_prep, alignment, counting, collect, run_name.getText());
 	}
 
 	private void toggleCountingDep(ToggleGroup group) {
 		RSEM.disableProperty().bind(
-				Bindings.when(
-						Bowtie.selectedProperty()
-								.or(Bowtie2.selectedProperty())).then(false)
-						.otherwise(true));
-		group.selectedToggleProperty().addListener(
-				new ChangeListener<Toggle>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends Toggle> observable,
-							Toggle oldValue, Toggle newValue) {
-						if (!Bowtie.isSelected() && !Bowtie2.isSelected()) {
-							RSEM.setSelected(false);
-						}
-					}
-				});
+				Bindings.when(Bowtie.selectedProperty().or(Bowtie2.selectedProperty())).then(false).otherwise(true));
+		group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+			@Override
+			public void changed(ObservableValue<? extends Toggle> observable, Toggle oldValue, Toggle newValue) {
+				if (!Bowtie.isSelected() && !Bowtie2.isSelected()) {
+					RSEM.setSelected(false);
+				}
+			}
+		});
 	}
 
 	/*
@@ -1265,16 +1193,13 @@ public final class MainPageController implements Initializable {
 	private void progressBarListener() {
 		SingleSelectionModel<Tab> current_tab = tab_check.getSelectionModel();
 		double percent_per_index = (100.0 / tab_check.getTabs().size());
-		current_tab.selectedIndexProperty().addListener(
-				new ChangeListener<Number>() {
-					@Override
-					public void changed(ObservableValue<? extends Number> arg0,
-							Number arg1, Number arg2) {
-						double currentPercent = ((current_tab
-								.getSelectedIndex() + 2) * percent_per_index) / 100;
-						footer_progress.setProgress(currentPercent);
-					}
-				});
+		current_tab.selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				double currentPercent = ((current_tab.getSelectedIndex() + 2) * percent_per_index) / 100;
+				footer_progress.setProgress(currentPercent);
+			}
+		});
 	}
 
 	private void logoutGlow() {
@@ -1334,8 +1259,7 @@ public final class MainPageController implements Initializable {
 			}
 		});
 		// Only allows user to select R files
-		ExtensionFilter R = new ExtensionFilter("R Attribute Files (*.R)",
-				"*.R");
+		ExtensionFilter R = new ExtensionFilter("R Attribute Files (*.R)", "*.R");
 		open_att.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -1397,16 +1321,14 @@ public final class MainPageController implements Initializable {
 				/*
 				 * Update absolutely everything.
 				 */
-				UpdateAttributeSingleton.getInstance().updateAllAttributes(
-						alignment, counting, load, liblistData);
+				UpdateAttributeSingleton.getInstance().updateAllAttributes(alignment, counting, load, liblistData);
 				DirectoryChooser dc = new DirectoryChooser();
 				dc.setTitle("Save attribute file");
 				File directory = Main.openDirectoryChooser(dc);
 				if (directory != null) {
 					AttributeFileWriter action = new AttributeFileWriter();
 					try {
-						action.writeAttributesFile(null,
-								directory.getAbsolutePath());
+						action.writeAttributesFile(null, directory.getAbsolutePath());
 					} catch (IOException e) {
 						// Should be fine with selector
 					}
@@ -1425,8 +1347,7 @@ public final class MainPageController implements Initializable {
 		// Creates a new dialog which is just a popup
 		Dialog<Pair<String, String>> login = new Dialog<>();
 		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
-		login.getDialogPane().getButtonTypes()
-				.addAll(loginButtonType, ButtonType.CANCEL);
+		login.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 		login.setTitle("Login Dialog");
 		login.setHeaderText("GLOW Login");
 
@@ -1462,83 +1383,80 @@ public final class MainPageController implements Initializable {
 		login.show();
 
 		// The login button
-		Button login_button = (Button) login.getDialogPane().lookupButton(
-				loginButtonType);
+		Button login_button = (Button) login.getDialogPane().lookupButton(loginButtonType);
 
-		login_button
-				.addEventFilter(EventType.ROOT, e -> {
-					if (e.getEventType().equals(ActionEvent.ACTION)) {
-						e.consume();
-						GlowRequest req = new GlowRequest(username.getText(),
-								password.getText());
-						if (req.requestCookie()) {
+		login_button.addEventFilter(EventType.ROOT, e -> {
+			if (e.getEventType().equals(ActionEvent.ACTION)) {
+				e.consume();
+				GlowRequest req = new GlowRequest(username.getText(), password.getText());
+				login.setTitle("Connecting to Glow Server...Please wait");
+				if (req.requestCookie()) {
 
-							// Login worked, assign it as the current login
-							// session
-						request = req;
-						Task<Object> t = request;
-						// Pings the server to verify connection
-						new Thread(t).start();
+					// Login worked, assign it as the current login
+					// session
+					request = req;
+					Task<Object> t = request;
+					// Pings the server to verify connection
+					new Thread(t).start();
 
+					/*
+					 * Give a visual clue at the top of the UI that they are
+					 * currently logged into the server. They are actually never
+					 * really "logged in", we just keep using their initial
+					 * credentials to send further requests and automatically
+					 * renew the credentials as necessary.
+					 */
+					String loggedInHeaderString = "|   GLSeq2 User Interface   -  Currently logged in as "
+							+ username.getText() + "   |";
+					login.setTitle("Login Dialog");
+					Main.setStageTitle(loggedInHeaderString);
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Logged in");
+					alert.setHeaderText("You've been logged into GLOW!");
+					alert.setContentText(
+							"You will be connected to the GLOW server through this client until you either log off explicitly or close the application.");
+
+					alert.showAndWait();
+
+					/*
+					 * If the user has logged in and not entered a destination
+					 * directory, we'll just auto-populate this as being the
+					 * base of their own directory
+					 */
+					data_request_glow.setText(REQUEST_GLOW);
+					ref_request_glow.setText(REQUEST_GLOW);
+					if (destinationDirectory.getText() == "") {
+						destinationDirectory.setText("/home/GLBRCORG/" + username.getText());
+					}
+
+					// Close the dialog as it's job is now complete
+					login.close();
+
+					// If the login failed
+				} else {
+					// http://stackoverflow.com/questions/29911552/how-to-shake-a-login-dialog-in-javafx-8
+					try {
 						/*
-						 * Give a visual clue at the top of the UI that they are
-						 * currently logged into the server. They are actually
-						 * never really "logged in", we just keep using their
-						 * initial credentials to send further requests and
-						 * automatically renew the credentials as necessary.
+						 * Do a little shake animation. Also clears both the
+						 * fields and adds a red border around them to further
+						 * indicate that their credentials were wrong.
 						 */
-						String loggedInHeaderString = "|   GLSeq2 User Interface   -  Currently logged in as "
-								+ username.getText() + "   |";
-
-						Main.setStageTitle(loggedInHeaderString);
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setTitle("Logged in");
-						alert.setHeaderText("You've been logged into GLOW!");
-						alert.setContentText("You will be connected to the GLOW server through this client until you either log off explicitly or close the application.");
-
-						alert.showAndWait();
-
-						/*
-						 * If the user has logged in and not entered a
-						 * destination directory, we'll just auto-populate this
-						 * as being the base of their own directory
-						 */
-						data_request_glow.setText(REQUEST_GLOW);
-						ref_request_glow.setText(REQUEST_GLOW);
-						if (destinationDirectory.getText() == "") {
-							destinationDirectory.setText("/home/GLBRCORG/"
-									+ username.getText());
-						}
-
-						// Close the dialog as it's job is now complete
-						login.close();
-
-						// If the login failed
-					} else {
-						// http://stackoverflow.com/questions/29911552/how-to-shake-a-login-dialog-in-javafx-8
-						try {
-							/*
-							 * Do a little shake animation. Also clears both the
-							 * fields and adds a red border around them to
-							 * further indicate that their credentials were
-							 * wrong.
-							 */
-							ShakeTransition anim = new ShakeTransition(login
-									.getDialogPane(), null);
-							username.setText("");
-							username.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
-							password.setText("");
-							password.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
-							anim.playFromStart();
-						} catch (Exception a) {
-							// Do nothing
-							// Exceptions could be caused because of the null
-							// passed
-							// into the
-							// animation and this just removes the stack traces
-						}
+						login.setTitle("Login Dialog");
+						ShakeTransition anim = new ShakeTransition(login.getDialogPane(), null);
+						username.setText("");
+						username.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
+						password.setText("");
+						password.setStyle("-fx-border-color: red ; -fx-border-width: 1px ;");
+						anim.playFromStart();
+					} catch (Exception a) {
+						// Do nothing
+						// Exceptions could be caused because of the null
+						// passed
+						// into the
+						// animation and this just removes the stack traces
 					}
 				}
-			}	);
+			}
+		});
 	}
 }
