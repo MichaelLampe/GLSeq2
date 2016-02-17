@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,8 +11,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import com.jcabi.ssh.SSHByPassword;
-import com.jcabi.ssh.SSHD;
 import com.jcabi.ssh.Shell;
 
 import javafx.application.Platform;
@@ -271,6 +268,8 @@ public final class MainPageController implements Initializable {
 	private static final ToggleGroup fastqFiles = new ToggleGroup();
 	private static final ToggleGroup samGroup = new ToggleGroup();
 
+	boolean runningOnLinux = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).indexOf("nux") >= 0;
+
 	// The head tree items of both of alignment and counting for advanced
 	// options
 	private static TreeItem<String> alignment;
@@ -308,7 +307,11 @@ public final class MainPageController implements Initializable {
 		// try to log the user in
 		if (request == null) {
 			createLoginDialog();
-			return request.getUsername();
+			try {
+				return request.getUsername();
+			} catch (NullPointerException e) {
+				return null;
+			}
 		} else {
 			return request.getUsername();
 		}
@@ -491,7 +494,9 @@ public final class MainPageController implements Initializable {
 						if (request == null) {
 							// Log the user in and change the button name
 							createLoginDialog();
-						} else {
+						}
+						// Starts right away if they actually did login.
+						if (request != null) {
 							Task<Object> refReq = new GlowReferenceRequest(request, requestFor.getText());
 							/*
 							 * Run on a different thread so it doesn't lock up
@@ -509,7 +514,9 @@ public final class MainPageController implements Initializable {
 						if (request == null) {
 							// Log the user in and change the button name
 							createLoginDialog();
-						} else {
+						}
+						// Starts right away if they actually did login.
+						if (request != null) {
 							Task<Object> dataReq = new GlowDataRequest(request, requestFor.getText());
 							/*
 							 * Run on a different thread so it doesn't lock up
@@ -542,14 +549,15 @@ public final class MainPageController implements Initializable {
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> arg0, String arg1, String new_file) {
-
-					File dest = new File(new_file);
-					String color = "red";
-					if (dest.isDirectory() || dest.exists()) {
-						color = "green";
+					if (runningOnLinux) {
+						File dest = new File(new_file);
+						String color = "red";
+						if (dest.isDirectory() || dest.exists()) {
+							color = "green";
+						}
+						// Just a nice little border
+						fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
 					}
-					// Just a nice little border
-					fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
 				}
 			});
 		});
@@ -558,6 +566,7 @@ public final class MainPageController implements Initializable {
 		 * Adds the files in the given directory to the select file.
 		 */
 		dataDirectory.textProperty().addListener(new ChangeListener<String>() {
+
 			@Override
 			public void changed(ObservableValue<? extends String> arg0, String oldValue, String newValue) {
 				File folder = new File(newValue);
@@ -618,21 +627,26 @@ public final class MainPageController implements Initializable {
 		TextArea[] tempDirectoryMayBeWritable = { storageDestination, destinationDirectory };
 		List<TextArea> directoryMayBeWritable = Arrays.asList(tempDirectoryMayBeWritable);
 
-		directoryMayBeWritable.parallelStream().forEach((fileName) -> {
+		directoryMayBeWritable.parallelStream().forEach((fileName) ->
+
+		{
 			fileName.textProperty().addListener(new ChangeListener<String>() {
 				@Override
 				public void changed(ObservableValue<? extends String> arg0, String arg1, String arg2) {
-					File dest = new File(fileName.getText());
-					String color = "red";
-					if (dest.canWrite()) {
-						color = "green";
-					}
+					if (runningOnLinux) {
+						File dest = new File(fileName.getText());
+						String color = "red";
+						if (dest.canWrite()) {
+							color = "green";
+						}
 
-					// Just a nice little border
-					fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
+						// Just a nice little border
+						fileName.setStyle("-fx-border-color: " + color + " ; -fx-border-width: 2px ;");
+					}
 				}
 			});
 		});
+
 	}
 
 	private void fileSelectTree() {
@@ -745,6 +759,7 @@ public final class MainPageController implements Initializable {
 		List<CheckBox> modifyCountOptions = Arrays.asList(tempModifyCountOptions);
 		modifyCountOptions.parallelStream().forEach((checkBox) -> {
 			checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
 				@Override
 				public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
 					String countOptionName = checkBox.getText();
@@ -757,6 +772,7 @@ public final class MainPageController implements Initializable {
 						counting.getChildren().remove(countOptions.get(countOptionName));
 					}
 				}
+
 			});
 		});
 	}
@@ -986,6 +1002,15 @@ public final class MainPageController implements Initializable {
 		start_run.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent arg0) {
+				if (!runningOnLinux) {
+					if (request == null) {
+						createLoginDialog();
+						// They didn't login so don't try to run
+						if (request == null) {
+							return;
+						}
+					}
+				}
 				/*
 				 * Update absolutely everything.
 				 */
@@ -1017,12 +1042,10 @@ public final class MainPageController implements Initializable {
 					e.printStackTrace();
 				}
 
-				String operatingSystem = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-
 				/*
 				 * Running on Linux
 				 */
-				if (operatingSystem.indexOf("nux") >= 0) {
+				if (runningOnLinux) {
 					/*
 					 * Creates a run instance
 					 */
@@ -1030,6 +1053,13 @@ public final class MainPageController implements Initializable {
 					currentRun.constructArgs(htcondor_check.isSelected(), attributeFileLocation,
 							scriptDirectory.getText());
 					currentRun.start();
+
+					String command = currentRun.returnArgString();
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Job started");
+					alert.setHeaderText("You have launched a new local linux pipeline job");
+					alert.setContentText("Job launched with command \n'" + command + "'");
+					alert.showAndWait();
 				} else {
 					/*
 					 * Creates a run instance, condor always activated
@@ -1045,20 +1075,13 @@ public final class MainPageController implements Initializable {
 
 					RunInstantiator currentRun = constructRun();
 					currentRun.constructArgs(true, attributeFileLocationOnLinux, scriptDirectory.getText());
-
 					String command = currentRun.returnArgString();
-
-					int portNumber = 22;
 					// This throws a null pointer when you first hit it. Still
 					// working on how I want to resolve it. The application
 					// thread catches the pointer and doesn't crash and then the
 					// user just needs to hit it again after login and it is all
 					// ok, so it isn't that pressing of an issue.
-					String userName = getUsername();
-					String password = getPassword();
-					SSHByPassword sshSession;
 					try {
-						sshSession = new SSHByPassword(condorAddress, portNumber, userName, password);
 						// Transfer attribute file to server
 						System.out.println("Splitting command");
 						String[] attributeFileLines = attributeFileWriter.fullFileAsString().split("\n");
@@ -1074,22 +1097,36 @@ public final class MainPageController implements Initializable {
 								finalSend.append(line);
 							}
 						}
-
+						Alert alertInitial = new Alert(AlertType.INFORMATION);
+						alertInitial.setTitle("Sending job to server");
+						alertInitial.setHeaderText("Transfering attribute file to server and instantiating job");
+						alertInitial.setContentText(
+								"Another alert will occur when job has been successfully submitted to server");
+						// Nonblocking
+						alertInitial.show();
 						String toFile = "echo '" + finalSend.toString() + "' >> " + attributeFileLocationOnLinux;
 						System.out.println("Sent to the server: ");
 						System.out.println(toFile);
-						String response = new Shell.Plain(sshSession).exec(toFile);
+						String response = new Shell.Plain(request.establishSsh()).exec(toFile);
 						System.out.println("Server responded with: ");
 						System.out.println(response);
 						System.out.println("Finished writing attribute file");
-						new Thread(new Shell.Plain(sshSession).exec(command)).start();
+						new Thread(new Shell.Plain(request.establishSsh()).exec(command)).start();
 						System.out.println("Started job");
-					} catch (UnknownHostException e1) {
+						Alert alertFinal = new Alert(AlertType.INFORMATION);
+						alertFinal.setTitle("Job started");
+						alertFinal.setHeaderText("You have launched a Condor job");
+						alertFinal.setContentText("Job launched with command \n'" + command + "'");
+						alertFinal.showAndWait();
+
+					} catch (IOException e1) {
 						// TODO Auto-generated catch block
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setTitle("Unable to connect to Condor server");
+						alert.setHeaderText("Unable to establish connection");
+						alert.setContentText(
+								"Please check with the helpdesk about the current status of the Condor servers.  If this problem persists, please submit a ticket on this project's repository.");
 						e1.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 				}
 			}
@@ -1239,7 +1276,7 @@ public final class MainPageController implements Initializable {
 				if (request == null) {
 					createLoginDialog();
 				} else {
-					if (!request.getUsername().equals("")) {
+					if (!"".equals(request.getUsername())) {
 						logoutGlow();
 						createLoginDialog();
 					} else {
@@ -1389,16 +1426,26 @@ public final class MainPageController implements Initializable {
 			if (e.getEventType().equals(ActionEvent.ACTION)) {
 				e.consume();
 				GlowRequest req = new GlowRequest(username.getText(), password.getText());
+				request = req;
 				login.setTitle("Connecting to Glow Server...Please wait");
-				if (req.requestCookie()) {
 
-					// Login worked, assign it as the current login
-					// session
-					request = req;
-					Task<Object> t = request;
-					// Pings the server to verify connection
-					new Thread(t).start();
+				boolean loggedIn = false;
+				// Only request cookies when you really need it on windows
+				if (runningOnLinux) {
+					if (req.requestCookie()) {
+						// Login worked, assign it as the current login
+						// session
+						request = req;
+						Task<Object> t = request;
+						// Pings the server to verify connection
+						new Thread(t).start();
+						loggedIn = true;
+					}
+				} else {
+					loggedIn = req.establishSsh() != null;
+				}
 
+				if (loggedIn) {
 					/*
 					 * Give a visual clue at the top of the UI that they are
 					 * currently logged into the server. They are actually never
@@ -1456,6 +1503,7 @@ public final class MainPageController implements Initializable {
 						// animation and this just removes the stack traces
 					}
 				}
+
 			}
 		});
 	}

@@ -32,6 +32,7 @@ public class GlowRequest extends Task<Object> {
 	protected boolean runningOnLinux;
 	// If connected to GLOW by cookie and ping was true
 	protected boolean connected = false;
+	protected Shell localShell = null;
 
 	public GlowRequest(String username, String password) {
 		this.username = username;
@@ -49,10 +50,15 @@ public class GlowRequest extends Task<Object> {
 		}
 	}
 
-	Shell establishSsh() {
+	public Shell establishSsh() {
+		// Return already established shell
+		if (localShell != null) {
+			return localShell;
+		}
 		try {
 			try {
 				Shell shell = new SSHByPassword(sshServer, 22, this.username, this.password);
+				localShell = shell;
 				return shell;
 			} catch (IllegalArgumentException e) {
 				// Comes up if we try to log off after logging out.
@@ -237,7 +243,7 @@ public class GlowRequest extends Task<Object> {
 			Shell ssh = establishSsh();
 			try {
 				try {
-					String response = new Shell.Plain(ssh).exec("rm " + cookie);
+					new Shell.Plain(ssh).exec("rm " + cookie);
 				} catch (NullPointerException e) {
 					// Meh no cookie getting removed because they logged out or
 					// something. Cookie should already be removed if they

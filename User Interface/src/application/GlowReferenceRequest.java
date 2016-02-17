@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import com.jcabi.ssh.Shell;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class GlowReferenceRequest extends GlowRequest {
 
@@ -69,6 +71,19 @@ public class GlowReferenceRequest extends GlowRequest {
 	@Override
 	protected Object call() throws Exception {
 		/*
+		 * Cookie request takes a while, so give the alert prior to give a
+		 * notice to the user. Needs to run on platform thread so we call it as
+		 * a lambda.
+		 */
+		Platform.runLater(() -> {
+			Alert alertLooking = new Alert(AlertType.INFORMATION);
+			alertLooking.setTitle("Reference Files");
+			alertLooking.setHeaderText("Requesting Reference Files from GLOW Server");
+			alertLooking.setContentText("Another alert will occur when the files have been received.");
+			alertLooking.show();
+		});
+
+		/*
 		 * Check the cookie, if it is not good try to renew it
 		 */
 		if (renewCookieExpiration()) {
@@ -114,7 +129,6 @@ public class GlowReferenceRequest extends GlowRequest {
 				Shell ssh = establishSsh();
 				try {
 					System.out.println("Looking for files");
-
 					fileR = new BufferedReader(new StringReader(new Shell.Plain(ssh)
 							.exec(convertCommandToString((ArrayList<String>) requestReferenceFiles(reference_id)))));
 					nameR = new BufferedReader(new StringReader(new Shell.Plain(ssh)
@@ -136,7 +150,13 @@ public class GlowReferenceRequest extends GlowRequest {
 			 * from GLOW. If this doesn't work, they may have changed the format
 			 * of the response.
 			 */
-
+			Platform.runLater(() -> {
+				Alert alertReceived = new Alert(AlertType.INFORMATION);
+				alertReceived.setTitle("Received Reference Files");
+				alertReceived.setHeaderText("Files have been received from GLOW.");
+				alertReceived.setContentText("Fields populated with all data retrieved from GLOW for that ID");
+				alertReceived.show();
+			});
 			for (String line : commands) {
 				if (line.contains("name")) {
 					/*

@@ -11,9 +11,11 @@ import com.jcabi.ssh.Shell;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.Alert.AlertType;
 
 public class GlowDataRequest extends GlowRequest {
 	private String glow_id;
@@ -125,6 +127,21 @@ public class GlowDataRequest extends GlowRequest {
 
 	@Override
 	protected Object call() {
+		/*
+		 * Cookie request takes a while, so give the alert prior to give a
+		 * notice to the user. Needs to run on platform thread so we call it as
+		 * a lambda.
+		 */
+		Platform.runLater(() -> {
+			Alert alertLooking = new Alert(AlertType.INFORMATION);
+			alertLooking.setTitle("Data Files");
+			alertLooking.setHeaderText("Requesting Data Files from GLOW Server");
+			alertLooking.setContentText("Another alert will occur when the files have been received.");
+			alertLooking.show();
+		});
+		/*
+		 * Check the cookie, if it is not good try to renew it
+		 */
 		if (renewCookieExpiration()) {
 			String response = "";
 			if (runningOnLinux) {
@@ -149,7 +166,6 @@ public class GlowDataRequest extends GlowRequest {
 					//
 				}
 			} else {
-
 				Shell ssh = establishSsh();
 
 				try {
@@ -160,6 +176,13 @@ public class GlowDataRequest extends GlowRequest {
 					System.out.println("Error");
 				}
 			}
+			Platform.runLater(() -> {
+				Alert alertReceived = new Alert(AlertType.INFORMATION);
+				alertReceived.setTitle("Received Data Files");
+				alertReceived.setHeaderText("Files have been received from GLOW.");
+				alertReceived.setContentText("Fields populated with all data retrieved from GLOW for that ID");
+				alertReceived.show();
+			});
 			ArrayList<String> foundFiles = new ArrayList<String>();
 			String[] endingSplit = response.split("</file_path>");
 			try {
