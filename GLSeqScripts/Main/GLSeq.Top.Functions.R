@@ -12,7 +12,7 @@ create.text.add <- function(expID,runAttempt) {
 }
 
 # Destination directory for the processed files (if no connection to DB performed):
-create.dest.dir <- function(dest.dir.base,text.add){
+create.dest.dir <- function(dest.dir.base,text.add) {
   if(is.null(dest.dir.base) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir.base <- trailDirCheck(dest.dir.base)
   # Creates the destination directory.  It does so by going to the
@@ -24,7 +24,7 @@ create.dest.dir <- function(dest.dir.base,text.add){
 }
 
 # Destination directory for log /stat files:
-create.dest.dir.log <- function(dest.dir,text.add){
+create.dest.dir.log <- function(dest.dir,text.add) {
   if(is.null(dest.dir) || is.null(text.add)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
   # Let's call the status and log files folder .stat
@@ -169,7 +169,6 @@ create.Collect.folder <- function (dest.dir, text.add,Condor=FALSE){
   collectDir
 }
 
-
 # Copy attribute file into the destination directory for record keeping
 copy.attribute.file.to.dest <- function(attrPath,dest.dir,Condor=FALSE){
   if(is.null(dest.dir) || is.null(attrPath)) stop("Arguments should not be NULL")
@@ -192,6 +191,7 @@ create.run.logs <- function(destDirLog,text.add) {
   runErrFile1 <- paste(destDirLog, text.add, ".runErr1.txt", sep="")
   runErrFile2 <- paste(destDirLog, text.add, ".runErr2.txt", sep="")
 }
+
 ############################
 # Preparing data file names (ready for expression computation)
 ############################
@@ -208,7 +208,6 @@ fqfiles.table.pe.assemble <- function(fqfiles.base) {
     fqfiles.table <- rbind(fqfiles.table, c(left.fq, right.fq)) }
   fqfiles.table
 }
-
 
 # Rename processed files
 rename.preprocessed.files <- function(data.dir,readyData.dir,Condor=FALSE){
@@ -493,6 +492,7 @@ run.data.prep <- function(destDirLog,text.add,attrPath,dest.dir,base.dir,Condor=
   source("GLSeq.dataprep.R")
   relative.fqFiles
 }
+
 # Executes the communication stack
 execute.comm.stack <- function (comm.stack.pool, Condor=FALSE) {
   if (is.null(comm.stack.pool)) stop("Arguments should not be NULL")
@@ -507,6 +507,7 @@ previous.run.directories <- function(previous.dir,previous.run.name){
   dest.dir <- trailDirCheck(dest.dir)
   dest.dir
 }
+
 previous.run.FeatureCounts <- function(previous.dir,previous.run.name){
   if (is.null(previous.dir) || is.null(previous.run.name)) stop("Arguments should not be NULL")
   dest.dir <- previous.run.directories(previous.dir,previous.run.name)
@@ -514,6 +515,7 @@ previous.run.FeatureCounts <- function(previous.dir,previous.run.name){
   destDirFeatureCountsCount <-  paste(dest.dir,previous.run.name,".FeatureCounts.counting/", sep="")
   destDirFeatureCountsCount
 }
+
 previous.run.HTSeq <- function(previous.dir,previous.run.name){
   if (is.null(previous.dir) || is.null(previous.run.name)) stop("Arguments should not be NULL")
   dest.dir <- previous.run.directories(previous.dir,previous.run.name)
@@ -521,6 +523,7 @@ previous.run.HTSeq <- function(previous.dir,previous.run.name){
   destDirHTSeqCount <-  paste(dest.dir,previous.run.name,".HTSeq.counting/", sep="")
   destDirHTSeqCount
 }
+
 previous.run.RSEM <- function(previous.dir,previous.run.name){
   if (is.null(previous.dir) || is.null(previous.run.name)) stop("Arguments should not be NULL")
   dest.dir <- previous.run.directories(previous.dir,previous.run.name)
@@ -528,6 +531,7 @@ previous.run.RSEM <- function(previous.dir,previous.run.name){
   destDirRSEMCount <-  paste(dest.dir,previous.run.name,".RSEM.counting/", sep="")
   destDirRSEMCount
 }
+
 collect.counted.results <- function() {
   setwd(base.dir)
   source("GLSeq.ResultsCollect.R")

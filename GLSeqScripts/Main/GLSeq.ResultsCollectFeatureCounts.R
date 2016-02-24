@@ -1,7 +1,6 @@
 args <- commandArgs(trailingOnly = TRUE)
 load.file <- as.character(args[1])
 load(load.file)
-
 setwd(destDirFeatureCountsCount)
 #
 ###########################
@@ -75,10 +74,9 @@ write.csv(count.mtrx, file=featureCounts.counts.fName)
 #
 #
 # Load GTF file
-#
 reference.gtf <- paste(dest.dir,refGFFname,sep="")
 gtf <-  read.table(reference.gtf, sep="\t", header=FALSE, as.is=TRUE)
-mess <- gtf[,gtfFeatureColumn] # 9
+mess <- gtf[,9] # 9
 geneIDs.full <- idPull(mess, idAttr)
 lengthData <- cbind(gtf[,3:5], geneIDs.full) # columns: 1) feature, 2) start, 3) end, 4) ID
 lengthData <- lengthData[lengthData[,1] == "exon",]
@@ -99,11 +97,13 @@ for (multiexon in 1:length(names(duplicated.IDs.summary))) {
   data.multiexon[1,5] <- sum(data.multiexon[,5])
   lengthData <- rbind(lengthData, data.multiexon[1,])
 } # for multiexon
-#
+
+
 # End of multiple exons per gene summarization
 #
 lengthData <- lengthData[lengthData[,4] %in% rownames(count.mtrx),] # avoiding trouble with occasional NAs in the column 4 of the lengthData
 rownames(lengthData) <- lengthData[,4]
+
 # Sorting / restricting the count matrix based on the non-redundant ID vector:
 lengthData <- lengthData[rownames(count.mtrx),]
 for (normCol in 1:ncol(count.mtrx)) {
@@ -164,6 +164,7 @@ featureCounts.counts.graphTitle <- paste(text.add,",log10(counts+1",sep="")
 featureCounts.FPKM.graphTitle <- paste(text.add,",log10(FPKM+0.01",sep="")
 #
 graph.title <- paste(text.add,".FeatureCounts.BoxPlot.png",sep="")
+
 png(graph.title,width=1400,height=700)
 par(mfrow=c(1,2))
 boxplot(log10(featureCounts.counts + 1), main=featureCounts.counts.graphTitle)

@@ -55,19 +55,19 @@ public class GlowRequest extends Task<Object> {
 		if (localShell != null) {
 			return localShell;
 		}
+
 		try {
-			try {
-				Shell shell = new SSHByPassword(sshServer, 22, this.username, this.password);
-				localShell = shell;
-				return shell;
-			} catch (IllegalArgumentException e) {
-				// Comes up if we try to log off after logging out.
-				return null;
-			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			Shell shell = new SSHByPassword(sshServer, 22, this.username, this.password);
+
+			// Test connection
+			new Shell.Plain(shell).exec("echo 'test'");
+
+			localShell = shell;
+			return shell;
+		} catch (IllegalArgumentException | IOException e) {
+			// Comes up if we try to log off after logging out.
+			return null;
 		}
-		return null;
 	}
 
 	String getUsername() {
@@ -139,6 +139,7 @@ public class GlowRequest extends Task<Object> {
 		} else {
 			Shell ssh = establishSsh();
 			ArrayList<String> command = new ArrayList<String>() {
+
 				/**
 				 * 
 				 */
@@ -157,10 +158,15 @@ public class GlowRequest extends Task<Object> {
 				// This keeps the request off the main draw thread and also
 				// makes the request go a lot faster, win win.
 				new Thread(new Shell.Plain(ssh).exec(convertCommandToString(command))).start();
-			} catch (Exception e) {
+			} catch (
+
+			Exception e)
+
+			{
 				return false;
 			}
 			return true;
+
 		}
 	}
 

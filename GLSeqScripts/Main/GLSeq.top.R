@@ -68,11 +68,11 @@ source("GLSeq.Top.Functions.R")
 #
 # Some little fixes to make sure that Condor works.
 # Also assigns the nStreams to give the most parallel jobs
-if(is.na(Condor)){
+if(is.na(Condor)) {
   Condor <- FALSE
 }
 # Set to a really high number so that Condor can establish all of the computational resources most effectively. (Parallelize the most stuff)
-if(Condor){
+if(Condor) {
   nStreams <- 1000
   nStreamsDataPrep <- 1000
 }
@@ -110,28 +110,28 @@ if (!is.null(raw.dir)) raw.dir <- trailDirCheck(raw.dir)
 if (!is.null(readyData.dir)) readyData.dir <- trailDirCheck(readyData.dir)
 if (!is.null(picardToolsPath)) picardToolsPath <- trailDirCheck(picardToolsPath)
 
-if (alignment == "alignment" || counting == "counting"){
+if (alignment == "alignment" || counting == "counting") {
   #
-  if ("HTSeq" %in% cAlgor){
+  if ("HTSeq" %in% cAlgor) {
     destDirHTSeqCount <- create.HtSeq.folder(dest.dir,text.add,Condor)
   }
   #
-  if ("FeatureCounts" %in% cAlgor){
+  if ("FeatureCounts" %in% cAlgor) {
     destDirFeatureCountsCount <- create.FeatureCounts.folder(dest.dir,text.add,Condor)
   }
   #
-  if ("RSEM" %in% cAlgor){
+  if ("RSEM" %in% cAlgor) {
     destDirRSEMCount <- create.RSEM.folder(dest.dir,text.add,Condor)
   }
-  if ("Cufflinks" %in% cAlgor){
+  if ("Cufflinks" %in% cAlgor) {
     destDirCufflinksCount <- create.Cufflinks.folder(dest.dir, text.add,Condor)
   }
 }
 
-if (resCollect == "collect"){
-  if (alignment == "alignment" || counting == "counting"){
+if (resCollect == "collect") {
+  if (alignment == "alignment" || counting == "counting") {
     collectDir <- create.Collect.folder(dest.dir, text.add,Condor)
-  } else{
+  } else {
     collectDir <- create.Collect.folder(previous.dir,text.add,Condor)
   }
 }
@@ -192,55 +192,56 @@ if (length(cAlgor) > 0){
   move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "*.Counting ", cleanup.directory, sep=""))
 }
 
-if (aAlgor == "Rockhopper"){
+if (aAlgor == "Rockhopper") {
   move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "ReferenceGenome ", cleanup.directory, sep=""))
   move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "*RockhopperResults ", cleanup.directory, sep=""))
 }
 
-if (resCollect == "collect"){
+if (resCollect == "collect") {
   data.file <- paste(dest.dir,"collect.run.status.RData",sep="")
   save.image(file=data.file)
   move.files <- paste(move.files,";",paste("cp -r ", trailDirCheck(dest.dir), "*.Collect ", cleanup.directory, sep=""))
 
-  #
+  collect.command <- ""
   #############################################################################################
   ###############################          HTSeq             #################################
   #############################################################################################
-  if ("HTSeq" %in% cAlgor){
+  if ("HTSeq" %in% cAlgor) {
     collect.script <- paste(base.dir,"GLSeq.ResultsCollectHTSeq.R",sep="")
     collect.script.args <- paste(data.file)
     collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
   }
-  #
+
   #############################################################################################
   ###############################         Feature Counts      #################################
   #############################################################################################
-  if ("FeatureCounts" %in% cAlgor){
+  if ("FeatureCounts" %in% cAlgor) {
     collect.script <- paste(base.dir,"GLSeq.ResultsCollectFeatureCounts.R",sep="")
     collect.script.args <- paste(data.file)
     collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
   }
-  #
+
   #############################################################################################
   ###############################            RSEM             #################################
   #############################################################################################
-  if ("RSEM" %in% cAlgor){
+  if ("RSEM" %in% cAlgor) {
     collect.script <- paste(base.dir,"GLSeq.ResultsCollectRSEM.R",sep="")
     collect.script.args <- paste(data.file)
     collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
   }
-  #
+
   #############################################################################################
   ###############################          Cufflinks         #################################
   #############################################################################################
-  if ("Cufflinks" %in% cAlgor){
+  if ("Cufflinks" %in% cAlgor) {
     collect.script <- paste(base.dir,"GLSeq.ResultsCollectCufflinks.R",sep="")
     collect.script.args <- paste(data.file)
     # Currently disabled
     #collect.command <- paste(collect.command,"Rscript",collect.script,collect.script.args,"&")
   }
-  if (collect.script != ""){
-    if (is.null(comm.stack.pool)){
+
+  if (collect.script != "") {
+    if (is.null(comm.stack.pool)) {
       comm.stack.pool <- paste(collect.command)
     } else{
       comm.stack.pool <- paste(comm.stack.pool,"&&",paste("(",collect.command,")",sep=""))
@@ -251,7 +252,7 @@ if (resCollect == "collect"){
   save.image(file=data.file)
 }
 
-if (!is.null(comm.stack.pool)){
+if (!is.null(comm.stack.pool)) {
   comm.stack.pool <- paste(comm.stack.pool,"&& wait")
   comm.stack.pool <- paste(comm.stack.pool)
   execute.comm.stack(comm.stack.pool,Condor)

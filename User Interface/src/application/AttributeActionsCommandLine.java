@@ -42,7 +42,6 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 				attributeArray.remove(i);
 			}
 		}
-
 		for (int i = 0; i < attributeArray.size(); i++) {
 
 			/*
@@ -95,7 +94,6 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 					s += splitValues[i];
 				}
 			}
-
 			jsonKey += ", \"options\":[" + s + "]";
 		}
 		if (current.getDefault() != null) {
@@ -106,7 +104,6 @@ public final class AttributeActionsCommandLine extends AttributeFileWriter {
 		}
 		jsonKey += "}";
 		return jsonKey;
-
 	}
 
 	private String defaultNullIsEmpty(String defaultVal) {

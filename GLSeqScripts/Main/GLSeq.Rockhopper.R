@@ -13,7 +13,7 @@ indCopy <- paste("mkdir",rGenomeDestination,"&&","cp",paste(ref.dir,refFASTAname
 printOrExecute(indCopy,Condor)
 #
 # Small script I wrote that breaks fasta files into individual FNA files in the format that Rockhopper likes.
-convertReferenceGenome <- paste("python",paste(base.dir,"rhFnaConverter.py",sep=""),rGenomeDestination,refFASTAname,dest.dir)
+convertReferenceGenome <- paste("python", paste(base.dir,"rhFnaConverter.py",sep="") ,rGenomeDestination, refFASTAname,dest.dir)
 printOrExecute(convertReferenceGenome,Condor)
 # Creates ptt files from a single gtf file
 ref.dir <- paste(base.dir, rGenome, sep="")
@@ -24,7 +24,7 @@ printOrExecute(refCopy,Condor)
 gtfToPtt <- paste("python",paste(base.dir,"GtfToPtt.py",sep=""),refGtf,rGenomeDestination)
 printOrExecute(gtfToPtt,Condor)
 # check the environment over.  If a GTF file has 0 transcripts for a certain FASTA sequence, rockhopper will crash if that folder remains.
-checkEnvironment <- paste("python checkRhEnvironment.py",rGenomeDestination)
+checkEnvironment <- paste("python",paste(base.dir,"checkRhEnvironment.py",sep=""),rGenomeDestination)
 printOrExecute(checkEnvironment,Condor)
 # This needs to catch the output doesnt it
 #

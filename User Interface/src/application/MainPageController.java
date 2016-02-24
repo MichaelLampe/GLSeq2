@@ -1104,6 +1104,9 @@ public final class MainPageController implements Initializable {
 								"Another alert will occur when job has been successfully submitted to server");
 						// Nonblocking
 						alertInitial.show();
+						// Make sure the directory for the attribute file is there.
+						new Thread(new Shell.Plain(request.establishSsh()).exec("mkdir -p " + dest)).start();
+						
 						String toFile = "echo '" + finalSend.toString() + "' >> " + attributeFileLocationOnLinux;
 						System.out.println("Sent to the server: ");
 						System.out.println(toFile);

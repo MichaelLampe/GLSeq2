@@ -1,8 +1,4 @@
 __author__ = 'Michael Lampe'
-__version__ = "1.0.0"
-__maintainer__ = "Michael Lampe"
-__email__ = "MrLampe@Wisc.edu"
-__status__ = "Development"
 
 import re
 import os
@@ -34,12 +30,15 @@ class ResourceSummarizer:
         efficiency = dict()
         resources = dict()
         for log_file in self.log_files:
-            # Get the string "JOB##"
-            # It will be used as the key for all of this
-            # And also the label for the bars.
-            # The try is here in case we get a badly formed log file.
-            # This may occur primarily if we run the efficiency analyzer as a member of the DAG, in which case its log
-            #  file wouldn't be complete.
+
+            """
+            Get the string "JOB##"
+            It will be used as the key for all of this
+            And also the label for the bars.
+            The try is here in case we get a badly formed log file.
+            This may occur primarily if we run the efficiency analyzer as a member of the DAG, in which case its log
+            file wouldn't be complete.
+            """
             try:
                 job_number = self.parse_job_name(log_file)
                 job_numbers.append(job_number)
@@ -49,6 +48,7 @@ class ResourceSummarizer:
                 efficiency[job_number] = self.resource_efficiency(used, expected)
             except:
                 pass
+
         # After we have everything, plot it
         job_numbers = self.natural_sort(job_numbers)
         self.plot_visual(job_numbers, resources, efficiency)
