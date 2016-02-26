@@ -19,10 +19,11 @@ class CommandFile:
     Have access to a normal user environment (pretty much)
     Putting this up here means we only hit the system with 4 echo calls instead of a bunch
     """
-    def __init__(self,run_name,node):
+    def __init__(self, run_name, condor_path, node):
         # Keep track of how many command files we have
         CommandFile.file_count = CommandFile.file_count + 1
         # Just make the files based on the number of their command and the run name because it is easy.
+        self.condor_path = condor_path
         self.run_name = run_name
         self.file_name = run_name + "_Node" + str(node.number) + ".sh"
 
@@ -36,7 +37,7 @@ class CommandFile:
     Creates a template bash file with the given command node.
     """
     def generate_bash_file(self):
-        file = self.run_name + "/" + self.file_name
+        file = self.condor_path + self.run_name + "/" + self.file_name
 
         # Need to pass a string if using shell=True
         with open(file,"w") as command:

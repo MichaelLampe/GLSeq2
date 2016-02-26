@@ -211,7 +211,7 @@ class Graph:
     """
     Stuff for drawing usage stats
     """
-    def plot_graph(self, run_name):
+    def plot_graph(self, run_name, condor_path):
         # Graph one plots the memory utilization of various steps
         plt.figure(1, figsize=(30, 30))
         plt.axis("off")
@@ -219,7 +219,7 @@ class Graph:
         pos = nx.graphviz_layout(self.G)
         nx.draw_networkx(self.G, pos, k=10, with_labels=False, node_size=1500, node_color=self.memory_colors())
         nx.draw_networkx_labels(self.G, pos, labels=self.memory_labels())
-        plt.savefig(run_name + "/" + "CondorMemoryUtilization.png")
+        plt.savefig(condor_path + run_name + "/" + "CondorMemoryUtilization.png")
         plt.clf()
 
         # Graph two plots the CPU utilization of various steps
@@ -229,7 +229,7 @@ class Graph:
         pos = nx.graphviz_layout(self.G)
         nx.draw_networkx(self.G, pos, k=10, with_labels=False, node_size=1500, node_color=self.cpu_colors())
         nx.draw_networkx_labels(self.G, pos, self.cpu_labels())
-        plt.savefig(run_name + "/" + "CondorCpuUtilization.png")
+        plt.savefig(condor_path + run_name + "/" + "CondorCpuUtilization.png")
         plt.clf()
 
         # Graph three plots the GPU utilization of various steps
@@ -239,7 +239,7 @@ class Graph:
         pos = nx.graphviz_layout(self.G)
         nx.draw_networkx(self.G, pos, k=10, with_labels=False, node_size=1500, node_color=self.gpu_colors())
         nx.draw_networkx_labels(self.G, pos, self.gpu_labels())
-        plt.savefig(run_name + "/" + "CondorGpuUtilization.png")
+        plt.savefig(condor_path + run_name + "/" + "CondorGpuUtilization.png")
         plt.clf()
 
     """
@@ -401,11 +401,12 @@ class CommandProcessor:
         'wait',
     ]
 
-    def __init__(self, commands, run_name, script_path):
+    def __init__(self, commands, run_name, script_path, condor_path):
         # The list of all commands broken into the order they were sent
         self.run_name = run_name
         self.commands = commands
         self.script_path = script_path
+        self.condor_path = condor_path
         self.graph = Graph()
 
         # Precompile all the regex.  Goes faster.
@@ -567,6 +568,7 @@ class CommandProcessor:
             commands = re.split("\(|\)", commands)
             for x in xrange(0, len(commands)):
                 commands[x] = commands[x].strip()
+
             # Removes a junk split
             commands = [command for command in commands if command is not ""]
             new_nodes = [Node(command) for command in commands]

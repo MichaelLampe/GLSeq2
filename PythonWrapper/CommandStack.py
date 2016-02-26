@@ -40,9 +40,9 @@ def get_environment():
 """
 Creates the given directories for Condor
 """
-def create_condor_directories(run_name):
+def create_condor_directories(run_name, condor_path):
     # The names of all the directories
-    run = str(run_name) + "/"
+    run = condor_path + str(run_name) + "/"
     log_file_dir = run + "LogFile/"
     out_file_dir = run + "OutputFile/"
     err_file_dir = run + "ErrorFile/"
@@ -60,16 +60,19 @@ def create_condor_directories(run_name):
 
 
 class Stack:
-    def __init__(self, graph):
+    def __init__(self, graph, condor_path):
         # Graph containing all the commands after they have been organized
         self.graph = graph
+
+        self.condor_path = condor_path
+
         # Keeps track of the shell files created
         self.associated_bash_files = dict()
         # Keeps track of the dog jobs
         self.dag_jobs = dict()
 
     def plot_graph(self, run_name):
-        self.graph.plot_graph(run_name)
+        self.graph.plot_graph(run_name, self.condor_path)
 
     def create_stack(self, run_name):
         self._create_bash_files(run_name)
@@ -90,14 +93,14 @@ class Stack:
 
         # Topological sort is great for ordering these files in the order they will execute.
         for node in nx.topological_sort(self.graph.G):
-            new_command = CommandFile(run_name, node)
+            new_command = CommandFile(run_name, self.condor_path, node)
             bash_file = new_command.generate_bash_file()
             self.associated_bash_files[node] = (file_number, bash_file)
             file_number += 1
 
     def create_dag_jobs(self, run_name):
         # Creates the directories on the file system if they are not already created
-        self.log_file_dir, self.out_file_dir, self.err_file_dir = create_condor_directories(run_name)
+        self.log_file_dir, self.out_file_dir, self.err_file_dir = create_condor_directories(run_name, self.condor_path)
 
         # Topological sort is great for ordering these files in the order they will execute.
         for node in nx.topological_sort(self.graph.G):
@@ -105,10 +108,10 @@ class Stack:
 
             # If to run with a GPU or not (Moreso if to request one)
             if int(self.graph.G.node[node]['gpus']) >= 1:
-                current_job = Job((run_name + "/" + run_name + ".gpu.submit"), "JOB" +
+                current_job = Job((self.condor_path + run_name + "/" + run_name + ".gpu.submit"), "JOB" +
                                   str(self.associated_bash_files[node][0]))
             else:
-                current_job = Job((run_name + "/" + run_name + ".submit"), "JOB" +
+                current_job = Job((self.condor_path + run_name + "/" + run_name + ".submit"), "JOB" +
                                   str(self.associated_bash_files[node][0]))
 
             """
@@ -125,7 +128,8 @@ class Stack:
                 current_job.add_var("gpus", self.graph.G.node[node]['gpus'])
 
             # Run the created SH file
-            current_job.add_var("execute", "./" + run_name + "/" + self.associated_bash_files[node][1])
+
+            current_job.add_var("execute", self.condor_path + run_name + "/" + self.associated_bash_files[node][1])
             # Still need to add parent interactions, which is done in the comm stack
             self.dag_jobs[node] = current_job
 
@@ -142,12 +146,12 @@ class Stack:
         # Topological sort is great for ordering these files in the order they will execute.
         for node in nx.topological_sort(self.graph.G):
             mydag.add_job(self.dag_jobs[node])
-        self.dag_file = run_name + "/my_workflow.dag"
+        self.dag_file = self.condor_path + run_name + "/my_workflow.dag"
         mydag.save(self.dag_file)
 
     def create_submit_file(self, run_name):
         # Just create both submit files as this makes sure that the GPU condition is handled properly
-        submit_file_name = str(run_name + "/" + run_name + ".submit")
+        submit_file_name = str(self.condor_path + run_name + "/" + run_name + ".submit")
         environment = get_environment()
         with open(str(submit_file_name), 'w') as submit_file:
             submit_file.write("universe = vanilla\n")
@@ -163,7 +167,7 @@ class Stack:
 
         self.submit_file = submit_file_name
         # This is a special submit file that allows GPUs
-        submit_file_name = str(run_name + "/" + run_name + ".gpu.submit")
+        submit_file_name = str(self.condor_path + run_name + "/" + run_name + ".gpu.submit")
         environment = get_environment()
         with open(str(submit_file_name), 'w') as submit_file:
             submit_file.write("universe = vanilla\n")

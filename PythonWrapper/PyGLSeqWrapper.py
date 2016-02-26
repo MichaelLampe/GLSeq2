@@ -30,23 +30,25 @@ def clear_classes():
 
 def start_run(glseq_instance):
     commands = glseq_instance.run()
+
     # Creates the directory for the Dagman shell scripts and log files
     # Trims and groups commands
     script_path = glseq_instance.glseq_path.split("/")
     script_path = script_path[0:len(script_path) - 1]
     script_path = "/".join(script_path) + "/"
 
-    processor = CommandProcessor(commands, glseq_instance.run_name, script_path)
+    processor = CommandProcessor(commands, glseq_instance.run_name, script_path, glseq_instance.condor_path)
     # Puts the commands into an organized graph structure
     graph = processor.create_graph()
     # Starts a command stack which will do the processing moving forward
-    command_stack = Stack(graph)
+    command_stack = Stack(graph, glseq_instance.condor_path)
 
     # If MatPlotLib is available, create a nice graph.
     try:
         command_stack.plot_graph(glseq_instance.run_name)
     except:
         pass
+
     # Creates a new stack by a run name
     command_stack.create_stack(glseq_instance.run_name)
     # Submits the workflow to condor.
@@ -72,6 +74,16 @@ command = {
     "protocol_id" : ""
 }
 
+# ['/home/GLBRCORG/mrlampe/_GlowCurrent/Scripts/PyGLSeqWrapper.py',
+# 'Placeholder',
+# 'nodataprep',
+#  'alignment',
+# 'counting',
+# 'collect',
+#  'RunningOneWindows',
+#  '0',
+#  '/home/GLBRCORG/mrlampe/ssh/RunningOneWindows.R']
+
 # Based on the command line args, fill the command fields.
 try:
     command["glseq_path"] = sys.argv[1]
@@ -85,6 +97,7 @@ try:
         # We can exclude run name in directory runs.
         command["attribute_file_path"] = sys.argv[8]
         command["protocol_id"] = sys.argv[7]
+
     else:
         command["attribute_file_path"] = sys.argv[9]
         command["run_name"] = sys.argv[7]
@@ -122,14 +135,11 @@ if os.path.isdir(command["attribute_file_path"]):
                                        command["attribute_file_path"],
                                        "TRUE")
                 start_run(current_run)
-            except:
+            except Exception as e:
+                print e
                 print("Your attribute file " + current_att_file + " failed to run.")
                 pass
 else:
-    # Creates the directory for the Dagman shell scripts and log files
-    if not os.path.exists(os.path.dirname(command["run_name"] + "/")):
-        os.makedirs(os.path.dirname(command["run_name"] + "/"))
-
     # Creates a GLSeq wrapper run which will print out all the commands to be taken in by the python wrapper
     try:
         current_run = GlSeqRun(command["glseq_path"],
@@ -143,7 +153,9 @@ else:
                                command["attribute_file_path"],
                                "TRUE")
         start_run(current_run)
-    except:
+    except Exception as e:
+        print "The run name is : " + command["run_name"]
+        print e
         print("Your attribute file " + command["attribute_file_path"] + " failed to run.")
         exit(1)
 exit(0)

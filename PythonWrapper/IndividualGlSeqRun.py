@@ -1,6 +1,7 @@
 __author__ = 'Michael Lampe'
 
 import subprocess
+import os
 # The goal of this class is to create a wrapper from within which we can run
 # GLSeq and receive the output command
 
@@ -20,11 +21,22 @@ class GlSeqRun:
         self.attribute_file_path = attribute_file_path
         self.condor = condor
 
+        self.condor_path = attribute_file_path.split("/")
+        self.condor_path = self.condor_path[0:len(self.condor_path) - 1]
+        self.condor_path = "/".join(self.condor_path) + "/"
+
     def run(self):
         # Scarcity server uses Python 2.6, so we need to do it this way.
         output = subprocess.Popen(self.define_run_args(), stdout=subprocess.PIPE)
         out, err = output.communicate()
-        output_file = self.run_name + "/" + self.run_name + "_GLSeqOutput.txt"
+
+        directory = self.condor_path + self.run_name
+        print directory
+        # Create Directory
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        output_file = directory + "/" + self.run_name + "_GLSeqOutput.txt"
         with open(output_file, 'w') as log_file:
             if out is not None:
                 log_file.write("The output was:\n")

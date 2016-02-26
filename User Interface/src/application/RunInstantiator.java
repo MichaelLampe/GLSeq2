@@ -39,6 +39,7 @@ public class RunInstantiator {
 		if (Condor) {
 			args.add("python");
 			args.add(scriptsDirectory + "PyGLSeqWrapper.py");
+			args.add(scriptsDirectory + "GLSeq.top.R");
 			// RScript
 		} else {
 			args.add("Rscript");

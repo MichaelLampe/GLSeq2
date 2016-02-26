@@ -1108,13 +1108,16 @@ public final class MainPageController implements Initializable {
 						new Thread(new Shell.Plain(request.establishSsh()).exec("mkdir -p " + dest)).start();
 						
 						String toFile = "echo '" + finalSend.toString() + "' >> " + attributeFileLocationOnLinux;
+						
 						System.out.println("Sent to the server: ");
 						System.out.println(toFile);
 						String response = new Shell.Plain(request.establishSsh()).exec(toFile);
+						
 						System.out.println("Server responded with: ");
 						System.out.println(response);
 						System.out.println("Finished writing attribute file");
-						new Thread(new Shell.Plain(request.establishSsh()).exec(command)).start();
+						String re = new Shell.Plain(request.establishSsh()).exec(command);//).start();
+						System.out.println(re);
 						System.out.println("Started job");
 						Alert alertFinal = new Alert(AlertType.INFORMATION);
 						alertFinal.setTitle("Job started");
