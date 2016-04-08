@@ -20,10 +20,13 @@ class CommandFile:
     Putting this up here means we only hit the system with 4 echo calls instead of a bunch
     """
     def __init__(self, run_name, condor_path, node):
-        # Keep track of how many command files we have
-        CommandFile.file_count = CommandFile.file_count + 1
-        # Just make the files based on the number of their command and the run name because it is easy.
+        CommandFile.file_count = CommandFile.file_count + 1         # Keep track of how many command files we have
+
+        """
+        Just make the files based on the number of their command and the run name because it is easy.
+        """
         self.condor_path = condor_path
+
         self.run_name = run_name
         self.file_name = run_name + "_Node" + str(node.number) + ".sh"
 
@@ -37,17 +40,25 @@ class CommandFile:
     Creates a template bash file with the given command node.
     """
     def generate_bash_file(self):
+        """
+        Generates a bash file to execute the given command.
+        :return:
+        """
+
         file = self.condor_path + self.run_name + "/" + self.file_name
 
-        # Need to pass a string if using shell=True
+        """
+        Need to pass a string if using shell=True
+        """
         with open(file,"w") as command:
             """
             Write the bash header
             """
             command.write("#!/bin/bash\n\n")
 
-            for x in xrange(0,len(self.command_bundle)):
-                self.command_bundle[x] = self.command_bundle[x].replace("\"","")
+            for x in xrange(0, len(self.command_bundle)):
+                self.command_bundle[x] = self.command_bundle[x].replace("\"", "")
+
                 """
                 Write the command in with a new line
                 """
@@ -58,7 +69,7 @@ class CommandFile:
                 Not all of the commands have useful error messages
                 """
                 result = re.search(no_useful_error_messages,self.command_bundle[x])
-                if (result==None):
+                if result is None:
                     command.write(self.error_checking(x,self.command_bundle[x]))
 
             """
@@ -75,7 +86,12 @@ class CommandFile:
     """
     Adjust the files such that it makes the file executable.
     """
-    def create_executable(self,sh_file):
+    def create_executable(self, sh_file):
+        """
+        Construct a chmod command to give executable permissions
+        :return: The chmod command in the form of a list of whitespace separated words.
+        """
+
         command_list = list()
         command_list.append("chmod")
 
@@ -88,7 +104,12 @@ class CommandFile:
     Adds an error checking script to each command in the shell script
     Based on checking exit codes and if they are 0 or not.
     """
-    def error_checking(self,command_number,command):
+    def error_checking(self, command_number, command):
+        """
+        Construct a string which does error checking in the bash script.
+        :return: The error checking string
+        """
+
         error_check = "\n"
         error_check += "if [[ $? -ne 0 ]]; then\n"
         error_check += "  echo \"Step " + str(command_number) + " failed. The command was " + command + " Exiting now.\" \n"

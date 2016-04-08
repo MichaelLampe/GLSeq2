@@ -3,7 +3,7 @@ __author__ = 'Michael Lampe'
 import re
 import os
 import sys
-import numpy as np
+
 try:
     import matplotlib
 # Let's us run this without a display
@@ -86,7 +86,8 @@ class ResourceSummarizer:
                 return 100
             return a
 
-        size = np.arange(len(job_numbers))
+        size = range(len(job_numbers))
+
         figure = plt.figure(figsize=(20 ,20), dpi=600)
 
         # Subplot 1 - Usage and request side by side

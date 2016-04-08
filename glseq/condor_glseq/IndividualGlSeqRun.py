@@ -30,7 +30,18 @@ class GlSeqRun:
         output = subprocess.Popen(self.define_run_args(), stdout=subprocess.PIPE)
         out, err = output.communicate()
 
-        directory = self.condor_path + self.run_name
+        # If condor or not
+        if self.condor != "":
+            output = subprocess.Popen(self.define_run_args(), stdout=subprocess.PIPE)
+            out, err = output.communicate()
+            directory = self.condor_path + self.run_name
+        else:
+            # Run non condor as daemon.
+            args = self.define_run_args()
+            args.append("&")
+            subprocess.Popen(args)
+            return
+
         print directory
         # Create Directory
         if not os.path.exists(directory):

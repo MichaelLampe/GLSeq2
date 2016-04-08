@@ -13,9 +13,10 @@ import os
 Grabs a given file path based on a command
 """
 def get_paths(command):
-    # Grap the output of the echo $PATH command
+    # Grab the output of the echo $PATH command
     output = Popen(command, shell=True, stdout=PIPE)
     path_out, err = output.communicate()
+
     # Make sure connection is dead.
     try:
         output.kill()
@@ -77,10 +78,12 @@ class Stack:
     def create_stack(self, run_name):
         self._create_bash_files(run_name)
         self.create_dag_jobs(run_name)
+
         for node in self.graph.nodes():
             parents = self.graph.get_parents(node)
             for parent in parents:
                 self.dag_jobs[node].add_parent(self.dag_jobs[parent])
+
         self.create_dag_workflow(run_name)
         self.create_submit_file(run_name)
 
@@ -128,8 +131,8 @@ class Stack:
                 current_job.add_var("gpus", self.graph.G.node[node]['gpus'])
 
             # Run the created SH file
-
             current_job.add_var("execute", self.condor_path + run_name + "/" + self.associated_bash_files[node][1])
+
             # Still need to add parent interactions, which is done in the comm stack
             self.dag_jobs[node] = current_job
 
@@ -146,6 +149,7 @@ class Stack:
         # Topological sort is great for ordering these files in the order they will execute.
         for node in nx.topological_sort(self.graph.G):
             mydag.add_job(self.dag_jobs[node])
+
         self.dag_file = self.condor_path + run_name + "/my_workflow.dag"
         mydag.save(self.dag_file)
 
