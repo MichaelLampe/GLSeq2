@@ -7,7 +7,7 @@ InvalidJobObjectError: Thrown when add_job is called with an invalid pydagman.jo
 CircularDependencyError: Thrown when add_job would result in a circular dependency because
 the new_job already has the existing job as a parent
 """
-from pydagman.job import Job
+from glseq.condor_glseq.job import Job
 
 class Dagfile:
     """

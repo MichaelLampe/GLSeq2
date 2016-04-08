@@ -1,6 +1,5 @@
 __author__ = 'mlampe'
 
-import sys
 import copy
 import os
 import argparse
@@ -59,7 +58,7 @@ class GlSeq():
         """
         Condor mode
         """
-        if command_line_args.condor:
+        if command_line_args.get("condor"):
             command_line_args["condor"] = "TRUE"
         else:
             command_line_args["condor"] = ""
@@ -80,7 +79,7 @@ class GlSeq():
             # Only try running .R files.
             current_attribute_file_path = command_line_args["attribute_file_path"][file_number]
             if current_file.endswith(".R"):
-                if command_line_args.verbose:
+                if command_line_args.get("verbose"):
                     print "Attempting to run attribute file {0}".format(current_file)
 
                 current_att_file = current_attribute_file_path + current_file
@@ -115,7 +114,7 @@ class GlSeq():
                     # Start run
                     self.start_run(current_run)
 
-                    if command_line_args.verbose:
+                    if command_line_args.get("verbose"):
                         print "Successfully started run with attribute file {0}".format(current_commands["attribute_file_path"])
 
                 except Exception as e:
@@ -133,7 +132,7 @@ class GlSeq():
                                      command_line_args["attribute_file_path"] + \
                                      " failed to run.\n\n"
 
-                    if command_line_args.verbose:
+                    if command_line_args.get("verbose"):
                         print current_message
 
                     error_message += current_message
@@ -141,6 +140,9 @@ class GlSeq():
         return error_message
 
 if __name__ == "__main__":
+    print os.path.dirname(os.path.abspath(__file__))
+
+
     parser = argparse.ArgumentParser(description="Runs a GlSeq2 bioinformatic pipeline.\n")
 
     parser.add_argument("--condor",
@@ -154,7 +156,10 @@ if __name__ == "__main__":
 
     parser.add_argument('glseq_path',
                         type=str,
-                        help="Absolute path to the GlSeq scripts.\n")
+                        nargs="?",
+                        const = "/GLSeqScripts/Main/GLSeq.top.R",
+                        default= "/GLSeqScripts/Main/GLSeq.top.R",
+                        help="Absolute path to the GlSeq scripts.  Uses the setup.py installed version if nothing provided.\n")
 
     parser.add_argument('update_database',
                         type=str,
@@ -204,8 +209,6 @@ if __name__ == "__main__":
                         help="Unused currently, but planned to be used to retrieve attributes "
                              "from a protocol table in a database.  If you are not using a database,"
                              " the default value of 0 is used.\n")
-
-    print parser.parse_args()
     r = GlSeq()
-    return_message = r.start_run_instance(parser.parse_args())
+    return_message = r.start_run_instance(vars(parser.parse_args()))
     exit(return_message)

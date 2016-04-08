@@ -1,13 +1,15 @@
 __author__ = 'Michael Lampe'
 
 # Pydagman can be found at https://github.com/brandentimm/pydagman
-from pydagman.dagfile import Dagfile
-from pydagman.job import Job
 from subprocess import Popen
 from subprocess import PIPE
-from CommandFile import CommandFile
-import networkx as nx
 import os
+
+import networkx as nx
+
+from dagfile import Dagfile
+from job import Job
+from CommandFile import CommandFile
 
 """
 Grabs a given file path based on a command

@@ -9,3 +9,4 @@ description= 'GLBRC Customizable RNASeq Pipeline Platform'
 download_url = 'https://github.com/MichaelLampe/GlSeq2/tarball/2.0'
 keywords = ["GLBRC","rna", "rna_seq", "rna seq", "rna seq pipeline", "pipeline"]
 install_requires = ["networkx","matplotlib"]
+package_data = {'':['LICENSE']}
