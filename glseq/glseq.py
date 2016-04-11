@@ -69,8 +69,28 @@ class GlSeq():
         if os.path.isdir(command_line_args["attribute_file_path"]):
             attribute_file_path = self.trail_check(command_line_args["attribute_file_path"])
             command_line_args["attribute_file_path"] = os.listdir(attribute_file_path)
+            if len(command_line_args["attribute_file_path"]) <= 0:
+                return "No files available in attribute file directory supplied."
+
+            r_files = [file for file in command_line_args["attribute_file_path"] if file.endswith(".R")]
+            if len(r_files) <= 0:
+                return "No attributes files (Files ending with .R) available in attribute file directory supplied."
+
+
         else:
             command_line_args["attribute_file_path"] = [self.trail_check(command_line_args["attribute_file_path"])]
+            if not os.path.isfile(command_line_args["attribute_file_path"][0]):
+                return "Unable to locate attribute file supplied.  Please check whether supplied file exists.  " \
+                       "\n\nIf you meant to run a directory instead, we have determined that the directory you wanted does not exist as well." \
+                       "\n\nRemember to supply the absolute path."
+
+        """
+        Check if glseq path supplied
+        """
+        if command_line_args["glseq_path"] == "":
+            # Local version if pip installed
+            absolute_path = os.path.abspath("GLSeqScripts/Main/GLSeq.top.R")
+            command_line_args["glseq_path"] = absolute_path
 
         """
         Go through and start each run.
@@ -140,10 +160,9 @@ class GlSeq():
         return error_message
 
 if __name__ == "__main__":
-    print os.path.dirname(os.path.abspath(__file__))
-
-
-    parser = argparse.ArgumentParser(description="Runs a GlSeq2 bioinformatic pipeline.\n")
+    parser = argparse.ArgumentParser(description="Runs a GlSeq2 bioinformatic pipeline.\n  "
+                                                 "To utilize this pipeline with a graphical interface, "
+                                                 "try the command {0}\n".format("python -m glseq.glseq-gui"))
 
     parser.add_argument("--condor",
                        action="store_true",
@@ -211,4 +230,4 @@ if __name__ == "__main__":
                              " the default value of 0 is used.\n")
     r = GlSeq()
     return_message = r.start_run_instance(vars(parser.parse_args()))
-    exit(return_message)
+    exit("\nReturn Message: " + return_message + "\n")
