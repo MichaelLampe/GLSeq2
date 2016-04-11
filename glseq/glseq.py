@@ -69,13 +69,12 @@ class GlSeq():
         if os.path.isdir(command_line_args["attribute_file_path"]):
             attribute_file_path = self.trail_check(command_line_args["attribute_file_path"])
             command_line_args["attribute_file_path"] = os.listdir(attribute_file_path)
+
             if len(command_line_args["attribute_file_path"]) <= 0:
                 return "No files available in attribute file directory supplied."
 
-            r_files = [file for file in command_line_args["attribute_file_path"] if file.endswith(".R")]
-            if len(r_files) <= 0:
+            if len([file for file in command_line_args["attribute_file_path"] if file.endswith(".R")]) <= 0:
                 return "No attributes files (Files ending with .R) available in attribute file directory supplied."
-
 
         else:
             command_line_args["attribute_file_path"] = [self.trail_check(command_line_args["attribute_file_path"])]
@@ -90,7 +89,12 @@ class GlSeq():
         if command_line_args["glseq_path"] == "":
             # Local version if pip installed
             absolute_path = os.path.abspath("GLSeqScripts/Main/GLSeq.top.R")
-            command_line_args["glseq_path"] = absolute_path
+            if os.path.isfile(absolute_path):
+                command_line_args["glseq_path"] = absolute_path
+            else:
+                return "No copy of GLSeq.top.R supplied and no local copy installed. " \
+                       "The command \'pip install glseq\' installs a local copy of this file.  " \
+                       "You can then run this script as python -m glseq.glseq <options>"
 
         """
         Go through and start each run.
