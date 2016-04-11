@@ -77,7 +77,7 @@ class GlSeq():
                 return "No attributes files (Files ending with .R) available in attribute file directory supplied."
 
         else:
-            command_line_args["attribute_file_path"] = [self.trail_check(command_line_args["attribute_file_path"])]
+            command_line_args["attribute_file_path"] = [command_line_args["attribute_file_path"]]
             if not os.path.isfile(command_line_args["attribute_file_path"][0]):
                 return "Unable to locate attribute file supplied.  Please check whether supplied file exists.  " \
                        "\n\nIf you meant to run a directory instead, we have determined that the directory you wanted does not exist as well." \
@@ -153,7 +153,7 @@ class GlSeq():
                     current_message += str(e)
                     current_message += "\n\n"
                     current_message += "Your attribute file " + \
-                                     command_line_args["attribute_file_path"] + \
+                                     str(command_line_args["attribute_file_path"][file_number]) + \
                                      " failed to run.\n\n"
 
                     if command_line_args.get("verbose"):
@@ -176,13 +176,6 @@ if __name__ == "__main__":
                         action="store_true",
                         help="Outputs errors as they happen instead of at the end,"
                              " slightly more vocal about what is occuring.")
-
-    parser.add_argument('glseq_path',
-                        type=str,
-                        nargs="?",
-                        const = "/GLSeqScripts/Main/GLSeq.top.R",
-                        default= "/GLSeqScripts/Main/GLSeq.top.R",
-                        help="Absolute path to the GlSeq scripts.  Uses the setup.py installed version if nothing provided.\n")
 
     parser.add_argument('update_database',
                         type=str,
@@ -214,6 +207,13 @@ if __name__ == "__main__":
                         help="The absolute path to the attribute file which will be used to instantiate the pipeline.  "
                              "If the --condor option is active, you can also provide a directory containing multiple "
                              "attribute files to instantiate runs for all files within the directory.\n")
+
+    parser.add_argument('glseq_path',
+                        type=str,
+                        nargs="?",
+                        const = "/GLSeqScripts/Main/GLSeq.top.R",
+                        default= "/GLSeqScripts/Main/GLSeq.top.R",
+                        help="Absolute path to the GlSeq scripts.  Uses the setup.py installed version if nothing provided.\n")
 
     parser.add_argument('run_name',
                         type=str,
