@@ -10,14 +10,14 @@ reference.genome.folder <- paste(dest.dir,rGenome,sep="")
 create.directory <- paste("mkdir",reference.genome.folder)
 printOrExecute(create.directory,Condor)
 # Copies the fasta file into reference genome
-reference.fasta.location <- paste(base.dir,rGenome,refFASTAname,sep="")
+reference.fasta.location <- refFASTAname
 indCopy <- paste("cp",reference.fasta.location,reference.genome.folder)
 printOrExecute(indCopy,Condor)
 
 # Index
 star.path <- "/home/GLBRCORG/mrlampe/STAR/STAR"
 
-index <- paste(star.path,"--runMode genomeGenerate --genomeDir",reference.genome.folder,"--genomeFastaFiles",paste(reference.genome.folder,refFASTAname,sep=""))
+index <- paste(star.path,"--runMode genomeGenerate --genomeDir",reference.genome.folder,"--genomeFastaFiles",paste(reference.genome.folder,convertPathToName(refFASTAname),sep=""))
 if (Condor){
   paste(index,"--runThreadN 6")
 }

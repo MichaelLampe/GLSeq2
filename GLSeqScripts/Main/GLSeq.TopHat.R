@@ -16,7 +16,7 @@ file.name.change <- NULL
 ####################################
 # Copy genome indices to the destimation dir:
 ####################################
-indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 ####################
 
@@ -52,7 +52,7 @@ if (paired.end){
 #-f means FASTA input
 ####################
 IndexOptions <- paste("-f")
-index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
+index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,convertPathToName(refFASTAname),sep=""),paste(dest.dir,rGenome,sep=""))
 printOrExecute(index,Condor)
 #
 for (zz in 1:nStreams) {

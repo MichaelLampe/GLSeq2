@@ -55,13 +55,18 @@ protID <- as.character(args[7])
 attrPath <- as.character(args[8])
 #
 Condor <- as.logical(args[9])
-#
 # Naturally set to null, if the user would like they can activate
 # this log type in the cattribute file by assigning it.
 destDirTest <- NULL
 #
 source(attrPath)
 # Allows us to run the top script from anywhere instead of having to be within the RScript folder
+# If not assigned, we assume running via current dir
+if (base.dir == "") {
+  a <- commandArgs(trailingOnly = FALSE)
+  base.dir <- dirname(sub("--file=","",a[grep("--file",a)]))
+  print(base.dir)
+}
 setwd(base.dir)
 source("GLSeq.Util.R")
 source("GLSeq.Top.Functions.R")

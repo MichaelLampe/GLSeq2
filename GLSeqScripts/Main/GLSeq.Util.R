@@ -157,6 +157,12 @@ add.to.logs <- function(text="No Message Found",file=NULL){
   }
 }
 
+convertPathToName <- function(file.path) {
+  s <- unlist(strsplit(file.path , "/"))
+  name <- s[length(s)]
+  name
+}
+
 
 
 

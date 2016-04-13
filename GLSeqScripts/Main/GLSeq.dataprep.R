@@ -93,7 +93,7 @@ if (!presplit) {
 }
 # Copy the artificial.fq file in
 if (readTrim) {
-  copy.artificial.fq(base.dir,artificial.fq,dest.dir,Condor)
+  copy.artificial.fq(artificial.fq,dest.dir,Condor)
 }
 
 # Construct command to be run.
@@ -128,7 +128,7 @@ for (zz in 1:nStreamsDataPrep) {
       ######################################
       if (readTrim) {
         # The trim command
-        trimCommand <- trimAssemble.PE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
+        trimCommand <- trimAssemble.PE(fqFiles[j], trimPath, qScores, trimhead, convertPathToName(artificial.fq),trimMin)
 
         if (is.null(comm.pools)) {
           comm.pools <- paste(trimCommand)
@@ -180,7 +180,7 @@ for (zz in 1:nStreamsDataPrep) {
       if (readTrim) {
 
         # The trim command
-        trimCommand <- trimAssemble.SE(fqFiles[j], trimPath, qScores, trimhead, artificial.fq,trimMin)
+        trimCommand <- trimAssemble.SE(fqFiles[j], trimPath, qScores, trimhead, convertPathToName(artificial.fq),trimMin)
         if (is.null(comm.pools)) {
           comm.pools <- paste(trimCommand)
         } else {
@@ -237,7 +237,7 @@ for (zz in 1:nStreamsDataPrep) {
 }
 
 # Store stuff
-store.artificial <- store.artificial.seqs.file(paste(dest.dir,artificial.fq,sep=""),qcFolder)
+store.artificial <- store.artificial.seqs.file(paste(dest.dir,convertPathToName(artificial.fq),sep=""),qcFolder)
 comm.pool <- paste(comm.pool,"wait","&&", store.artificial)
 
 

@@ -4,7 +4,7 @@ source("GLSeq.Alignment.Functions.R")
 # The final return pool for the program
 comm.stack.pool <- NULL
 comm.stack.pools <- NULL
-indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 ####################
 # Index the Bowtie or Bowtie2 Aligner
@@ -16,10 +16,10 @@ printOrExecute(indCopy,Condor)
 ####################
 IndexOptions <- paste("-f")
 if (aAlgor == "Bowtie"){
-  index <- paste("bowtie-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
+  index <- paste("bowtie-build",IndexOptions,paste(dest.dir,convertPathToName(refFASTAname),sep=""),paste(dest.dir,rGenome,sep=""))
 }
 if (aAlgor == "Bowtie2"){
-  index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
+  index <- paste("bowtie2-build",IndexOptions,paste(dest.dir,convertPathToName(refFASTAname),sep=""),paste(dest.dir,rGenome,sep=""))
 }
 printOrExecute(index,Condor)
 #

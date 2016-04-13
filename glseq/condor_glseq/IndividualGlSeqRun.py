@@ -63,6 +63,7 @@ class GlSeqRun:
             output.kill()
         except:
             pass
+
         # The Rscript will give us a command output here.
         # This is just a big long string that we need to parse.
         return self.parse_command(out)
@@ -80,6 +81,13 @@ class GlSeqRun:
         run.append(self.protocol_id)
         run.append(self.attribute_file_path)
         run.append(self.condor)
+
+        # Serialize
+        for i in xrange(len(run)):
+            run[i] = str(run[i])
+
+        print run
+
         return run
 
     def parse_command(self,command):

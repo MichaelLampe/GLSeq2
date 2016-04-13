@@ -13,7 +13,13 @@ library(Rsubread)
 # Makes sure in the correct dir
 #############
 setwd(dest.dir)
-#
+
+convertPathToName <- function(file.path) {
+  s <- unlist(strsplit(file.path , "/"))
+  name <- s[length(s)]
+  name
+}
+
 #############
 # Reads output into a file
 #############
@@ -96,7 +102,7 @@ if (!is.na(countable.sam)) {
 
   fc <- featureCounts(
     files=countable.sam,
-    annot.ext=paste(dest.dir,refGFFname,sep=""),
+    annot.ext=paste(dest.dir,convertPathToName(refGFFname),sep=""),
     isGTFAnnotationFile=TRUE,
     GTF.featureType="exon",
     GTF.attrType="gene_id",

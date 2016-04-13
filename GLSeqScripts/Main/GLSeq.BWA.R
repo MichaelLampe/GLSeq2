@@ -1,12 +1,12 @@
 source("GLSeq.Util.R")
 source("GLSeq.Alignment.Functions.R")
 
-indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 ###################################################################################
 # Index the BWA
 ###################################################################################
-index <- paste(bwaPath, "index", paste(dest.dir,refFASTAname,sep=""))
+index <- paste(bwaPath, "index", paste(dest.dir,convertPathToName(refFASTAname),sep=""))
 printOrExecute(index,Condor)
 #
 # Declare both pools as nulls
@@ -35,13 +35,13 @@ for (zz in 1:nStreams) {
     # Two alignments happen no matter what, after the SAI file is made we can combine paired files into one SAM
     # file using some BWA tools.
     align.options <- paste("-t 8")
-    aln.left <- paste(bwaPath, "aln",align.options,alignmentSpecialOptions, paste(dest.dir,refFASTAname,sep=""), fq.left, ">", sainame.left)
-    if (paired.end) aln.right <- paste(bwaPath, "aln", alignmentSpecialOptions, paste(dest.dir,refFASTAname,sep=""), fq.right, ">", sainame.right)
+    aln.left <- paste(bwaPath, "aln",align.options,alignmentSpecialOptions, paste(dest.dir,convertPathToName(refFASTAname),sep=""), fq.left, ">", sainame.left)
+    if (paired.end) aln.right <- paste(bwaPath, "aln", alignmentSpecialOptions, paste(dest.dir,convertPathToName(refFASTAname),sep=""), fq.right, ">", sainame.right)
     # Sam File Creation
     # Sampe/Samse transforms a .sai file into a SAM file.
     # We take the output of the Sam*e program and appends the content to the unsorted SAM file
-    if (paired.end) sam.create <- paste(bwaPath, "sampe", paste(dest.dir,refFASTAname,sep=""), sainame.left, sainame.right, fq.left, fq.right, ">>", unsorted.sam)
-    if (!(paired.end)) sam.create <- paste(bwaPath, "samse", paste(dest.dir,refFASTAname,sep=""), sainame.left, fq.left, ">>", unsorted.sam)
+    if (paired.end) sam.create <- paste(bwaPath, "sampe", paste(dest.dir,convertPathToName(refFASTAname),sep=""), sainame.left, sainame.right, fq.left, fq.right, ">>", unsorted.sam)
+    if (!(paired.end)) sam.create <- paste(bwaPath, "samse", paste(dest.dir,convertPathToName(refFASTAname),sep=""), sainame.left, fq.left, ">>", unsorted.sam)
     ###################
     # SAM => BAM file with index
     ###################

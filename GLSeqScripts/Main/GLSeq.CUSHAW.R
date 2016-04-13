@@ -12,12 +12,12 @@ source("GLSeq.Alignment.Functions.R")
 
 comm.stack.pool <- NULL
 
-indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 # This will index the CUSHAW with your FASTA file, necessary.
 # Previously the user needed to do this, but it should be easier if we just take care of
 # This stuff on our end during each run (It is fast && cheap anyway)
-index <- paste(CUSHAW.index.path,"-a","bwtsw",paste(dest.dir,refFASTAname,sep=""))
+index <- paste(CUSHAW.index.path,"-a","bwtsw",paste(dest.dir,convertPathToName(refFASTAname),sep=""))
 ####################################
 # ~Hot~ system command to index aligner
 ####################################
@@ -73,8 +73,8 @@ if (aAlgor == "Cushaw_GPU"){
       if (nCores > 6) {
         warning("Too many cores can slow alignment.  Best results have been seen at 6 cores.")
       }
-      if (paired.end)  create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,refFASTAname,sep=""), "-q", fq.right, fq.left, "-o", unsorted.sam,"-t", nCores)
-      if (!(paired.end)) create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,refFASTAname,sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (paired.end)  create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,convertPathToName(refFASTAname),sep=""), "-q", fq.right, fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (!(paired.end)) create <- paste(CUSHAW.GPU.path, alignmentSpecialOptions, "-r", paste(dest.dir,convertPathToName(refFASTAname),sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
       # Checks to make sure that this process actually is GPU
       # The is.null is there for later on implementation of parallel GPU runs. (Hopefully!)
       if (is.null(sam.create)){
@@ -121,8 +121,8 @@ for (zz in 1:nStreams) {
       nCores <- 8
     }
     if (aAlgor == "Cushaw"){
-      if (paired.end) sam.create<- paste(CUSHAW.path, "-r", paste(dest.dir,refFASTAname,sep=""), "-q", fq.left, fq.right, "-o", unsorted.sam, "-t", nCores)
-      if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", paste(dest.dir,refFASTAname,sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
+      if (paired.end) sam.create<- paste(CUSHAW.path, "-r", paste(dest.dir,convertPathToName(refFASTAname),sep=""), "-q", fq.left, fq.right, "-o", unsorted.sam, "-t", nCores)
+      if (!paired.end) sam.create <- paste(CUSHAW.path, "-r", paste(dest.dir,convertPathToName(refFASTAname),sep=""), "-f", fq.left, "-o", unsorted.sam,"-t", nCores)
     }
     ###################
     # Convert BAM to sorted BAM file

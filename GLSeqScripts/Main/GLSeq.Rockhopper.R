@@ -9,11 +9,11 @@ if (seqPlatform != "illumina"){
 rGenome <- trailDirCheck(rGenome)
 ref.dir <- paste(base.dir, rGenome, sep="")
 rGenomeDestination <- paste(dest.dir,"ReferenceGenome",sep="")
-indCopy <- paste("mkdir",rGenomeDestination,"&&","cp",paste(ref.dir,refFASTAname,sep=""),rGenomeDestination)
+indCopy <- paste("mkdir",rGenomeDestination,"&&","cp",refFASTAname,rGenomeDestination)
 printOrExecute(indCopy,Condor)
 #
 # Small script I wrote that breaks fasta files into individual FNA files in the format that Rockhopper likes.
-convertReferenceGenome <- paste("python", paste(base.dir,"rhFnaConverter.py",sep="") ,rGenomeDestination, refFASTAname,dest.dir)
+convertReferenceGenome <- paste("python", paste(base.dir,"rhFnaConverter.py",sep=""), rGenomeDestination, convertPathToName(refFASTAname), dest.dir)
 printOrExecute(convertReferenceGenome,Condor)
 # Creates ptt files from a single gtf file
 ref.dir <- paste(base.dir, rGenome, sep="")

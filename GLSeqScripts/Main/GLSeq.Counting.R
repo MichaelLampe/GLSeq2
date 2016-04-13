@@ -18,7 +18,7 @@ if ("RSEM" %in% cAlgor){
   if (!occured){
     ref.dir <- paste(base.dir, rGenome, sep="")
     ref.dir <- trailDirCheck(ref.dir)
-    refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
+    refCopy <- paste("cp ", refGFFname," ",dest.dir, sep="")
     printOrExecute(refCopy,Condor)
   }
     occured <- TRUE
@@ -37,7 +37,7 @@ if ("HTSeq" %in% cAlgor){
   if (!occured){
     ref.dir <- paste(base.dir, rGenome, sep="")
     ref.dir <- trailDirCheck(ref.dir)
-    refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
+    refCopy <- paste("cp ",refGFFname," ",dest.dir, sep="")
     printOrExecute(refCopy,Condor)
   }
   occured <- TRUE
@@ -53,7 +53,7 @@ if ("Cufflinks" %in% cAlgor){
   if (!occured){
     ref.dir <- paste(base.dir, rGenome, sep="")
     ref.dir <- trailDirCheck(ref.dir)
-    refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
+    refCopy <- paste("cp ",refGFFname," ",dest.dir, sep="")
     printOrExecute(refCopy,Condor)
   }
   occured <- TRUE
@@ -69,7 +69,7 @@ if ("FeatureCounts" %in% cAlgor){
   if (!occured){
     ref.dir <- paste(base.dir, rGenome, sep="")
     ref.dir <- trailDirCheck(ref.dir)
-    refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
+    refCopy <- paste("cp ",refGFFname," ",dest.dir, sep="")
     printOrExecute(refCopy,Condor)
   }
   occured <- TRUE
@@ -116,7 +116,7 @@ if (aAlgor != "Rockhopper"){
     if (!occured) {
       ref.dir <- paste(base.dir, rGenome, sep="")
       ref.dir <- trailDirCheck(ref.dir)
-      refCopy <- paste("cp ",paste(ref.dir,refGFFname,sep="")," ",dest.dir, sep="")
+      refCopy <- paste("cp ",refGFFname," ",dest.dir, sep="")
       printOrExecute(refCopy,Condor)
     }
     occured <- TRUE

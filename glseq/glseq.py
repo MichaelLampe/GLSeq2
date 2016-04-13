@@ -86,7 +86,7 @@ class GlSeq():
         """
         Check if glseq path supplied
         """
-        if command_line_args["glseq_path"] == "":
+        if command_line_args["glseq_path"] is None:
             # Local version if pip installed
             absolute_path = os.path.abspath("GLSeqScripts/Main/GLSeq.top.R")
             if os.path.isfile(absolute_path):
@@ -106,16 +106,14 @@ class GlSeq():
                 if command_line_args.get("verbose"):
                     print "Attempting to run attribute file {0}".format(current_file)
 
-                current_att_file = current_attribute_file_path + current_file
-
                 # Copy array so we don't overwrite anything important.
                 current_commands = copy.deepcopy(command_line_args)
-                current_commands["attribute_file_path"] = current_att_file
+                current_commands["attribute_file_path"] =  current_attribute_file_path
 
                 try:
                     # Switch run name if more than 1 file running or run name not provided.
                     if (len(command_line_args["attribute_file_path"]) > 1) or (current_commands["run_name"] == ""):
-                        run_name = os.path.splitext(current_file)[0]
+                        run_name = current_file.split("/")[-1].replace(".R","")
                         current_commands["run_name"] = run_name
 
                     # Make directory if not currently in existence.
@@ -208,11 +206,10 @@ if __name__ == "__main__":
                              "If the --condor option is active, you can also provide a directory containing multiple "
                              "attribute files to instantiate runs for all files within the directory.\n")
 
+    # Default for this is defined above to get absolute path.
     parser.add_argument('glseq_path',
                         type=str,
                         nargs="?",
-                        const = "/GLSeqScripts/Main/GLSeq.top.R",
-                        default= "/GLSeqScripts/Main/GLSeq.top.R",
                         help="Absolute path to the GlSeq scripts.  Uses the setup.py installed version if nothing provided.\n")
 
     parser.add_argument('run_name',

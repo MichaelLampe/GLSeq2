@@ -3,13 +3,10 @@ source("GLSeq.Util.R")
 ####################################
 # Copy genome indices to the destination dir:
 ####################################
-copy.genome <- function(base.dir,rGenome,refFASTAname,dest.dir) {
-  if (is.null(base.dir) || is.null(rGenome) || is.null(refFASTAname) || is.null(dest.dir)) stop("Arguments should not be NULL")
+copy.genome <- function(refFASTAname,dest.dir) {
+  if (is.null(refFASTAname) || is.null(dest.dir)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
-  base.dir <- trailDirCheck(base.dir)
-  rGenome <- trailDirCheck(rGenome)
-  ref.dir <- paste(base.dir, rGenome, sep="")
-  indCopy <- paste("cp",paste(ref.dir,refFASTAname,sep=""),dest.dir)
+  indCopy <- paste("cp", refFASTAname,dest.dir)
 }
 
 countable.sam.name <- function(this.resName) {

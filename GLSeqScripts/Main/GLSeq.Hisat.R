@@ -5,11 +5,11 @@ hisat.directory <- trailDirCheck(hisat.path)
 
 comm.stack.pool <- NULL
 comm.stack.pools <- NULL
-indCopy <- copy.genome(base.dir,rGenome,refFASTAname,dest.dir)
+indCopy <- copy.genome(refFASTAname,dest.dir)
 printOrExecute(indCopy,Condor)
 
 hisat.builder.location <- paste(hisat.directory,"hisat-build",sep="")
-index <- paste("python",hisat.builder.location,paste(dest.dir,refFASTAname,sep=""),paste(dest.dir,rGenome,sep=""))
+index <- paste("python",hisat.builder.location,paste(dest.dir,convertPathToName(refFASTAname),sep=""),paste(dest.dir,rGenome,sep=""))
 printOrExecute(index,Condor)
 
 for (zz in 1:nStreams) {

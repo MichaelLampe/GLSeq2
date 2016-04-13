@@ -178,11 +178,10 @@ chunk.data.files.unsplit <- function(fqFiles,nStreamsDataPrep){
 }
 
 # Grabs the artificial fq sequence that the trimmomatic uses.
-copy.artificial.fq <- function(base.dir,artificial.fq,dest.dir,Condor=FALSE){
-  if (is.null(base.dir) || is.null(artificial.fq) || is.null(dest.dir)) stop("Arguments should not be NULL")
+copy.artificial.fq <- function(artificial.fq,dest.dir,Condor=FALSE){
+  if (is.null(artificial.fq) || is.null(dest.dir)) stop("Arguments should not be NULL")
   dest.dir <- trailDirCheck(dest.dir)
-  base.dir <- trailDirCheck(base.dir)
-  copy <- paste("cp",paste(base.dir,artificial.fq,sep=""),dest.dir)
+  copy <- paste("cp",artificial.fq,dest.dir)
   printOrExecute(copy,Condor)
   copy
 }
