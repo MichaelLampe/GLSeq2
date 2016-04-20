@@ -88,7 +88,13 @@ class GlSeq():
         """
         if command_line_args["glseq_path"] is None:
             # Local version if pip installed
-            absolute_path = os.path.abspath("GLSeqScripts/Main/GLSeq.top.R")
+            path = __file__.split("/")
+            path = path[:len(path)-1]
+            string_path = ""
+            for p in path:
+                string_path += p + "/"
+
+            absolute_path = os.path.abspath(string_path + "GLSeqScripts/Main/GLSeq.top.R")
             if os.path.isfile(absolute_path):
                 command_line_args["glseq_path"] = absolute_path
             else:

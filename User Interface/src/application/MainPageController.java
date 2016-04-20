@@ -178,6 +178,8 @@ public final class MainPageController implements Initializable {
 	@FXML
 	protected CheckBox htcondor_check;
 	@FXML
+	protected CheckBox python_module_glseq_source;
+	@FXML
 	protected CheckBox RSEM;
 	@FXML
 	protected CheckBox HTseq;
@@ -1015,7 +1017,14 @@ public final class MainPageController implements Initializable {
 				 * Update absolutely everything.
 				 */
 				UpdateAttributeSingleton.getInstance().updateAllAttributes(alignment, counting, load, liblistData);
-
+				if (python_module_glseq_source.isSelected()){
+					try {
+						UpdateAttributeSingleton.getInstance().clearBaseDir();
+					} catch (NoSuchKeyInAttributeFactoryException e) {
+						System.out.println("Base.dir not found");
+					}
+				}
+				
 				AttributeFileWriter attributeFileWriter = new AttributeFileWriter();
 
 				/*
@@ -1050,7 +1059,7 @@ public final class MainPageController implements Initializable {
 					 * Creates a run instance
 					 */
 					RunInstantiator currentRun = constructRun();
-					currentRun.constructArgs(htcondor_check.isSelected(), attributeFileLocation,
+					currentRun.constructArgs(htcondor_check.isSelected(), python_module_glseq_source.isSelected(), attributeFileLocation,
 							scriptDirectory.getText());
 					currentRun.start();
 
@@ -1074,7 +1083,7 @@ public final class MainPageController implements Initializable {
 					;
 
 					RunInstantiator currentRun = constructRun();
-					currentRun.constructArgs(true, attributeFileLocationOnLinux, scriptDirectory.getText());
+					currentRun.constructArgs(true, python_module_glseq_source.isSelected(), attributeFileLocationOnLinux, scriptDirectory.getText());
 					String command = currentRun.returnArgString();
 					// This throws a null pointer when you first hit it. Still
 					// working on how I want to resolve it. The application
@@ -1115,7 +1124,7 @@ public final class MainPageController implements Initializable {
 						
 						System.out.println("Server responded with: ");
 						System.out.println(response);
-						System.out.println("Finished writing attribute file");
+						System.out.println("Finished writing attribute file");					
 						String re = new Shell.Plain(request.establishSsh()).exec(command);//).start();
 						System.out.println(re);
 						System.out.println("Started job");

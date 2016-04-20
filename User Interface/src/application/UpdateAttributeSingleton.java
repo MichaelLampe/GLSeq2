@@ -265,6 +265,9 @@ public class UpdateAttributeSingleton {
 		UpdateAttributeSingleton.getInstance().updateLiblist(libListData);
 		UpdateAttributeSingleton.getInstance().addSpecialArgs(alignment,
 				counting, commandHolder);
-
+	}
+	
+	public void clearBaseDir() throws NoSuchKeyInAttributeFactoryException{
+		AttributeFactorySingleton.getInstance().setAttributeValue("base.dir", "");
 	}
 }

@@ -223,7 +223,7 @@
                            </tooltip>
                         </TextArea>
                         <Button fx:id="ref_request_glow" layoutX="611.0" layoutY="105.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="248.0" text="Request from GLOW" />
-                        <Text fill="WHITE" layoutX="13.0" layoutY="290.0" strokeType="OUTSIDE" strokeWidth="0.0" text="FASTA File Name">
+                        <Text fill="WHITE" layoutX="13.0" layoutY="290.0" strokeType="OUTSIDE" strokeWidth="0.0" text="FASTA Absolute File Path">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -233,7 +233,7 @@
                               <Font size="18.0" />
                            </font>
                         </Text>
-                        <Text fill="WHITE" layoutX="13.0" layoutY="380.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GTF File Name">
+                        <Text fill="WHITE" layoutX="13.0" layoutY="380.0" strokeType="OUTSIDE" strokeWidth="0.0" text="GTF Absolute File Path">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -485,6 +485,14 @@
                               <Font size="18.0" />
                            </font>s
                         </Label>
+                        <CheckBox fx:id="python_module_glseq_source" layoutX="17.0" layoutY="237.0" mnemonicParsing="false" prefHeight="99.0" prefWidth="831.0" text="Use Python Module" textFill="WHITE">
+                           <font>
+                              <Font size="27.0" />
+                           </font>
+                           <tooltip>
+                              <Tooltip text="HTCondor runs GLSeq2 as a DAG file.  " />
+                           </tooltip>
+                        </CheckBox>
                      </children>
                   </AnchorPane>
                </content>

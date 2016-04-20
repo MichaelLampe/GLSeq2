@@ -30,23 +30,32 @@ public class RunInstantiator {
 		return runs_count;
 	}
 
-	public void constructArgs(boolean Condor, String attribute_file,
+	public void constructArgs(boolean Condor, boolean pythonModule, String attribute_file,
 			String scriptsDirectory) {
 		// Condor Wrapper to run via Condor
 		if (!scriptsDirectory.endsWith("/")) {
 			scriptsDirectory = scriptsDirectory + "/";
 		}
 		if (Condor) {
+			if (pythonModule){
+				args.add("python -m glseq.glseq");
+			} else{
 			args.add("python");
 			args.add(scriptsDirectory + "PyGLSeqWrapper.py");
 			args.add(scriptsDirectory + "GLSeq.top.R");
+			}
 			// RScript
 		} else {
-			args.add("Rscript");
-			args.add(scriptsDirectory + "GLSeq.top.R");
+			if (pythonModule){
+				args.add("python -m glseq.glseq");
+			} else{
+				args.add("Rscript");
+				args.add(scriptsDirectory + "GLSeq.top.R");
+			}
 		}
+		
 		// Where update was, might add to here later
-		args.add("Placeholder");
+		args.add("noupdate");
 
 		// Dataprep
 		if (dataprep)
@@ -73,12 +82,16 @@ public class RunInstantiator {
 			args.add("nocollect");
 
 		// This means it is a directory, so we don't assign a name
-		if (!attribute_file.endsWith("/")) {
-			args.add(this.run_name);
+		if (!pythonModule){
+			if (!attribute_file.endsWith("/")) {
+				args.add(this.run_name);
+			}
 		}
 
 		// Protocol ID
-		args.add("0");
+		if (!pythonModule){
+			args.add("0");
+		}
 
 		// Attribute File
 		args.add(attribute_file);
@@ -100,12 +113,15 @@ public class RunInstantiator {
 			/*
 			 * Might add some logic in the future that starts an SSH on
 			 * windows/mac
-			 */
+			 */		
+			
+
 			Task<Object> task = new GlSeqRunWorker(args);
 			// Run on a different thread so it doesn't lock up the UI.
 			Thread thread = new Thread(task);
 			thread.setDaemon(true);
 			thread.start();
+			
 		} else {
 			System.out.println("Please select something for the script to do.");
 		}
